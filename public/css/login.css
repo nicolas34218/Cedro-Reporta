@@ -1,0 +1,371 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.left,
+.right {
+    width: 50%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left {
+    background: #2F6B3F;
+    color: white;
+}
+
+.right {
+    background: #ffffff;
+}
+
+.left-content {
+    max-width: 400px;
+}
+
+.card {
+    background: white;
+    padding: 35px;
+    border-radius: 12px;
+    width: 360px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.right {
+    width: 50%;
+    min-height: 100vh;
+    background: #f7f7ef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    background: #ffffff;
+    width: 360px;
+    max-width: 90%;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ecebe4;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #2F6B3F;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.brand-mark {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.card h2 {
+    text-align: center;
+    font-size: 22px;
+    color: #23412f;
+    margin-bottom: 4px;
+}
+
+.card p {
+    text-align: center;
+    font-size: 12px;
+    color: #8a8a8a;
+    margin-bottom: 22px;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #67756b;
+    margin-bottom: 6px;
+    letter-spacing: 0.4px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    height: 42px;
+    border: none;
+    border-radius: 2px;
+    background: #e4e4e4;
+    padding: 0 42px 0 12px;
+    font-size: 13px;
+    color: #2b2b2b;
+}
+
+.input-group input:focus {
+    outline: 1px solid #2F6B3F;
+    background: #ececec;
+}
+
+.icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #222;
+}
+
+.forgot {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: #2F6B3F;
+    text-decoration: none;
+    margin-top: -6px;
+    margin-bottom: 14px;
+}
+
+.primary {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 4px;
+    background: #2F6B3F;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    color: #b8b8b8;
+    font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e4e4e4;
+}
+
+.secondary {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #2F6B3F;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #2F6B3F;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Lado Esquerdo */
+.left {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f4f2f 0%, #1e6038 45%, #2f6b3f 100%);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.06), transparent 45%);
+    pointer-events: none;
+}
+
+.left-content {
+    position: relative;
+    z-index: 2;
+    width: min(420px, 80%);
+    transform: translateY(-36px);
+}
+
+.logo {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: #e0ad1b;
+    color: #111;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 22px;
+}
+
+.left h1 {
+    text-align: center;
+    font-size: 40px;
+    line-height: 1.1;
+    font-weight: 700;
+}
+
+.left h1 span {
+    color: #f2b827;
+}
+
+.left p {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 26px;
+    opacity: 0.75;
+    font-style: italic;
+}
+
+.stars {
+    text-align: center;
+    color: #f2b827;
+    letter-spacing: 6px;
+    margin: 14px 0 42px;
+    font-size: 12px;
+}
+
+/* Listagem */
+.left ul {
+    list-style: none;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+.left ul li {
+    position: relative;
+    padding-left: 16px;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 21px;
+}
+
+.left ul li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f2b827;
+}
+
+/* Rodapé */
+.skyline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 135px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 22px;
+    z-index: 1;
+}
+
+.building {
+    width: 28px;
+    border: 1px solid rgba(12, 41, 25, 0.55);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: rgba(45, 113, 67, 0.38);
+    position: relative;
+}
+
+.building::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 12px;
+    bottom: 14px;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(12, 41, 25, 0.35) 0 2px,
+        transparent 2px 14px
+    );
+}
+
+.b1  { height: 95px; }
+.b2  { height: 112px; }
+.b3  { height: 54px; }
+.b4  { height: 64px; }
+.b5  { height: 96px; }
+.b6  { height: 66px; }
+.b7  { height: 78px; }
+.b8  { height: 96px; }
+.b9  { height: 54px; }
+.b10 { height: 77px; }
+.b11 { height: 96px; }
+.b12 { height: 66px; }
+
+/* Responsividade */
+
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .left,
+    .right {
+        width: 100%;
+        min-height: auto;
+        padding: 40px 20px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 420px;
+    }
+}
+
+@media (max-width: 900px) {
+    .left-content {
+        transform: translateY(0);
+        width: min(420px, 92%);
+    }
+
+    .left h1 {
+        font-size: 34px;
+    }
+
+    .left p {
+        font-size: 20px;
+    }
+
+    .left ul li {
+        font-size: 17px;
+    }
+
+    .skyline {
+        height: 96px;
+    }
+}
