@@ -5,6 +5,7 @@
     <title>Login</title>
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <div class="container">
@@ -51,14 +52,17 @@
                  <form>
                     <label for="email">E-MAIL</label>
                     <div class="input-group">
-                        <input id="email" type="email" placeholder="usuario@gmail.com">
-                        <span class="icon">✉</span>
-                    </div>
+                        <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
+                        <input id="email" name="email" type="email" placeholder="usuario@gmail.com" autocomplete="email">
+                    </div>  
 
                     <label for="senha">SENHA</label>
                     <div class="input-group">
-                        <input id="senha" type="password" placeholder="******">
-                        <span class="icon">🔒</span>
+                        <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+                        <input id="senha" name="senha" type="password" placeholder="******" autocomplete="current-password">
+                        <button type="button" class="toggle-password" aria-label="Mostrar senha" aria-pressed="false">
+                            <i class="bi bi-eye"></i>
+                        </button>
                     </div>
 
                     <a href="#" class="forgot">Esqueci minha senha</a>
@@ -72,5 +76,27 @@
             </div>
         </div>
     </div>
+
+<script>
+    const toggleBtn = document.querySelector('.toggle-password');
+    const passwordInput = document.querySelector('#senha');
+
+    if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+            const isPassword = passwordInput.type === 'password';
+
+            passwordInput.type = isPassword ? 'text' : 'password';
+            this.setAttribute('aria-pressed', String(isPassword));
+            this.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+
+            if (icon) {
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
+            }
+        });
+    }
+</script>
+
 </body>
 </html>
