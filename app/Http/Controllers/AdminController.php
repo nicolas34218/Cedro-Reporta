@@ -14,16 +14,6 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
     /**
-     * Construtor do controller.
-     * Aplica middleware de autenticação e autorização.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('admin.only');
-    }
-
-    /**
      * Exibe o painel administrativo com resumo das denúncias.
      *
      * Subtasks validadas:
