@@ -50,17 +50,18 @@
                 <h2>Bem-vindo(a) de volta</h2>
                 <p>Faça login para acessar sua conta</p>
 
-                 <form>
+                 <form action="{{ route('login.store') }}" method="post">
+                    @csrf
                     <label for="email">E-MAIL</label>
                     <div class="input-group">
                         <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
                         <input id="email" name="email" type="email" placeholder="usuario@gmail.com" autocomplete="email">
                     </div>  
 
-                    <label for="senha">SENHA</label>
+                    <label for="password">SENHA</label>
                     <div class="input-group">
                         <i class="bi bi-lock input-icon" aria-hidden="true"></i>
-                        <input id="senha" name="senha" type="password" placeholder="******" autocomplete="current-password">
+                        <input id="password" name="password" type="password" placeholder="******" autocomplete="current-password">
                         <button type="button" class="toggle-password" aria-label="Mostrar senha" aria-pressed="false">
                             <i class="bi bi-eye"></i>
                         </button>
