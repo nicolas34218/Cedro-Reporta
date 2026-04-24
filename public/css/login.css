@@ -198,7 +198,11 @@ label {
 }
 
 .secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
+    padding: 10px;
     height: 40px;
     border: 1px solid var(--brand-green);
     border-radius: 4px;
@@ -206,6 +210,13 @@ label {
     color: var(--brand-green);
     font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.secondary:hover {
+    background: rgba(47, 107, 63, 0.05);
+    border-color: var(--brand-green);
 }
 
 /* Lado Esquerdo */
