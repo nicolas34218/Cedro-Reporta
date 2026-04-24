@@ -49,20 +49,20 @@ Route::prefix('admin')->name('admin.')->controller(AdminController::class)->grou
     // Dashboard - resumo das denúncias
     Route::get('/dashboard', 'dashboard')
         ->name('dashboard')
-        ->middleware('auth');
+        ->middleware(['auth', 'admin.only']);
 
     // Lista de denúncias
     Route::get('/reports', 'listReports')
         ->name('reports')
-        ->middleware('auth');
+        ->middleware(['auth', 'admin.only']);
 
     // Detalhes da denúncia
     Route::get('/reports/{id}', 'showReport')
         ->name('report.show')
-        ->middleware('auth');
+        ->middleware(['auth', 'admin.only']);
 
     // Atualizar status da denúncia
     Route::put('/reports/{id}/status', 'updateReportStatus')
         ->name('report.status')
-        ->middleware('auth');
+        ->middleware(['auth', 'admin.only']);
 });
