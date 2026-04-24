@@ -5,7 +5,7 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 /**
- * Rota de boas-vindas
+ * Rota inicial / dashboard
  */
 Route::get('/', function () {
     return view('welcome');

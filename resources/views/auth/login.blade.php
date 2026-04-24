@@ -73,7 +73,7 @@
 
                 <div class="divider">ou</div>
 
-                <button class="secondary" type="button">Criar conta</button>
+                <a href="{{ route('register') }}" class="secondary" role="button">Criar conta</a>
             </div>
         </div>
     </div>
