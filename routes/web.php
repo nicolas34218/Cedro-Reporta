@@ -12,6 +12,13 @@ Route::get('/', function () {
 })->name('welcome');
 
 /**
+ * Rota Home / Cidadão
+ */
+Route::get('/home', function () {
+    return view('citizen.home');
+})->name('citizen.home')->middleware('auth');
+
+/**
  * Rotas de autenticação
  */
 Route::controller(AuthController::class)->group(function () {

@@ -53,7 +53,7 @@ class AuthController extends Controller
             Auth::login($user);
 
             return redirect()
-                ->route('welcome')
+                ->route('citizen.home')
                 ->with('success', 'Cadastro realizado com sucesso! Bem-vindo ao Cedro Reporta.');
         } catch (\Exception $e) {
             return back()
@@ -108,7 +108,7 @@ class AuthController extends Controller
         }
 
         return redirect()
-            ->route('welcome')
+            ->route('citizen.home')
             ->with('success', 'Login realizado com sucesso!');
     }
 
