@@ -40,7 +40,7 @@ Abra `http://localhost/phpmyadmin/` e crie um banco chamado `cedro_reporta`
 ### 5. Rodar Migrations e Seeds
 ```bash
 php artisan migrate
-php artisan db:seed
+php artisan migrate:fresh --seed
 ```
 
 ### 6. Iniciar Servidor
