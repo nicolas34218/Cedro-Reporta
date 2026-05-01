@@ -1,66 +1,85 @@
-:root {
-    --bg-soft: #f2f5ec;
-    --brand-green: #2f6b3f;
-    --text-primary: #2d3436;
-    --danger-bg: #ffe8e8;
-    --danger-text: #c0392b;
+:root{
+  --brand-green:#2F6B3F;
+  --bg-soft:#F2F5EC;
+  --card-bg:#fff;
+  --text:#2d3436;
+  --muted:#6b6f6b;
+  --accent:#f2b827;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Inter', sans-serif;
+  background:var(--bg-soft);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-body {
-    min-height: 100vh;
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-soft);
-    color: var(--text-primary);
+/* Header */
+.citizen-header{
+  background:var(--brand-green);
+  color:#fff;
+  padding:12px 18px;
 }
-
-.home-container {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    text-align: center;
+.container-header{
+  max-width:1100px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand .logo{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:var(--brand-green);font-weight:800}
+.brand-name{font-size:18px}
+.brand-name span{color:var(--accent)}
 
-.home-container h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--brand-green);
+/* Main */
+.content{max-width:1100px;margin:24px auto;padding:0 18px}
+.home-main{display:grid;place-items:center;min-height:60vh}
+.home-card{
+  width:100%;
+  max-width:900px;
+  background:var(--card-bg);
+  border-radius:12px;
+  padding:28px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.06);
+  border:1px solid rgba(0,0,0,0.04);
 }
+.home-card h1{font-size:24px;margin-bottom:6px}
+.home-card .subtitle{color:var(--muted);margin-bottom:18px}
 
-.logout-form {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
+/* Actions */
+.home-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary, .btn-outline{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:600;
+  cursor:pointer;
 }
+.btn-primary{background:var(--brand-green);color:#fff;border:1px solid var(--brand-green)}
+.btn-outline{background:transparent;color:var(--brand-green);border:1px solid rgba(47,107,63,0.12)}
 
-.logout-btn {
-    border: none;
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--danger-bg);
-    color: var(--danger-text);
-    transition: 0.2s ease;
+/* Logout component styling (fixed bottom-right) */
+.component-logout-form{position:fixed;right:20px;bottom:20px;z-index:999}
+.component-logout-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 12px;border-radius:10px;border:none;
+  background:#fff;color:var(--brand-green);box-shadow:0 6px 20px rgba(46,70,40,0.06);
+  font-weight:700;cursor:pointer;border:1px solid rgba(47,107,63,0.08);
 }
+.component-logout-btn .icon{font-size:16px}
 
-.logout-btn:hover {
-    filter: brightness(0.95);
-}
-
-@media (max-width: 768px) {
-    .home-container h1 {
-        font-size: 1.6rem;
-    }
-
-    .logout-form {
-        right: 14px;
-        bottom: 14px;
-    }
+/* RESPONSIVO */
+@media (max-width:900px){
+  .container-header{padding:0 12px}
+  .home-card{padding:20px}
+  .component-logout-form{right:14px;bottom:14px}
+  .home-card h1{font-size:20px}
+  .brand-name{font-size:16px}
 }

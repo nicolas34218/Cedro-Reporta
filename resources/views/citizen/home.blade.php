@@ -1,19 +1,18 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Tela Principal - Cidadão</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ asset('css/citizen-home.css') }}">
-</head>
-<body>
-    <main class="home-container">
-        <h1>Tela principal</h1>
-    </main>
+@extends('layouts.citizen')
 
-    <form action="{{ route('logout') }}" method="post" class="logout-form">
-        @csrf
-        <button type="submit" class="logout-btn">Sair</button>
-    </form>
-</body>
-</html>
+@section('title', 'Tela principal')
+
+@section('content')
+<section class="home-main">
+    <div class="home-card">
+        <h1>Tela principal</h1>
+        <p class="subtitle">Bem-vindo(a)! Aqui você terá acesso às suas funcionalidades.</p>
+
+        <!-- Exemplo de botões/áreas futuras -->
+        <div class="home-actions">
+            <a href="#" class="btn-primary">Nova Denúncia</a>
+            <a href="#" class="btn-outline">Minhas Denúncias</a>
+        </div>
+    </div>
+</section>
+@endsection
