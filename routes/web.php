@@ -54,6 +54,10 @@ Route::controller(AuthController::class)->group(function () {
         return view('citizen.reports.create');
     })->name('reports.create');
 
+    Route::get('/denuncias', function () {
+        return view('citizen.reports.index');
+    })->name('reports.index');
+
     Route::post('/denuncias', function () {
         return redirect()
             ->route('citizen.reports.create')
