@@ -48,6 +48,19 @@ Route::controller(AuthController::class)->group(function () {
         ->middleware('auth');
 });
 
+// Formulário de Denúncias - Bloco temporário para testes, será movido para rotas de cidadão
+    Route::middleware('auth')->prefix('cidadao')->name('citizen.')->group(function () {
+    Route::get('/denuncias/nova', function () {
+        return view('citizen.reports.create');
+    })->name('reports.create');
+
+    Route::post('/denuncias', function () {
+        return redirect()
+            ->route('citizen.reports.create')
+            ->with('success', 'Front-end pronto: envio será conectado ao back-end em breve.');
+    })->name('reports.store');
+});
+
 /**
  * Rotas do painel administrativo
  * Requer autenticação e acesso de Admin ou Secretário

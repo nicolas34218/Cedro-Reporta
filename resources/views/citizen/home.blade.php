@@ -10,7 +10,7 @@
 
         <!-- Exemplo de botões/áreas futuras -->
         <div class="home-actions">
-            <a href="#" class="btn-primary">Nova Denúncia</a>
+            <a href="{{ route('citizen.reports.create') }}" class="btn-primary">Fazer denúncia</a>
             <a href="#" class="btn-outline">Minhas Denúncias</a>
         </div>
     </div>
