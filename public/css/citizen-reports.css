@@ -6,6 +6,7 @@
     --muted: #6b6f6b;
     --border: #ddd;
     --accent: #f2b827;
+    --shadow: 0 1px 2px rgba(34, 50, 36, 0.06), 0 6px 18px rgba(34, 50, 36, 0.06);
 }
 
 * {
@@ -184,15 +185,15 @@ body {
 }
 
 .reports-content {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
 }
 
 /* Topbar com busca */
 .reports-topbar {
-    background: #fff;
+    background: transparent;
     border-radius: 12px;
-    padding: 16px;
+    padding: 0 0 12px;
     margin-bottom: 16px;
     display: flex;
     flex-direction: column;
@@ -202,10 +203,12 @@ body {
 .search-box {
     width: 100%;
     max-width: 400px;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    padding: 8px 12px;
+    border: 1px solid #dfe6d8;
+    border-radius: 4px;
     font-size: 14px;
+    background: #fff;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) inset;
 }
 
 .filter-badges {
@@ -215,11 +218,11 @@ body {
 }
 
 .badge-btn {
-    border: 1px solid var(--border);
+    border: 1px solid #d7ddce;
     background: #fff;
-    color: var(--text);
+    color: #46604a;
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 999px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
@@ -227,33 +230,177 @@ body {
 }
 
 .badge-btn:hover {
-    border-color: var(--brand-green);
+    border-color: #aebca5;
 }
 
 .badge-btn.active {
-    background: var(--brand-green);
+    background: #214f31;
     color: #fff;
-    border-color: var(--brand-green);
+    border-color: #214f31;
 }
 
 /* Results Info */
 .results-info {
-    background: #fff;
+    background: transparent;
     border-radius: 12px;
-    padding: 12px 16px;
+    padding: 0 0 12px;
     margin-bottom: 16px;
     font-size: 14px;
+    color: #7a8a75;
 }
 
 .results-info strong {
-    color: var(--brand-green);
+    color: #334d39;
 }
 
 /* Reports List */
 .reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.report-card {
+    background: var(--card-bg);
+    border: 1px solid #e7eadf;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 14px 16px 12px;
+}
+
+.report-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.report-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2e4331;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.report-location {
+    color: #8ba07e;
+    font-size: 13px;
+}
+
+.report-description {
+    font-size: 14px;
+    color: #415144;
+    line-height: 1.45;
+    margin-bottom: 8px;
+}
+
+.report-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    color: #9aac93;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.report-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.report-actions a {
+    color: #48714e;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.report-actions a:hover {
+    text-decoration: underline;
+}
+
+.report-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+
+.status-pendente,
+.status-aberta {
+    color: #c58f12;
+    background: #fff7e1;
+    border-color: #f4d58e;
+}
+
+.status-em-andamento,
+.status-em-analise {
+    color: #2563eb;
+    background: #eef4ff;
+    border-color: #9bbcfb;
+}
+
+.status-resolvido,
+.status-resolvida {
+    color: #2f6b3f;
+    background: #edf7ed;
+    border-color: #b7ddbb;
+}
+
+.status-fechada {
+    color: #7a5b0d;
+    background: #f8f0d5;
+    border-color: #e8d28f;
+}
+
+.reports-empty {
     background: #fff;
-    border-radius: 12px;
-    padding: 16px;
+    border: 1px dashed #d6ddcf;
+    border-radius: 8px;
+    padding: 28px 20px;
+    text-align: center;
+    color: #6f806c;
+}
+
+.reports-empty a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #214f31;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.reports-pagination {
+    margin-top: 20px;
+}
+
+.reports-pagination nav {
+    display: flex;
+    justify-content: center;
+}
+
+.reports-pagination .pagination {
+    gap: 6px;
+}
+
+.reports-pagination .page-link,
+.reports-pagination .page-item span {
+    border-color: #d7ddce;
+    color: #48614d;
+}
+
+.reports-pagination .page-item.active .page-link {
+    background: #214f31;
+    border-color: #214f31;
 }
 
 /* Responsive */
@@ -282,5 +429,13 @@ body {
 
     .top-nav {
         width: 100%;
+    }
+
+    .report-card-header {
+        flex-direction: column;
+    }
+
+    .report-actions {
+        gap: 10px;
     }
 }

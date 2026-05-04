@@ -30,14 +30,57 @@
 
     <!-- Contagem de resultados -->
     <div class="results-info">
-        <p>Exibindo <strong>24 denúncias</strong> · ordenado por <strong>Mais recentes</strong></p>
-    </div>
-
-    <!-- Lista de denúncias (cards vazios por enquanto) -->
-    <div class="reports-list">
-        <p style="color: #999; text-align: center; padding: 40px;">
-            (Cards de denúncias serão adicionados na próxima etapa)
+        <p>
+            Exibindo
+            <strong>{{ $reports->total() }}</strong>
+            denúncia{{ $reports->total() === 1 ? '' : 's' }} · ordenado por
+            <strong>Mais recentes</strong>
         </p>
     </div>
+
+    <!-- Lista de denúncias -->
+    <div class="reports-list">
+        @forelse ($reports as $report)
+            <article class="report-card">
+                <div class="report-card-header">
+                    <div>
+                        <h3 class="report-title">{{ $report->title }}</h3>
+                        <p class="report-location">
+                            {{ $report->location ?: 'Localização não informada' }}
+                        </p>
+                    </div>
+
+                    <span class="report-status status-{{ \Illuminate\Support\Str::slug($report->status) }}">
+                        {{ $report->status }}
+                    </span>
+                </div>
+
+                <p class="report-description">
+                    {{ \Illuminate\Support\Str::limit($report->description, 180) }}
+                </p>
+
+                <div class="report-meta">
+                    <span>{{ $report->category }}</span>
+                    <span>{{ $report->created_at->format('d/m/Y H:i') }}</span>
+                </div>
+
+                <div class="report-actions">
+                    <a href="{{ route('citizen.reports.show', $report->id) }}">Ver detalhes</a>
+                    <a href="{{ route('citizen.reports.track-status', $report->id) }}">Acompanhar status</a>
+                </div>
+            </article>
+        @empty
+            <div class="reports-empty">
+                <p>Você ainda não registrou nenhuma denúncia.</p>
+                <a href="{{ route('citizen.reports.create') }}">Criar primeira denúncia</a>
+            </div>
+        @endforelse
+    </div>
+
+    @if ($reports->hasPages())
+        <div class="reports-pagination">
+            {{ $reports->links() }}
+        </div>
+    @endif
 </div>
 @endsection
