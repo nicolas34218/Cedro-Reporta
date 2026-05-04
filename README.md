@@ -1,55 +1,85 @@
 # 🚨 Cedro Reporta
 
-Sistema de denúncias desenvolvido com Laravel 11 e MySQL.
+Sistema de denúncias desenvolvido com Laravel 11.
 
 ---
 
 ## 📋 Pré-requisitos
 
-- XAMPP (Apache, MySQL, PHP 8.0+)
-- Git
+- PHP 8.3+
 - Composer
 - Node.js
+- **Banco de Dados**: SQLite (padrão) ou MySQL
 
 ---
 
-## 🚀 Setup Rápido
+## 🚀 Setup Automático
 
-### 1. Clonar/Atualizar Repositório
+### 1. Clonar e Configurar
 ```bash
 git clone https://github.com/seu-usuario/cedro-reporta.git
 cd cedro-reporta
-# ou
-git pull origin main
+composer run setup
 ```
 
-### 2. Instalar Dependências
+**Este comando automatiza:**
+- ✅ Instalação de dependências PHP
+- ✅ Configuração do arquivo `.env`
+- ✅ Geração da chave da aplicação
+- ✅ Execução das migrations
+- ✅ Instalação de dependências Node.js
+- ✅ Build dos assets
+
+**Nota:** O comando não executa seeds automaticamente. Para popular o banco com dados de teste, execute `php artisan db:seed` após o setup.
+
+### 2. Configurar Banco de Dados (Opcional)
+
+#### Para MySQL com XAMPP:
+1. Abra o **XAMPP Control Panel**
+2. Clique em **Start** para Apache e MySQL
+3. Acesse `http://localhost/phpmyadmin/`
+4. Crie um banco chamado `cedro_reporta`
+5. Edite o arquivo `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=cedro_reporta
+DB_USERNAME=root
+DB_PASSWORD=
+```
+6. Execute novamente: `php artisan migrate --seed`
+
+#### Para SQLite (Padrão):
+Não é necessária configuração adicional - o banco é criado automaticamente.
+
+---
+
+## 🏃‍♂️ Executando a Aplicação
+
+### Desenvolvimento
 ```bash
-composer install
-npm install
+composer run dev
 ```
+**Inicia automaticamente:** Servidor Laravel + Queue Worker + Vite (assets)
 
-### 3. Gerar Chave da Aplicação
+### Produção
 ```bash
-php artisan key:generate
+npm run build
+php artisan serve
 ```
 
-### 4. Criar Banco de Dados
-Abra `http://localhost/phpmyadmin/` e crie um banco chamado `cedro_reporta`
+---
 
-### 5. Rodar Migrations e Seeds
+## 🧪 Testes
+
 ```bash
-php artisan migrate
-php artisan migrate:fresh --seed
-```
+# Executar todos os testes
+php artisan test
 
-### 6. Iniciar Servidor
-- Abra **XAMPP Control Panel**
-- Clique em **Start** para Apache e MySQL
-
-### 7. Acessar Aplicação
-```
-http://localhost/Vs_Code/cedro-reporta/public/
+# Executar testes específicos
+php artisan test tests/Feature/ReportDetailsTest.php
+php artisan test tests/Feature/ReportFilterTest.php
 ```
 
 ---
@@ -62,4 +92,17 @@ http://localhost/Vs_Code/cedro-reporta/public/
 | Secretário | secretario@cedroreporta.com | senha123 |
 
 ---
+
+## 📊 API Endpoints
+
+Consulte [API_REFERENCE.md](API_REFERENCE.md) para documentação completa dos endpoints.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Backend**: Laravel 11 (PHP 8.3+)
+- **Banco de Dados**: SQLite (desenvolvimento) / MySQL (produção)
+- **Frontend**: Vite, Tailwind CSS
+- **Testes**: Pest PHP
 

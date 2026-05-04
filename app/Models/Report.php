@@ -53,4 +53,82 @@ class Report extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Scope para filtrar denúncias por categoria.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array $categories
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByCategory($query, $categories)
+    {
+        if (empty($categories)) {
+            return $query;
+        }
+
+        // Permite tanto string única quanto array de categorias
+        $categories = is_array($categories) ? $categories : [$categories];
+
+        return $query->whereIn('category', $categories);
+    }
+
+    /**
+     * Scope para filtrar denúncias por localização.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $location
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByLocation($query, $location)
+    {
+        if (empty($location)) {
+            return $query;
+        }
+
+        return $query->where('location', 'like', '%' . $location . '%');
+    }
+
+    /**
+     * Scope para filtrar denúncias por status.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array $statuses
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByStatus($query, $statuses)
+    {
+        if (empty($statuses)) {
+            return $query;
+        }
+
+        // Permite tanto string única quanto array de status
+        $statuses = is_array($statuses) ? $statuses : [$statuses];
+
+        return $query->whereIn('status', $statuses);
+    }
+
+    /**
+     * Scope para aplicar múltiplos filtros simultaneamente.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $filters
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFilter($query, array $filters)
+    {
+        if (isset($filters['category']) && !empty($filters['category'])) {
+            $query->byCategory($filters['category']);
+        }
+
+        if (isset($filters['location']) && !empty($filters['location'])) {
+            $query->byLocation($filters['location']);
+        }
+
+        if (isset($filters['status']) && !empty($filters['status'])) {
+            $query->byStatus($filters['status']);
+        }
+
+        return $query;
+    }
 }
