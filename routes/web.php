@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -48,21 +49,41 @@ Route::controller(AuthController::class)->group(function () {
         ->middleware('auth');
 });
 
-// Formulário de Denúncias - Bloco temporário para testes, será movido para rotas de cidadão
-    Route::middleware('auth')->prefix('cidadao')->name('citizen.')->group(function () {
-    Route::get('/denuncias/nova', function () {
-        return view('citizen.reports.create');
-    })->name('reports.create');
+/**
+ * Rotas de denúncias do cidadão
+ */
+Route::middleware('auth')->prefix('cidadao')->name('citizen.')->controller(ReportController::class)->group(function () {
+    // Formulário de criação de denúncia
+    Route::get('/denuncias/nova', 'create')
+        ->name('reports.create');
 
-    Route::get('/denuncias', function () {
-        return view('citizen.reports.index');
-    })->name('reports.index');
+    // Página de busca e filtro de denúncias
+    Route::get('/denuncias/buscar', 'search')
+        ->name('reports.search');
 
-    Route::post('/denuncias', function () {
-        return redirect()
-            ->route('citizen.reports.create')
-            ->with('success', 'Front-end pronto: envio será conectado ao back-end em breve.');
-    })->name('reports.store');
+    // Endpoint de API para filtrar denúncias
+    Route::get('/denuncias/api/filtrar', 'filter')
+        ->name('reports.filter');
+
+    // Lista de denúncias do usuário
+    Route::get('/denuncias', 'index')
+        ->name('reports.index');
+
+    // Registra uma nova denúncia
+    Route::post('/denuncias', 'store')
+        ->name('reports.store');
+
+    // Detalhes de uma denúncia específica
+    Route::get('/denuncias/{report}', 'show')
+        ->name('reports.show');
+
+    // Detalhes da denúncia em formato JSON (API)
+    Route::get('/denuncias/{report}/detalhes', 'getDetails')
+        ->name('reports.details');
+
+    // Acompanhamento de status da denúncia
+    Route::get('/denuncias/{report}/status', 'trackStatus')
+        ->name('reports.track-status');
 });
 
 /**

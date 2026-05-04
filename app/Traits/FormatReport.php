@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Traits;
+
+use App\Enums\ReportStatus;
+
+/**
+ * Trait para formatação consistente de denúncias.
+ * 
+ * Evita duplicação de código ao formatar dados de denúncias
+ * em diferentes contextos (views, APIs, etc).
+ */
+trait FormatReport
+{
+    /**
+     * Formata uma denúncia para exibição consistente.
+     * 
+     * @param mixed $report
+     * @param bool $includeDescription
+     * @return array
+     */
+    protected function formatReport($report, bool $includeDescription = true): array
+    {
+        $data = [
+            'id' => $report->id,
+            'title' => $report->title,
+            'category' => $report->category,
+            'status' => $report->status,
+            'status_config' => ReportStatus::getStatusConfig($report->status),
+            'location' => $report->location,
+            'created_at' => $report->created_at->format('d/m/Y H:i'),
+            'created_at_human' => $report->created_at->diffForHumans(),
+            'updated_at' => $report->updated_at->format('d/m/Y H:i'),
+        ];
+
+        if ($includeDescription) {
+            $data['description'] = $report->description;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Formata múltiplas denúncias.
+     */
+    protected function formatReports($reports, bool $includeDescription = false): array
+    {
+        return $reports->map(fn($report) => $this->formatReport($report, $includeDescription))->toArray();
+    }
+}

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->string('category');
-            $table->enum('status', ['Aberta', 'Em Análise', 'Resolvida', 'Fechada'])->default('Aberta');
+            $table->enum('status', ['Pendente', 'Em Análise', 'Resolvida', 'Fechada', 'Aberta'])->default('Pendente');
             $table->string('location')->nullable();
             $table->string('image_path')->nullable();
             $table->timestamps();
