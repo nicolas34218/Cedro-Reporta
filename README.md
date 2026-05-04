@@ -107,3 +107,4 @@ Consulte [API_REFERENCE.md](API_REFERENCE.md) para documentação completa dos e
 - **Frontend**: Vite, Tailwind CSS
 - **Testes**: Pest PHP
 
+

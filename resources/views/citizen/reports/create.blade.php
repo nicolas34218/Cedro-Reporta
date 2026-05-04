@@ -7,6 +7,12 @@
 
 @section('content')
 <section class="report-create-page">
+    @if (session('error'))
+        <div class="alert alert-error" style="margin-bottom: 16px; padding: 12px 16px; border-radius: 12px; background: #fdecec; color: #991b1b; border: 1px solid #fca5a5;">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="report-create-topbar">
         <a href="{{ route('citizen.home') }}" class="btn-back">← Voltar</a>
         <h1>Nova Denúncia</h1>
