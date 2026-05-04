@@ -60,6 +60,7 @@ http://localhost/Vs_Code/cedro-reporta/public/
 |------|-------|-------|
 | Admin | admin@cedroreporta.com | senha123 |
 | Secretário | secretario@cedroreporta.com | senha123 |
+| Cidiadão | teste@gmail.com | teste123 |
 
 ---
 
