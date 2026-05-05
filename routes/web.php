@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
  * Rota inicial / dashboard
  */
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 })->name('welcome');
 
 /**
