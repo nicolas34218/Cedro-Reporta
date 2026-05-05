@@ -225,7 +225,17 @@ class ReportController extends Controller
         // Constrói a query base com as denúncias do usuário
         $query = auth()->user()->reports();
 
-        // Aplica filtros da request
+        // Busca por termo livre (título, descrição, localização)
+        if ($request->filled('q')) {
+            $term = $request->input('q');
+            $query->where(function ($sub) use ($term) {
+                $sub->where('title', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%")
+                    ->orWhere('location', 'like', "%{$term}%");
+            });
+        }
+
+        // Aplica filtros da request (categoria / localização / status)
         $filters = [
             'category' => $request->input('category'),
             'location' => $request->input('location'),
@@ -237,8 +247,8 @@ class ReportController extends Controller
         // Obtém as denúncias filtradas, ordenadas por mais recentes
         $reports = $query->orderByDesc('created_at')->paginate(10);
 
-        // Retorna para view com filtros aplicados
-        return view('citizen.reports.search', [
+        // Retorna para a mesma view de listagem com filtros aplicados
+        return view('citizen.reports.index', [
             'reports' => $reports,
             'filters' => $filters,
             'categories' => $this->getAvailableCategories(),

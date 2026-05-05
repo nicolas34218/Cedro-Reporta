@@ -17,16 +17,76 @@
     @endif
 
     <!-- Topbar com busca -->
-    <div class="reports-topbar">
-        <input type="text" class="search-box" placeholder="Buscar denúncias, bairros, etc.">
-        <div class="filter-badges">
-            <button class="badge-btn active">Todos</button>
-            <button class="badge-btn">Iluminação</button>
-            <button class="badge-btn">Buraco</button>
-            <button class="badge-btn">Lixo</button>
-            <button class="badge-btn">Calçada</button>
+<form 
+    id="reports-filter-form" 
+    action="{{ route('citizen.reports.search') }}" 
+    method="get" 
+    class="reports-topbar">
+    <div style="display:flex; gap:12px; align-items:center;">
+            <input 
+                type="text" 
+                name="q" 
+                value="{{ request('q') }}" 
+                class="search-box" 
+                placeholder="Buscar denúncias, bairros, etc.">
+
+            <input 
+                type="hidden" 
+                name="category" 
+                id="filter-category" 
+                value="{{ request('category') }}"
+            >
+
+            <input 
+                type="hidden" 
+                name="status" 
+                id="filter-status" 
+                value="{{ request('status') }}"
+            >
         </div>
+
+        <div class="filter-badges">
+            <button 
+                type="button" 
+                class="badge-btn @if(!request('category')) active @endif" 
+                data-value=""
+            >
+            Todos
+            </button>
+
+            <button 
+                type="button" 
+                class="badge-btn @if(request('category')=='Iluminação') active @endif" 
+                data-value="Iluminação"
+            >
+                Iluminação
+            </button>
+
+            <button 
+                type="button" 
+                class="badge-btn @if(request('category')=='Buracos') active @endif" 
+                data-value="Buracos"
+            >
+                Buraco
+            </button>
+
+            <button 
+                type="button" 
+                class="badge-btn @if(request('category')=='Lixo') active @endif" 
+                data-value="Lixo"
+            >
+                Lixo
+            </button>
+
+            <button 
+                type="button" 
+                class="badge-btn @if(request('category')=='Calçada') active @endif" 
+                data-value="Calçada"
+            >
+                Calçada
+            </button>
     </div>
+</form>
 
     <!-- Contagem de resultados -->
     <div class="results-info">
@@ -79,8 +139,45 @@
 
     @if ($reports->hasPages())
         <div class="reports-pagination">
-            {{ $reports->links() }}
+                        {{ $reports->appends(request()->except('page'))->links() }}
         </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('reports-filter-form');
+    if (!form) return;
+    const catInput = document.getElementById('filter-category');
+    const statusInput = document.getElementById('filter-status');
+
+    document.querySelectorAll('.filter-badges .badge-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const value = btn.dataset.value || '';
+            catInput.value = value;
+
+            // atualizar classes ativas
+            document.querySelectorAll('.filter-badges .badge-btn').forEach(b => b.classList.remove('active'));
+            if (value === '') {
+                const todos = document.querySelector('.filter-badges .badge-btn[data-value=""]');
+                if (todos) todos.classList.add('active');
+            } else {
+                btn.classList.add('active');
+            }
+
+            form.submit();
+        });
+    });
+
+    const searchBox = form.querySelector('input[name="q"]');
+    if (searchBox) {
+        searchBox.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                // comportamento padrão: o browser submete o form GET
+            }
+        });
+    }
+});
+</script>
+
 @endsection
