@@ -43,6 +43,13 @@
                 id="filter-status" 
                 value="{{ request('status') }}"
             >
+
+            <input 
+                type="hidden" 
+                name="location" 
+                id="filter-location" 
+                value="{{ request('location') }}"
+            >
         </div>
 
         <div class="filter-badges">
@@ -80,10 +87,9 @@
 
             <button 
                 type="button" 
-                class="badge-btn @if(request('category')=='Calçada') active @endif" 
-                data-value="Calçada"
-            >
-                Calçada
+                class="badge-btn @if(request('category')=='Segurança Pública') active @endif" 
+                data-value="Segurança Pública">
+                Segurança
             </button>
     </div>
 </form>

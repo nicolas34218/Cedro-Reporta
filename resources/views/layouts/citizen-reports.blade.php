@@ -35,21 +35,27 @@
                 <div class="sidebar-section">
                     <h3>CATEGORIAS</h3>
                     <ul class="sidebar-list">
-                        <li><a href="#" class="sidebar-link active">● Todas</a></li>
-                        <li><a href="#" class="sidebar-link">● Iluminação</a></li>
-                        <li><a href="#" class="sidebar-link">● Buraco</a></li>
-                        <li><a href="#" class="sidebar-link">● Lixo</a></li>
-                        <li><a href="#" class="sidebar-link">● Calçada</a></li>
-                        <li><a href="#" class="sidebar-link">● Outros</a></li>
-                    </ul>
-                </div>
-
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('category', 'page'), ['category' => ''])) }}" class="sidebar-link @if(!request('category')) active @endif">● Todas</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['category' => 'Iluminação'])) }}" class="sidebar-link @if(request('category')=='Iluminação') active @endif">● Iluminação</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['category' => 'Buracos'])) }}" class="sidebar-link @if(request('category')=='Buracos') active @endif">● Buraco</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['category' => 'Lixo'])) }}" class="sidebar-link @if(request('category')=='Lixo') active @endif">● Lixo</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['category' => 'Segurança Pública'])) }}" class="sidebar-link @if(request('category')=='Segurança Pública') active @endif">● Segurança</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['category' => 'Outro'])) }}" class="sidebar-link @if(request('category')=='Outro') active @endif">● Outros</a></li>
                 <div class="sidebar-section">
                     <h3>STATUS</h3>
                     <ul class="sidebar-list">
-                        <li><a href="#" class="sidebar-link">Pendente</a></li>
-                        <li><a href="#" class="sidebar-link">Em Andamento</a></li>
-                        <li><a href="#" class="sidebar-link">Resolvido</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['status' => 'Pendente'])) }}" class="sidebar-link @if(request('status')=='Pendente') active @endif">Pendente</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['status' => 'Em Andamento'])) }}" class="sidebar-link @if(request('status')=='Em Andamento') active @endif">Em Andamento</a></li>
+                    <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['status' => 'Resolvido'])) }}" class="sidebar-link @if(request('status')=='Resolvido') active @endif">Resolvido</a></li>
+
+                <div class="sidebar-section">
+                    <h3>LOCALIZAÇÃO</h3>
+                    <ul class="sidebar-list">
+                        <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['location' => ''])) }}" class="sidebar-link @if(!request('location')) active @endif">● Todas</a></li>
+                        <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['location' => 'Centro'])) }}" class="sidebar-link @if(request('location')=='Centro') active @endif">● Centro</a></li>
+                        <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['location' => 'Bairro A'])) }}" class="sidebar-link @if(request('location')=='Bairro A') active @endif">● Bairro A</a></li>
+                        <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['location' => 'Bairro B'])) }}" class="sidebar-link @if(request('location')=='Bairro B') active @endif">● Bairro B</a></li>
+                        <li><a href="{{ route('citizen.reports.search', array_merge(request()->except('page'), ['location' => 'Bairro C'])) }}" class="sidebar-link @if(request('location')=='Bairro C') active @endif">● Bairro C</a></li>
                     </ul>
                 </div>
 
