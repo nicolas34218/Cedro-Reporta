@@ -1,3 +1,4 @@
+<!-- Tela Minhas Denúncias -->
 @extends('layouts.citizen-reports')
 
 @section('title', 'Visualizar Denúncias')

@@ -1,3 +1,4 @@
+<!-- Tela Acompanhar Status da Denúncia -->
 @extends('layouts.citizen')
 
 @section('title', 'Acompanhar Status da Denúncia')
@@ -6,8 +7,10 @@
 <section class="report-track-page">
     <div class="report-track-topbar">
         <a href="{{ route('citizen.reports.index') }}" class="btn-back">← Voltar</a>
-        <h1>Acompanhamento de Status - Denúncia #{{ $report->id }}</h1>
-        <a href="{{ route('citizen.reports.show', $report->id) }}" class="btn-details">Ver Detalhes</a>
+        <div class="topbar-title">
+            <h1 class="page-title">Acompanhamento de Status</h1>
+            <small style="display:block; color:#666; margin-top:6px;">{{ $report->title }}</small>
+        </div>
     </div>
 
     <div class="report-track-container">
@@ -121,17 +124,36 @@
         margin-bottom: 30px;
         padding-bottom: 20px;
         border-bottom: 2px solid #E0E0E0;
+        gap: 12px;
     }
 
+
     .btn-back {
-        color: #007BFF;
+        color: #333;
         text-decoration: none;
         font-weight: 600;
+        background-color: #F0F0F0;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #DDD;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
     }
 
     .btn-back:hover {
-        text-decoration: underline;
+        background-color: #EDEDED;
     }
+
+    .page-title {
+        font-size: 20px;
+        margin: 0;
+        font-weight: 700;
+        color: #222;
+    }
+
+    .topbar-title { margin-left: 10px; }
 
     .btn-details {
         background-color: #6C757D;
@@ -303,22 +325,33 @@
 
     .action-buttons {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         margin-top: 30px;
         padding-top: 20px;
         border-top: 1px solid #F0F0F0;
+        justify-content: flex-end;
+        align-items: center;
     }
 
     .btn-secondary {
-        flex: 1;
-        padding: 12px 24px;
-        border-radius: 4px;
+        /* consistent, non-wrapping buttons */
+        flex: 0 0 auto;
+        padding: 8px 16px;
+        min-width: 150px;
+        border-radius: 6px;
         text-decoration: none;
         font-weight: 600;
         text-align: center;
         background-color: #F0F0F0;
         color: #333;
         border: 1px solid #DDD;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+        .action-buttons { flex-direction: column; align-items: stretch; }
+        .btn-secondary { width: 100%; min-width: 0; }
     }
 
     .btn-secondary:hover {

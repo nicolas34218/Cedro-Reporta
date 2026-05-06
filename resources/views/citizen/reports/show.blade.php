@@ -1,3 +1,4 @@
+<!-- Tela Detalhes da Denúncia -->
 @extends('layouts.citizen')
 
 @section('title', 'Detalhes da Denúncia')
@@ -6,8 +7,9 @@
 <section class="report-detail-page">
     <div class="report-detail-topbar">
         <a href="{{ route('citizen.reports.index') }}" class="btn-back">← Voltar</a>
-        <h1>Denúncia #{{ $report->id }}</h1>
-        <a href="{{ route('citizen.reports.track-status', $report->id) }}" class="btn-track">Acompanhar Status</a>
+        <div class="topbar-title">
+            <h1 class="page-title">{{ $report->title }}</h1>
+        </div>
     </div>
 
     <div class="report-detail-container">
@@ -86,13 +88,27 @@
     }
 
     .btn-back {
-        color: #007BFF;
+        color: #333;
         text-decoration: none;
         font-weight: 600;
+        background-color: #F0F0F0;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #DDD;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .btn-back:hover {
-        text-decoration: underline;
+        background-color: #EDEDED;
+    }
+
+    .page-title {
+        font-size: 20px;
+        margin: 0;
+        font-weight: 700;
+        color: #222;
     }
 
     .btn-track {
@@ -167,26 +183,30 @@
     .report-actions-footer {
         display: flex;
         gap: 10px;
-        justify-content: space-between;
+        justify-content: flex-start;
         margin-top: 30px;
         padding-top: 20px;
         border-top: 1px solid #F0F0F0;
     }
 
     .btn-primary, .btn-secondary {
-        padding: 12px 24px;
-        border-radius: 4px;
+        padding: 8px 14px;
+        border-radius: 6px;
         text-decoration: none;
         font-weight: 600;
         text-align: center;
         cursor: pointer;
         border: none;
-        flex: 1;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .btn-primary {
         background-color: #007BFF;
         color: white;
+        padding: 8px 14px;
     }
 
     .btn-primary:hover {
@@ -197,6 +217,7 @@
         background-color: #F0F0F0;
         color: #333;
         border: 1px solid #DDD;
+        padding: 8px 14px;
     }
 
     .btn-secondary:hover {

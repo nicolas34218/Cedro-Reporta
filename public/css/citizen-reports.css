@@ -37,6 +37,8 @@ body {
     gap: 20px;
 }
 
+.container-header { position: relative; }
+
 .brand {
     display: flex;
     align-items: center;
@@ -81,6 +83,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-left: auto;
 }
 
 .user-avatar {
@@ -109,12 +112,21 @@ body {
 
 /* Sidebar */
 .reports-sidebar {
-    width: 190px;
+    width: 260px;
     background: var(--brand-green);
     color: #fff;
-    padding: 16px 12px;
+    padding: 16px 16px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
+
+.sidebar-columns {
+    display: flex;
+    gap: 12px;
+}
+.sidebar-left { flex: 1 1 60%; }
+.sidebar-right { flex: 0 0 38%; }
 
 .sidebar-section {
     margin-bottom: 24px;
@@ -133,13 +145,16 @@ body {
 }
 
 .sidebar-link {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: #fff;
     text-decoration: none;
     padding: 6px 8px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     transition: 0.2s ease;
+    white-space: nowrap;
 }
 
 .sidebar-link:hover,
@@ -149,8 +164,8 @@ body {
 
 .sidebar-footer {
     margin-top: auto;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -397,6 +412,118 @@ body {
     border-color: #d7ddce;
     color: #48614d;
 }
+
+/* Hamburger and responsive sidebar */
+.hamburger {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+}
+.hamburger-line {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+}
+
+/* Collapsed lists inside sidebar */
+.sidebar-list.collapsed {
+    display: none;
+}
+
+/* Small screens: hide sidebar by default and show hamburger */
+@media (max-width: 900px) {
+    .top-nav { display: none; }
+    .hamburger { display: inline-flex; }
+    .reports-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 260px;
+        transform: translateX(-110%);
+        transition: transform 0.28s ease;
+        z-index: 60;
+    }
+    .reports-layout {
+        position: relative;
+    }
+    .reports-layout.sidebar-open .reports-sidebar {
+        transform: translateX(0);
+    }
+    /* dim background when sidebar open */
+    .reports-layout.sidebar-open::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 50;
+    }
+}
+
+/* Sidebar toggle button style */
+.sidebar-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    padding: 6px 0;
+    cursor: pointer;
+}
+.sidebar-toggle[aria-expanded="true"] + .sidebar-list {
+    display: block;
+}
+
+/* Close button inside sidebar for mobile */
+.sidebar-close {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: #e3342f;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 70;
+}
+
+@media (max-width: 900px) {
+    .sidebar-close { display: block; }
+    .user-name { display: none; }
+    .reports-sidebar { padding-top: 44px; }
+}
+
+/* Ensure bullet and text stay on same line */
+.sidebar-link::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    margin-right: 8px;
+    opacity: 0.95;
+    vertical-align: middle;
+}
+.sidebar-link { padding-left: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+
+/* make list items align nicely with bullets */
+.sidebar-list li { margin: 6px 0; }
 
 .reports-pagination .page-item.active .page-link {
     background: #214f31;

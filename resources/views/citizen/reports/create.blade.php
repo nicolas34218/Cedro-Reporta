@@ -1,3 +1,5 @@
+<!-- Tela Criar Denúncia -->
+ 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/citizen-report-create.css') }}">
 @endpush
