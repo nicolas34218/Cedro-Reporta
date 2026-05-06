@@ -92,11 +92,7 @@ php artisan test tests/Feature/ReportFilterTest.php
 | Secretário | secretario@cedroreporta.com | senha123 |
 | Cidiadão | teste@gmail.com | teste123 |
 
----
 
-## 📊 API Endpoints
-
-Consulte [API_REFERENCE.md](API_REFERENCE.md) para documentação completa dos endpoints.
 
 ---
 

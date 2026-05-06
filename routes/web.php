@@ -61,10 +61,6 @@ Route::middleware('auth')->prefix('cidadao')->name('citizen.')->controller(Repor
     Route::get('/denuncias/buscar', 'search')
         ->name('reports.search');
 
-    // Endpoint de API para filtrar denúncias
-    Route::get('/denuncias/api/filtrar', 'filter')
-        ->name('reports.filter');
-
     // Lista de denúncias do usuário
     Route::get('/denuncias', 'index')
         ->name('reports.index');
@@ -76,10 +72,6 @@ Route::middleware('auth')->prefix('cidadao')->name('citizen.')->controller(Repor
     // Detalhes de uma denúncia específica
     Route::get('/denuncias/{report}', 'show')
         ->name('reports.show');
-
-    // Detalhes da denúncia em formato JSON (API)
-    Route::get('/denuncias/{report}/detalhes', 'getDetails')
-        ->name('reports.details');
 
     // Acompanhamento de status da denúncia
     Route::get('/denuncias/{report}/status', 'trackStatus')

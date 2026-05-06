@@ -164,48 +164,7 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Retorna os detalhes de uma denúncia em formato JSON (API).
-     *
-     * Critérios de Aceitação:
-     * - O usuário só pode acessar suas próprias denúncias ✓
-     * - Deve retornar todos os dados completos da denúncia ✓
-     * - Deve incluir data e hora de criação formatadas ✓
-     *
-     * @param Report $report
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getDetails(Report $report)
-    {
-        // Autoriza o acesso usando a Policy
-        $this->authorize('view', $report);
 
-        // Carrega o usuário relacionado
-        $report->load('user');
-
-        // Usa o trait para formatar a denúncia
-        $reportFormatted = $this->formatReport($report, includeDescription: true);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Detalhes da denúncia obtidos com sucesso.',
-            'data' => [
-                'report' => $reportFormatted,
-                'user' => [
-                    'id' => $report->user->id,
-                    'name' => $report->user->name,
-                    'email' => $report->user->email,
-                ],
-                'full_data' => [
-                    'id' => $report->id,
-                    'image_path' => $report->image_path,
-                    'created_at_iso' => $report->created_at->toIso8601String(),
-                    'updated_at_iso' => $report->updated_at->toIso8601String(),
-                    'timestamp_created' => $report->created_at->timestamp,
-                ],
-            ],
-        ]);
-    }
 
     /**
      * Exibe página de busca e filtro de denúncias.
@@ -256,66 +215,7 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Endpoint de API para filtrar denúncias.
-     *
-     * Critérios de Aceitação:
-     * - O usuário só vê suas próprias denúncias ✓
-     * - Retorna dados em formato JSON ✓
-     * - Permite combinar múltiplos filtros ✓
-     * - Inclui metadados de paginação ✓
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function filter(Request $request)
-    {
-        // Validação dos parâmetros de filtro
-        $validated = $request->validate([
-            'category' => 'nullable|string',
-            'location' => 'nullable|string|min:1',
-            'status' => 'nullable|string',
-            'per_page' => 'nullable|integer|min:1|max:100',
-        ]);
 
-        // Define paginação
-        $perPage = $validated['per_page'] ?? 10;
-
-        // Constrói a query base com as denúncias do usuário
-        $query = auth()->user()->reports();
-
-        // Aplica filtros
-        $filters = [
-            'category' => $validated['category'] ?? null,
-            'location' => $validated['location'] ?? null,
-            'status' => $validated['status'] ?? null,
-        ];
-
-        $query->filter($filters);
-
-        // Obtém as denúncias filtradas com paginação
-        $reports = $query->orderByDesc('created_at')->paginate($perPage);
-
-        // Formata os dados das denúncias
-        $formattedReports = $reports->map(fn($report) => $this->formatReport($report, includeDescription: false));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Filtros aplicados com sucesso.',
-            'data' => [
-                'reports' => $formattedReports,
-                'pagination' => [
-                    'total' => $reports->total(),
-                    'per_page' => $reports->perPage(),
-                    'current_page' => $reports->currentPage(),
-                    'last_page' => $reports->lastPage(),
-                    'from' => $reports->firstItem(),
-                    'to' => $reports->lastItem(),
-                ],
-                'filters_applied' => array_filter($filters),
-            ],
-        ]);
-    }
 
     /**
      * Retorna as categorias disponíveis para filtro.
