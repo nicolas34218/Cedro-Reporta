@@ -19,20 +19,19 @@ Sistema de denúncias desenvolvido com Laravel 11.
 ```bash
 git clone https://github.com/seu-usuario/cedro-reporta.git
 cd cedro-reporta
-composer run setup
+
+### 2. Configurar Storage (Upload de Imagens)
+
+**Essencial para a funcionalidade de upload de denúncias!**
+
+# Setup do storage (cria pastas e valida permissões)
+php artisan storage:setup
+
+# Diagnosticar problemas de upload (se houver)
+php artisan upload:diagnose
 ```
 
-**Este comando automatiza:**
-- ✅ Instalação de dependências PHP
-- ✅ Configuração do arquivo `.env`
-- ✅ Geração da chave da aplicação
-- ✅ Execução das migrations
-- ✅ Instalação de dependências Node.js
-- ✅ Build dos assets
-
-**Nota:** O comando não executa seeds automaticamente. Para popular o banco com dados de teste, execute `php artisan db:seed` após o setup.
-
-### 2. Configurar Banco de Dados (Opcional)
+### 3. Configurar Banco de Dados (Opcional)
 
 #### Para MySQL com XAMPP:
 1. Abra o **XAMPP Control Panel**
@@ -52,16 +51,6 @@ DB_PASSWORD=
 
 #### Para SQLite (Padrão):
 Não é necessária configuração adicional - o banco é criado automaticamente.
-
----
-
-## 🏃‍♂️ Executando a Aplicação
-
-### Desenvolvimento
-```bash
-composer run dev
-```
-**Inicia automaticamente:** Servidor Laravel + Queue Worker + Vite (assets)
 
 ### Produção
 ```bash
@@ -102,5 +91,3 @@ php artisan test tests/Feature/ReportFilterTest.php
 - **Banco de Dados**: SQLite (desenvolvimento) / MySQL (produção)
 - **Frontend**: Vite, Tailwind CSS
 - **Testes**: Pest PHP
-
-
