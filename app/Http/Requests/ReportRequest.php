@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Constants\ReportConstants;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -26,8 +27,9 @@ class ReportRequest extends FormRequest
      * Obtém as regras de validação que se aplicam ao request.
      *
      * Critérios de Aceitação:
+     * - O título, descrição, categoria, endereço e bairro são obrigatórios
      * - A descrição deve ter no mínimo 10 caracteres
-     * - Todas as informações obrigatórias devem estar preenchidas
+     * - Imagens devem estar nos formatos PNG, JPG ou JPEG com máximo de 2MB
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -36,9 +38,10 @@ class ReportRequest extends FormRequest
         return [
             'title' => 'required|string|min:5|max:255',
             'description' => 'required|string|min:10|max:1000',
-            'category' => 'required|string|in:Iluminação,Buracos,Lixo,Segurança,Outros',
-            'address_reference' => 'nullable|string|max:255',
-            'district' => 'nullable|string|max:100',
+            'category' => 'required|string|in:' . ReportConstants::getCategoriesValidation(),
+            'address_reference' => 'required|string|min:3|max:255',
+            'district' => 'required|string|min:3|max:100',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ];
     }
 
@@ -73,8 +76,15 @@ class ReportRequest extends FormRequest
             'description.max' => 'A descrição não pode exceder 1000 caracteres.',
             'category.required' => 'A categoria é obrigatória.',
             'category.in' => 'A categoria selecionada é inválida.',
-            'address_reference.max' => 'A referência de endereço não pode exceder 255 caracteres.',
+            'address_reference.required' => 'O endereço/referência é obrigatório.',
+            'address_reference.min' => 'O endereço deve ter no mínimo 3 caracteres.',
+            'address_reference.max' => 'O endereço não pode exceder 255 caracteres.',
+            'district.required' => 'O bairro é obrigatório.',
+            'district.min' => 'O bairro deve ter no mínimo 3 caracteres.',
             'district.max' => 'O bairro não pode exceder 100 caracteres.',
+            'image.image' => 'O arquivo deve ser uma imagem.',
+            'image.mimes' => 'A imagem deve estar nos formatos PNG, JPG ou JPEG.',
+            'image.max' => 'A imagem não pode exceder 2MB.',
         ];
     }
 }

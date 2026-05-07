@@ -51,15 +51,15 @@
         <!-- cards de resumo -->
         <div class="summary-grid">
             <article class="summary-card">
-                <strong>7</strong>
+                <strong>{{ $totalReports }}</strong>
                 <span>MINHAS DENÚNCIAS</span>
             </article>
             <article class="summary-card warning">
-                <strong>3</strong>
+                <strong>{{ $pendingReports }}</strong>
                 <span>PENDENTES</span>
             </article>
             <article class="summary-card info">
-                <strong>2</strong>
+                <strong>{{ $inProgressReports }}</strong>
                 <span>EM ANDAMENTO</span>
             </article>
         </div>

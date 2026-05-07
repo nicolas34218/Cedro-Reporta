@@ -11,6 +11,18 @@ use App\Models\User;
 class ReportPolicy
 {
     /**
+     * Verifica se o usuário é o proprietário da denúncia.
+     *
+     * @param User $user
+     * @param Report $report
+     * @return bool
+     */
+    private function isOwner(User $user, Report $report): bool
+    {
+        return $user->id === $report->user_id;
+    }
+
+    /**
      * Determina se o usuário pode visualizar uma denúncia.
      *
      * Um usuário só pode visualizar denúncias que sejam suas.
@@ -21,7 +33,7 @@ class ReportPolicy
      */
     public function view(User $user, Report $report): bool
     {
-        return $user->id === $report->user_id;
+        return $this->isOwner($user, $report);
     }
 
     /**
@@ -35,7 +47,7 @@ class ReportPolicy
      */
     public function update(User $user, Report $report): bool
     {
-        return $user->id === $report->user_id;
+        return $this->isOwner($user, $report);
     }
 
     /**
@@ -49,7 +61,7 @@ class ReportPolicy
      */
     public function delete(User $user, Report $report): bool
     {
-        return $user->id === $report->user_id;
+        return $this->isOwner($user, $report);
     }
 
     /**
@@ -63,6 +75,6 @@ class ReportPolicy
      */
     public function track(User $user, Report $report): bool
     {
-        return $user->id === $report->user_id;
+        return $this->isOwner($user, $report);
     }
 }

@@ -32,13 +32,24 @@ class User extends Authenticatable
     }
 
     /**
+     * Verifica se o usuário tem um tipo específico.
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function hasType(string $type): bool
+    {
+        return $this->user_type === $type;
+    }
+
+    /**
      * Verifica se o usuário é administrador.
      *
      * @return bool
      */
     public function isAdmin(): bool
     {
-        return $this->user_type === 'Admin';
+        return $this->hasType('Admin');
     }
 
     /**
@@ -48,7 +59,7 @@ class User extends Authenticatable
      */
     public function isSecretary(): bool
     {
-        return $this->user_type === 'Secretário';
+        return $this->hasType('Secretário');
     }
 
     /**
@@ -58,7 +69,7 @@ class User extends Authenticatable
      */
     public function isCitizen(): bool
     {
-        return $this->user_type === 'Cidadão';
+        return $this->hasType('Cidadão');
     }
 
     /**

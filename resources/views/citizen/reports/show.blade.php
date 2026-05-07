@@ -65,6 +65,16 @@
             </div>
         </div>
 
+        <!-- Fotos e Evidências -->
+        @if ($report->image_path)
+        <div class="report-section">
+            <h2>Fotos e Evidências</h2>
+            <div class="image-container">
+                <img src="{{ route('citizen.reports.image', $report->id) }}" alt="Foto da denúncia: {{ $report->title }}" class="report-image">
+            </div>
+        </div>
+        @endif
+
         <!-- Ações -->
         <div class="report-actions-footer">
             <a href="{{ route('citizen.reports.index') }}" class="btn-secondary">Voltar para Lista</a>
@@ -227,6 +237,32 @@
     .status-badge {
         text-transform: uppercase;
         font-size: 12px;
+    }
+
+    .image-container {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+    }
+
+    .report-image {
+        max-width: 100%;
+        max-height: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .report-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .report-image {
+            max-height: 350px;
+        }
     }
 </style>
 @endsection

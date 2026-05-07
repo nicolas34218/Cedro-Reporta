@@ -90,7 +90,7 @@ class AuthController extends Controller
         // Tenta autenticar o usuário
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => 'O e-mail ou senha fornecidos estão incorretos.',
+                'email' => 'Credenciais inválidas, tente novamente',
             ]);
         }
 

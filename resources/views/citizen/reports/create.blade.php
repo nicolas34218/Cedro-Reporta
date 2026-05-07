@@ -20,7 +20,7 @@
         <h1>Nova Denúncia</h1>
     </div>
 
-    <form action="{{ route('citizen.reports.store') }}" method="post" class="report-form">
+    <form action="{{ route('citizen.reports.store') }}" method="post" class="report-form" enctype="multipart/form-data">
         @csrf
 
         <div class="report-grid">
@@ -30,13 +30,13 @@
                 <div class="form-field">
                     <label for="title">TÍTULO DA DENÚNCIA</label>
                     <input id="title" name="title" type="text" value="{{ old('title') }}">
-                    @error('title') <small class="form-error">{{ $message }}</small> @enderror
+                    <x-error-message field="title" />
                 </div>
 
                 <div class="form-field">
                     <label for="description">DESCRIÇÃO</label>
                     <textarea id="description" name="description" rows="4">{{ old('description') }}</textarea>
-                    @error('description') <small class="form-error">{{ $message }}</small> @enderror
+                    <x-error-message field="description" />
                 </div>
 
                 <div class="form-field">
@@ -49,7 +49,7 @@
                         <option value="Segurança" @selected(old('category') === 'Segurança')>Segurança</option>
                         <option value="Outros" @selected(old('category') === 'Outros')>Outros</option>
                     </select>
-                    @error('category') <small class="form-error">{{ $message }}</small> @enderror
+                    <x-error-message field="category" />
                 </div>
             </div>
 
@@ -57,23 +57,25 @@
                 <h2><span class="step">2</span> Localização</h2>
 
                 <div class="form-field">
-                    <label for="address_reference">ENDEREÇO/REFERÊNCIA</label>
-                    <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}">
-                    @error('address_reference') <small class="form-error">{{ $message }}</small> @enderror
+                    <label for="address_reference">ENDEREÇO/REFERÊNCIA <span style="color: #d32f2f;">*</span></label>
+                    <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}" placeholder="Ex: Rua Principal, próximo ao mercado">
+                    <x-error-message field="address_reference" />
                 </div>
 
                 <div class="form-field">
-                    <label for="district">BAIRRO</label>
-                    <input id="district" name="district" type="text" value="{{ old('district') }}">
-                    @error('district') <small class="form-error">{{ $message }}</small> @enderror
+                    <label for="district">BAIRRO <span style="color: #d32f2f;">*</span></label>
+                    <input id="district" name="district" type="text" value="{{ old('district') }}" placeholder="Ex: Centro">
+                    <x-error-message field="district" />
                 </div>
             </div>
 
             <div class="form-column">
                 <h2><span class="step">3</span> Fotos e evidências</h2>
-                <div class="upload-placeholder">
-                    <p>Arraste fotos aqui ou clique para enviar</p>
-                    <small>(Vamos integrar upload real no próximo passo)</small>
+                <div class="form-field">
+                    <label for="image">UPLOAD DE IMAGEM (PNG, JPG ou JPEG)</label>
+                    <input id="image" name="image" type="file" accept="image/png,image/jpeg" aria-describedby="image-help">
+                    <small id="image-help" style="display: block; margin-top: 8px; color: #666;">Formatos aceitos: PNG, JPG, JPEG. Tamanho máximo: 2MB</small>
+                    <x-error-message field="image" />
                 </div>
             </div>
         </div>

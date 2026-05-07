@@ -50,6 +50,13 @@
                 <h2>Bem-vindo(a) de volta</h2>
                 <p>Faça login para acessar sua conta</p>
 
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ $errors->first('email') }}
+                    </div>
+                @endif
+
                  <form action="{{ route('login.store') }}" method="post">
                     @csrf
                     <label for="email">E-MAIL</label>

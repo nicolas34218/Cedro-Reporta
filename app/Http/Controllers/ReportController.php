@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\ReportConstants;
 use App\Enums\ReportStatus;
 use App\Http\Requests\ReportRequest;
 use App\Models\Report;
 use App\Traits\FormatReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Controlador de denúncias/relatórios.
@@ -61,6 +64,42 @@ class ReportController extends Controller
                 $location = implode(' - ', $parts);
             }
 
+            // Processa o upload de imagem se fornecida
+            $imagePath = null;
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                try {
+                    $file = $request->file('image');
+                    
+                    // Gera nome único para o arquivo
+                    $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                    
+                    // Cria a pasta se não existir
+                    Storage::disk('local')->makeDirectory('reports', 0755, true);
+                    
+                    // Armazena a imagem no storage (pasta: reports)
+                    $imagePath = Storage::disk('local')->putFileAs(
+                        'reports',
+                        $file,
+                        $filename,
+                        'private'
+                    );
+                    
+                    Log::info('Imagem enviada com sucesso', [
+                        'filename' => $filename,
+                        'path' => $imagePath,
+                        'size' => $file->getSize(),
+                    ]);
+                } catch (\Exception $imageException) {
+                    Log::error('Erro ao processar upload de imagem', [
+                        'user_id' => auth()->id(),
+                        'error' => $imageException->getMessage(),
+                        'file' => $request->file('image')->getClientOriginalName() ?? 'unknown',
+                    ]);
+                    // Continua sem imagem ao invés de falhar completamente
+                    $imagePath = null;
+                }
+            }
+
             // Cria a denúncia com o usuário autenticado
             $report = auth()->user()->reports()->create([
                 'user_id' => auth()->id(),
@@ -69,6 +108,7 @@ class ReportController extends Controller
                 'category' => $validated['category'],
                 'status' => ReportStatus::PENDING, // Status inicial sempre é "Pendente"
                 'location' => $location,
+                'image_path' => $imagePath, // Salva o caminho da imagem
             ]);
 
             // Log de sucesso
@@ -76,6 +116,7 @@ class ReportController extends Controller
                 'report_id' => $report->id,
                 'user_id' => auth()->id(),
                 'category' => $report->category,
+                'has_image' => !is_null($imagePath),
             ]);
 
             return redirect()
@@ -86,12 +127,20 @@ class ReportController extends Controller
             Log::error('Erro ao criar denúncia', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
+            // Retorna com mensagem de erro apropriada
+            $errorMessage = 'Ocorreu um erro ao registrar a denúncia. Tente novamente.';
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $errorMessage = 'Email já cadastrado no sistema.';
+            }
+
             return back()
                 ->withInput()
-                ->with('error', 'Ocorreu um erro ao registrar a denúncia. Tente novamente.');
+                ->with('error', $errorMessage);
         }
     }
 
@@ -210,39 +259,33 @@ class ReportController extends Controller
         return view('citizen.reports.index', [
             'reports' => $reports,
             'filters' => $filters,
-            'categories' => $this->getAvailableCategories(),
-            'statuses' => $this->getAvailableStatuses(),
+            'categories' => ReportConstants::getCategories(),
+            'statuses' => ReportStatus::getAll(),
         ]);
     }
 
-
-
     /**
-     * Retorna as categorias disponíveis para filtro.
+     * Serve a imagem privada da denúncia.
      *
-     * @return array
+     * @param Report $report
+     * @return \Illuminate\Http\Response
      */
-    private function getAvailableCategories(): array
+    public function getImage(Report $report)
     {
-        return [
-            'Infraestrutura',
-            'Trânsito',
-            'Limpeza Urbana',
-            'Segurança Pública',
-            'Saúde',
-            'Educação',
-            'Iluminação',
-            'Outro',
-        ];
-    }
+        // Autoriza o acesso usando a Policy
+        $this->authorize('view', $report);
 
-    /**
-     * Retorna os status disponíveis para filtro.
-     *
-     * @return array
-     */
-    private function getAvailableStatuses(): array
-    {
-        return ReportStatus::getAll();
+        // Verifica se a imagem existe
+        if (!$report->image_path || !Storage::disk('local')->exists($report->image_path)) {
+            abort(404);
+        }
+
+        // Retorna o arquivo como resposta inline (exibe na página)
+        $path = Storage::disk('local')->path($report->image_path);
+        $mimeType = Storage::disk('local')->mimeType($report->image_path);
+        
+        return response()->file($path, [
+            'Content-Type' => $mimeType ?? 'image/jpeg',
+        ]);
     }
 }

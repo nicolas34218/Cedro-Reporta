@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CitizenController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -15,9 +16,9 @@ Route::get('/', function () {
 /**
  * Rota Home / Cidadão
  */
-Route::get('/home', function () {
-    return view('citizen.home');
-})->name('citizen.home')->middleware('auth');
+Route::get('/home', [CitizenController::class, 'home'])
+    ->name('citizen.home')
+    ->middleware('auth');
 
 /**
  * Rotas de autenticação
@@ -72,6 +73,10 @@ Route::middleware('auth')->prefix('cidadao')->name('citizen.')->controller(Repor
     // Detalhes de uma denúncia específica
     Route::get('/denuncias/{report}', 'show')
         ->name('reports.show');
+
+    // Imagem da denúncia
+    Route::get('/denuncias/{report}/imagem', 'getImage')
+        ->name('reports.image');
 
     // Acompanhamento de status da denúncia
     Route::get('/denuncias/{report}/status', 'trackStatus')
