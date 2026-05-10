@@ -108,6 +108,8 @@ body {
 .reports-layout {
     display: flex;
     flex: 1;
+    position: relative;
+    overflow-x: hidden;
 }
 
 /* Sidebar */
@@ -119,6 +121,14 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    flex: 0 0 260px;
+    position: fixed;
+    left: 0;
+    top: 60px;
+    bottom: 0;
+    transform: translateX(0);
+    transition: opacity 0.35s ease, display 0.35s ease;
+    z-index: 60;
 }
 
 .sidebar-columns {
@@ -197,6 +207,28 @@ body {
 .reports-main {
     flex: 1;
     padding: 20px;
+    min-width: 0;
+    transition: margin-left 0.28s ease, width 0.28s ease;
+    margin-left: 0;
+}
+
+/* Desktop: sidebar hidden by default, shown when .sidebar-open */
+@media (min-width: 901px) {
+    .reports-sidebar {
+        display: none;
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .reports-layout.sidebar-open .reports-sidebar {
+        display: flex;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    
+    .reports-layout.sidebar-open .reports-main {
+        margin-left: 0;
+    }
 }
 
 .reports-content {
@@ -415,7 +447,7 @@ body {
 
 /* Hamburger and responsive sidebar */
 .hamburger {
-    display: none;
+    display: inline-flex;
     background: transparent;
     border: none;
     padding: 6px;
@@ -424,6 +456,8 @@ body {
     justify-content: center;
     flex-direction: column;
     gap: 4px;
+    order: -1;
+    margin-right: 12px;
 }
 .hamburger-line {
     display: block;
@@ -438,34 +472,134 @@ body {
     display: none;
 }
 
-/* Small screens: hide sidebar by default and show hamburger */
+.filter-section {
+    margin-bottom: 16px;
+}
+
+.filter-toggle {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filter-toggle::after {
+    content: '▼';
+    font-size: 10px;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.filter-toggle:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.filter-panel {
+    display: none;
+    margin-top: 8px;
+}
+
+.filter-panel.open {
+    display: block;
+}
+
+.sidebar-select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #fff;
+    color: #1f3f2b;
+    font-weight: 600;
+}
+
+/* Menu Hamburguer */
+.sidebar-hamburger {
+    display: none;
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.14);
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.sidebar-hamburger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #fff;
+    margin: 4px auto;
+    border-radius: 2px;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
 @media (max-width: 900px) {
     .top-nav { display: none; }
     .hamburger { display: inline-flex; }
+
+    .reports-layout {
+        display: block;
+    }
+
     .reports-sidebar {
         position: fixed;
         left: 0;
-        top: 0;
+        top: 60px;
         bottom: 0;
         width: 260px;
-        transform: translateX(-110%);
-        transition: transform 0.28s ease;
+        transform: translateX(-100%);
+        transition: transform 0.35s ease;
         z-index: 60;
+        overflow-y: auto;
     }
-    .reports-layout {
-        position: relative;
-    }
+
     .reports-layout.sidebar-open .reports-sidebar {
         transform: translateX(0);
     }
-    /* dim background when sidebar open */
-    .reports-layout.sidebar-open::after {
-        content: '';
+
+    .reports-main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .reports-layout.sidebar-open .reports-main {
+        margin-left: 260px;
+        width: calc(100% - 260px);
+    }
+
+    .sidebar-overlay {
+        display: none;
+    }
+
+    /* show overlay when open on mobile */
+    .reports-layout.sidebar-open .sidebar-overlay {
+        display: block;
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.35);
         z-index: 50;
     }
+
+    .sidebar-close {
+        display: block;
+    }
+
+    .user-name { display: none; }
 }
 
 /* Sidebar toggle button style */
@@ -480,6 +614,7 @@ body {
     padding: 6px 0;
     cursor: pointer;
 }
+
 .sidebar-toggle[aria-expanded="true"] + .sidebar-list {
     display: block;
 }
@@ -500,12 +635,6 @@ body {
     line-height: 1;
     cursor: pointer;
     z-index: 70;
-}
-
-@media (max-width: 900px) {
-    .sidebar-close { display: block; }
-    .user-name { display: none; }
-    .reports-sidebar { padding-top: 44px; }
 }
 
 /* Ensure bullet and text stay on same line */
@@ -530,25 +659,8 @@ body {
     border-color: #214f31;
 }
 
-/* Responsive */
+/* Responsive tweaks */
 @media (max-width: 768px) {
-    .reports-layout {
-        flex-direction: column;
-    }
-
-    .reports-sidebar {
-        width: 100%;
-        display: flex;
-        gap: 20px;
-        padding: 12px;
-        flex-direction: row;
-        height: auto;
-    }
-
-    .sidebar-section {
-        flex: 1;
-    }
-
     .container-header {
         flex-direction: column;
         align-items: flex-start;
