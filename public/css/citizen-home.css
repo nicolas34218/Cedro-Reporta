@@ -123,9 +123,9 @@ body{
 .home-dashboard{
   display: block;
   position: relative;
-  margin-left: 250px;
+  margin-left: 0;
   min-height: calc(100vh - 70px);
-  transition: margin-left 0.35s ease;
+  transition: margin-left 0.35s ease, width 0.35s ease;
 }
 
 .home-sidebar{
@@ -162,6 +162,69 @@ body{
   to {
     transform: translateX(0);
     opacity: 1;
+  }
+}
+
+/* Desktop behavior: sidebar is part of layout (pushes content) */
+@media (min-width: 861px) {
+  .home-dashboard {
+    display: flex;
+    align-items: stretch;
+    min-height: calc(100vh - 70px);
+  }
+
+  .home-sidebar {
+    position: relative;
+    left: 0;
+    top: 0;
+    height: calc(100vh - 70px);
+    min-height: calc(100vh - 70px);
+    align-self: stretch;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    display: none; /* hidden by default on desktop */
+    flex: 0 0 250px;
+  }
+
+  /* When sidebar is open, show it and shrink content */
+  .home-dashboard.sidebar-open .home-sidebar {
+    display: flex;
+  }
+
+  .home-dashboard .home-content {
+    flex: 1 1 auto;
+    transition: margin-left 0.35s ease, width 0.35s ease;
+    margin-left: 0;
+  }
+
+  /* When sidebar open, content gets left margin equal to sidebar width (smooth) */
+  .home-dashboard.sidebar-open .home-content {
+    margin-left: 0;
+    width: calc(100% - 250px);
+  }
+}
+
+/* Docked variant: when user opens sidebar on desktop, it becomes part of the layout and pushes content */
+@media (min-width: 861px) {
+  .home-dashboard.sidebar-docked {
+    display: flex;
+  }
+
+  .home-dashboard.sidebar-docked .home-sidebar {
+    display: flex;
+    position: relative;
+    left: 0;
+    top: 0;
+    flex: 0 0 250px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .home-dashboard.sidebar-docked .home-content {
+    flex: 1 1 auto;
+    width: calc(100% - 250px);
+    transition: width 0.35s ease, margin-left 0.35s ease;
   }
 }
 
@@ -395,7 +458,13 @@ body{
 @media (max-width: 900px){
   .home-hamburger {
     display: inline-flex;
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    z-index: 120;
   }
+  /* move logo right to sit next to the hamburger */
+  .brand .logo { margin-left: 40px; }
 
   .content{
     display:block;
@@ -408,23 +477,30 @@ body{
   }
 
   .home-sidebar{
-    position:fixed;
-    left:0;
-    top:70px;
-    width:250px;
-    transform: translateX(-100%);
-    transition: transform 0.35s ease;
+    /* compact dropdown panel on mobile (anchored under header) */
+    position: absolute;
+    left: 12px;
+    top: 56px;
+    width: 260px;
+    max-width: calc(100% - 24px);
+    transform: translateY(-8px) translateX(-6px);
+    transition: transform 0.22s ease, opacity 0.22s ease;
     border-right: none;
-    z-index: 70;
+    z-index: 90;
     flex-direction: column;
-    height: calc(100vh - 70px);
+    height: auto;
+    max-height: 60vh;
     overflow-y: auto;
-    opacity: 1;
-    pointer-events: auto;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
   }
 
   .home-dashboard.sidebar-open .home-sidebar {
-    transform: translateX(0);
+    transform: translateY(0) translateX(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .home-sidebar-overlay {
@@ -439,21 +515,22 @@ body{
     z-index: 60;
   }
 
+  /* keep home close button hidden (we close via hamburger/overlay) */
   .home-sidebar-close {
-    display: block;
+    display: none !important;
   }
 
   .sidebar-menu{
     display:flex;
     gap:8px;
-    padding:12px;
-    flex:1;
-    align-items:center;
+    padding:18px 12px;
+    flex-direction:column;
+    align-items:flex-start;
   }
 
   .sidebar-title{
     width:auto;
-    margin:0 12px 0 0;
+    margin:0 0 12px 0;
     font-size:14px;
   }
 
@@ -482,7 +559,7 @@ body{
     overflow-y:visible;
   }
 
-  .brand-name{font-size:24px}
+  .brand-name{display:none}
   .user-area{font-size:18px}
 
   .summary-grid{

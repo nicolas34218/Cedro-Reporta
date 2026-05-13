@@ -102,7 +102,9 @@
         const dashboard = document.querySelector('.home-dashboard');
 
         function openSidebar() {
+            // add both states; CSS will choose docked vs overlay based on media queries
             dashboard.classList.add('sidebar-open');
+            dashboard.classList.add('sidebar-docked');
             if (hamburger) {
                 hamburger.classList.add('open');
                 hamburger.setAttribute('aria-expanded', 'true');
@@ -111,6 +113,7 @@
 
         function closeSidebar() {
             dashboard.classList.remove('sidebar-open');
+            dashboard.classList.remove('sidebar-docked');
             if (hamburger) {
                 hamburger.classList.remove('open');
                 hamburger.setAttribute('aria-expanded', 'false');
@@ -120,7 +123,9 @@
         if (hamburger) {
             hamburger.addEventListener('click', function(e) {
                 e.stopPropagation();
+                // Toggle both; CSS controls visual mode via media queries
                 dashboard.classList.toggle('sidebar-open');
+                dashboard.classList.toggle('sidebar-docked');
                 hamburger.classList.toggle('open');
             });
         }
