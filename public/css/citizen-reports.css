@@ -212,22 +212,56 @@ body {
     margin-left: 0;
 }
 
-/* Desktop: sidebar hidden by default, shown when .sidebar-open */
+/* Desktop: hamburger visible, sidebar as overlay when open */
 @media (min-width: 901px) {
+    .hamburger {
+        display: inline-flex;
+    }
+
     .reports-sidebar {
         display: none;
         opacity: 0;
         pointer-events: none;
+        position: fixed;
+        left: 0;
+        top: 60px;
+        width: 260px;
+        height: calc(100vh - 60px);
+        z-index: 70;
     }
     
     .reports-layout.sidebar-open .reports-sidebar {
         display: flex;
         opacity: 1;
         pointer-events: auto;
+        animation: slideInLeft 0.35s ease;
     }
     
     .reports-layout.sidebar-open .reports-main {
         margin-left: 0;
+    }
+
+    @keyframes slideInLeft {
+        from {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .sidebar-overlay {
+        display: none;
+    }
+
+    .reports-layout.sidebar-open .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 60;
     }
 }
 
@@ -458,6 +492,7 @@ body {
     gap: 4px;
     order: -1;
     margin-right: 12px;
+    transition: all 0.3s ease;
 }
 .hamburger-line {
     display: block;
@@ -465,6 +500,20 @@ body {
     height: 2px;
     background: #fff;
     border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+/* Hamburger animation when open */
+.hamburger.open .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translateY(8px);
+}
+
+.hamburger.open .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.open .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translateY(-8px);
 }
 
 /* Collapsed lists inside sidebar */
@@ -554,6 +603,7 @@ body {
 
     .reports-layout {
         display: block;
+        position: relative;
     }
 
     .reports-sidebar {
@@ -564,7 +614,7 @@ body {
         width: 260px;
         transform: translateX(-100%);
         transition: transform 0.35s ease;
-        z-index: 60;
+        z-index: 70;
         overflow-y: auto;
     }
 
@@ -575,11 +625,11 @@ body {
     .reports-main {
         width: 100%;
         margin-left: 0;
+        transition: margin-left 0.35s ease;
     }
 
     .reports-layout.sidebar-open .reports-main {
-        margin-left: 260px;
-        width: calc(100% - 260px);
+        margin-left: 0;
     }
 
     .sidebar-overlay {
@@ -592,7 +642,7 @@ body {
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.35);
-        z-index: 50;
+        z-index: 60;
     }
 
     .sidebar-close {

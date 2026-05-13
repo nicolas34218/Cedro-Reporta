@@ -135,12 +135,18 @@
 
     function openSidebar() {
         layout.classList.add('sidebar-open');
-        if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', 'true');
+        if (sidebarToggle) {
+            sidebarToggle.classList.add('open');
+            sidebarToggle.setAttribute('aria-expanded', 'true');
+        }
     }
 
     function closeSidebar() {
         layout.classList.remove('sidebar-open');
-        if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', 'false');
+        if (sidebarToggle) {
+            sidebarToggle.classList.remove('open');
+            sidebarToggle.setAttribute('aria-expanded', 'false');
+        }
     }
 
     if (sidebarToggle) {
@@ -148,6 +154,7 @@
             e.stopPropagation();
             // Toggle sidebar visibility on all screen sizes
             layout.classList.toggle('sidebar-open');
+            sidebarToggle.classList.toggle('open');
         });
     }
 
