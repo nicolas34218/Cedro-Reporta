@@ -11,7 +11,6 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Controlador de autenticação.
- *
  * Gerencia registro, login e logout de usuários.
  */
 class AuthController extends Controller
@@ -28,11 +27,6 @@ class AuthController extends Controller
 
     /**
      * Registra um novo usuário no sistema.
-     *
-     * Subtasks validadas:
-     * - O e-mail deve ser único no sistema e válido.
-     * - A senha deve ter no mínimo 6 caracteres.
-     * - Todos os campos obrigatórios (nome, e-mail e senha) devem ser preenchidos corretamente.
      *
      * @param RegisterRequest $request
      * @return \Illuminate\Http\RedirectResponse
@@ -75,10 +69,6 @@ class AuthController extends Controller
     /**
      * Autentica o usuário no sistema.
      *
-     * Subtasks validadas:
-     * - O sistema deve autenticar usuário com e-mail e senha válidos.
-     * - O sistema deve identificar o tipo de usuário (Cidadão, Admin ou Secretário).
-     *
      * @param LoginRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -114,10 +104,6 @@ class AuthController extends Controller
 
     /**
      * Realiza logout do usuário.
-     *
-     * Subtasks validadas:
-     * - A sessão do usuário deve ser encerrada imediatamente ao logout.
-     * - O sistema deve redirecionar para a tela de login.
      *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse

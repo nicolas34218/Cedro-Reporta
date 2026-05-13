@@ -63,8 +63,8 @@
                                         <option value="Iluminação" @selected(request('category') === 'Iluminação')>Iluminação</option>
                                         <option value="Buracos" @selected(request('category') === 'Buracos')>Buracos</option>
                                         <option value="Lixo" @selected(request('category') === 'Lixo')>Lixo</option>
-                                        <option value="Segurança Pública" @selected(request('category') === 'Segurança Pública')>Segurança</option>
-                                        <option value="Outro" @selected(request('category') === 'Outro')>Outros</option>
+                                        <option value="Segurança" @selected(request('category') === 'Segurança')>Segurança</option>
+                                        <option value="Outros" @selected(request('category') === 'Outros')>Outros</option>
                                     </select>
                                 </form>
                             </div>
