@@ -4,9 +4,21 @@
 @section('title', 'Tela principal')
 
 @section('content')
-<section class="home-dashboard">
-    <!-- Sidebar lateral -->
-    <aside class="home-sidebar">
+<div class="home-page-wrapper">
+    <!-- Hamburger Button -->
+    <button id="home-sidebar-toggle" class="home-hamburger" aria-label="Abrir menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Overlay -->
+    <div class="home-sidebar-overlay" id="home-sidebar-overlay"></div>
+
+    <section class="home-dashboard">
+        <!-- Sidebar lateral -->
+        <aside class="home-sidebar" id="home-sidebar">
+            <button id="home-sidebar-close" class="home-sidebar-close" aria-label="Fechar menu">×</button>
         <div class="sidebar-menu">
             <h3 class="sidebar-title">MENU</h3>
 
@@ -77,5 +89,64 @@
             </a>
         </div>
     </main>
-</section>
+    </section>
+</div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.getElementById('home-sidebar-toggle');
+        const sidebar = document.getElementById('home-sidebar');
+        const overlay = document.getElementById('home-sidebar-overlay');
+        const closeBtn = document.getElementById('home-sidebar-close');
+        const dashboard = document.querySelector('.home-dashboard');
+
+        function openSidebar() {
+            dashboard.classList.add('sidebar-open');
+            if (hamburger) {
+                hamburger.classList.add('open');
+                hamburger.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function closeSidebar() {
+            dashboard.classList.remove('sidebar-open');
+            if (hamburger) {
+                hamburger.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        if (hamburger) {
+            hamburger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dashboard.classList.toggle('sidebar-open');
+                hamburger.classList.toggle('open');
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeSidebar();
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        if (sidebar) {
+            sidebar.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Reset sidebar on resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 901) {
+                dashboard.classList.remove('sidebar-open');
+            }
+        });
+    });
+</script>
