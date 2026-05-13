@@ -8,17 +8,12 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Controlador do painel administrativo.
- *
  * Gerencia funcionalidades do painel administrativo.
  */
 class AdminController extends Controller
 {
     /**
      * Exibe o painel administrativo com resumo das denúncias.
-     *
-     * Subtasks validadas:
-     * - O painel deve exibir resumo das denúncias.
-     * - Apenas Admin e Secretário podem acessar o painel.
      *
      * @return \Illuminate\View\View
      */

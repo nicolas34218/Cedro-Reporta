@@ -88,9 +88,18 @@
 
             <button 
                 type="button" 
-                class="badge-btn @if(request('category')=='Segurança Pública') active @endif" 
-                data-value="Segurança Pública">
+                class="badge-btn @if(request('category')=='Segurança') active @endif" 
+                data-value="Segurança">
+
                 Segurança
+            </button>
+
+            <button 
+                type="button" 
+                class="badge-btn @if(request('category')=='Outros') active @endif" 
+                data-value="Outros">
+                
+                Outros
             </button>
     </div>
 </form>

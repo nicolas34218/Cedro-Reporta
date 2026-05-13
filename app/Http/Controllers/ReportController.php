@@ -15,11 +15,6 @@ use Illuminate\Support\Str;
 /**
  * Controlador de denúncias/relatórios.
  *
- * Gerencia a criação, visualização e rastreamento de denúncias no sistema.
- * Implementa os critérios de aceitação para as três funcionalidades:
- * 1. Registrar Denúncia
- * 2. Visualizar Denúncia
- * 3. Acompanhar Status da Denúncia
  */
 class ReportController extends Controller
 {
@@ -37,14 +32,7 @@ class ReportController extends Controller
 
     /**
      * Registra uma nova denúncia no sistema.
-     *
-     * Critérios de Aceitação:
-     * - A descrição deve ter no mínimo 10 caracteres ✓
-     * - Todas as informações obrigatórias da denúncia devem estar corretamente
-     *   preenchidas antes do envio ✓
-     * - O status inicial da denúncia deve ser sempre definido como "Pendente"
-     *   pelo sistema ✓
-     *
+     * 
      * @param ReportRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -74,7 +62,7 @@ class ReportController extends Controller
                     $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                     
                     // Cria a pasta se não existir
-                    Storage::disk('local')->makeDirectory('reports', 0755, true);
+                    Storage::disk('local')->makeDirectory('reports');
                     
                     // Armazena a imagem no storage (pasta: reports)
                     $imagePath = Storage::disk('local')->putFileAs(
@@ -147,10 +135,6 @@ class ReportController extends Controller
     /**
      * Lista todas as denúncias do usuário autenticado.
      *
-     * Critérios de Aceitação:
-     * - As denúncias mais recentes devem aparecer primeiro ✓
-     * - Deve mostrar resumo (título, status e data) ✓
-     *
      * @return \Illuminate\View\View
      */
     public function index()
@@ -167,11 +151,6 @@ class ReportController extends Controller
 
     /**
      * Exibe os detalhes de uma denúncia específica.
-     *
-     * Critério de Aceitação:
-     * - O usuário só pode visualizar suas próprias denúncias ✓
-     * - Deve exibir todos os dados completos da denúncia ✓
-     * - Deve mostrar data e hora de criação da denúncia ✓
      *
      * @param Report $report
      * @return \Illuminate\View\View
@@ -196,10 +175,6 @@ class ReportController extends Controller
     /**
      * Exibe a página de acompanhamento de status da denúncia.
      *
-     * Critérios de Aceitação:
-     * - O usuário só pode visualizar suas próprias denúncias ✓
-     * - O status deve ser exibido de forma destacada (ex: cores ou ícones) ✓
-     *
      * @param Report $report
      * @return \Illuminate\View\View
      */
@@ -217,13 +192,6 @@ class ReportController extends Controller
 
     /**
      * Exibe página de busca e filtro de denúncias.
-     *
-     * Critérios de Aceitação:
-     * - O usuário só vê suas próprias denúncias ✓
-     * - Permite filtro por categoria ✓
-     * - Permite filtro por localização ✓
-     * - Permite filtro por status ✓
-     * - Permite combinar filtros simultaneamente ✓
      *
      * @param Request $request
      * @return \Illuminate\View\View
@@ -268,7 +236,7 @@ class ReportController extends Controller
      * Serve a imagem privada da denúncia.
      *
      * @param Report $report
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function getImage(Report $report)
     {
@@ -282,10 +250,10 @@ class ReportController extends Controller
 
         // Retorna o arquivo como resposta inline (exibe na página)
         $path = Storage::disk('local')->path($report->image_path);
-        $mimeType = Storage::disk('local')->mimeType($report->image_path);
-        
+        $mimeType = mime_content_type($path) ?: 'image/jpeg';
+
         return response()->file($path, [
-            'Content-Type' => $mimeType ?? 'image/jpeg',
+            'Content-Type' => $mimeType,
         ]);
     }
 }
