@@ -6,6 +6,8 @@ use App\Constants\ReportConstants;
 use App\Enums\ReportStatus;
 use App\Http\Requests\ReportRequest;
 use App\Models\Report;
+use App\Models\Citizen;
+use App\Models\Secretary;
 use App\Traits\FormatReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -88,7 +90,7 @@ class ReportController extends Controller
                 }
             }
 
-            // Cria a denúncia com o usuário autenticado
+            // Cria a denúncia com o cidadão autenticado
             $report = auth()->user()->reports()->create([
                 'user_id' => auth()->id(),
                 'title' => $validated['title'],
@@ -98,6 +100,29 @@ class ReportController extends Controller
                 'location' => $location,
                 'image_path' => $imagePath, // Salva o caminho da imagem
             ]);
+
+            // Atribui automaticamente a denúncia à secretária responsável da categoria
+            $secretary = Secretary::where('category', $validated['category'])
+                ->where('is_active', true)
+                ->first();
+
+            if ($secretary) {
+                $report->update([
+                    'secretary_id' => $secretary->id,
+                ]);
+
+                Log::info('Denúncia atribuída automaticamente à secretária', [
+                    'report_id' => $report->id,
+                    'secretary_id' => $secretary->id,
+                    'secretary_name' => $secretary->name,
+                    'category' => $validated['category'],
+                ]);
+            } else {
+                Log::warning('Nenhuma secretária encontrada para a categoria', [
+                    'report_id' => $report->id,
+                    'category' => $validated['category'],
+                ]);
+            }
 
             // Log de sucesso
             Log::info('Denúncia criada com sucesso', [

@@ -1,18 +1,16 @@
 <?php
 
 use App\Models\Report;
-use App\Models\User;
+use App\Models\Citizen;
 use App\Enums\ReportStatus;
 
 describe('Report Details', function () {
     
     beforeEach(function () {
-        // Cria um usuário para testes
-        $this->user = User::factory()->create([
-            'user_type' => 'Cidadão',
-        ]);
+        // Cria um cidadão para testes
+        $this->user = Citizen::factory()->create();
 
-        // Cria um relatório para o usuário
+        // Cria um relatório para o cidadão
         $this->report = Report::factory()->create([
             'user_id' => $this->user->id,
             'title' => 'Denúncia de Teste',

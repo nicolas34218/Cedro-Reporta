@@ -34,6 +34,7 @@ class Report extends Model
         'status',
         'location',
         'image_path',
+        'secretary_id',
     ];
 
     /**
@@ -45,13 +46,44 @@ class Report extends Model
     ];
 
     /**
-     * Relacionamento com o usuário que fez a denúncia.
+     * Relacionamento com o cidadão que fez a denúncia.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function citizen()
+    {
+        return $this->belongsTo(Citizen::class, 'user_id');
+    }
+
+    /**
+     * Alias para o cidadão (para compatibilidade com código existente).
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->citizen();
+    }
+
+    /**
+     * Relacionamento com a secretária responsável pela denúncia.
+     * A denúncia é automaticamente atribuída a uma secretária baseado na categoria.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function secretary()
+    {
+        return $this->belongsTo(Secretary::class, 'secretary_id');
+    }
+
+    /**
+     * Alias para compatibilidade (antes era assignedSecretary).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function assignedSecretary()
+    {
+        return $this->secretary();
     }
 
     /**

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'user_type', 'is_active'])]
+#[Fillable(['name', 'email', 'password', 'user_type', 'category', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -90,5 +90,16 @@ class User extends Authenticatable
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    /**
+     * Relacionamento com denúncias atribuídas a esta secretária.
+     * Apenas secretárias terão denúncias atribuídas.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function assignedReports()
+    {
+        return $this->hasMany(Report::class, 'assigned_secretary_id');
     }
 }

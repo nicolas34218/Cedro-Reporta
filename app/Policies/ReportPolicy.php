@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Report;
-use App\Models\User;
+use App\Models\Citizen;
 
 /**
  * Policy para controle de acesso a denúncias.
@@ -13,11 +13,11 @@ class ReportPolicy
     /**
      * Verifica se o usuário é o proprietário da denúncia.
      *
-     * @param User $user
+     * @param Citizen $user
      * @param Report $report
      * @return bool
      */
-    private function isOwner(User $user, Report $report): bool
+    private function isOwner(Citizen $user, Report $report): bool
     {
         return $user->id === $report->user_id;
     }
@@ -25,9 +25,9 @@ class ReportPolicy
     /**
      * Determina se o usuário pode visualizar uma denúncia.
      *
-     * Um usuário só pode visualizar denúncias que sejam suas.
+     * Um cidadão só pode visualizar denúncias que sejam suas.
      *
-     * @param User $user
+     * @param Citizen $user
      * @param Report $report
      * @return bool
      */

@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Report;
-use App\Models\User;
+use App\Models\Citizen;
 use Illuminate\Database\Seeder;
 
 /**
@@ -19,17 +19,16 @@ class ReportSeeder extends Seeder
     /**
      * Seed the application's database.
      *
-     * Cria um usuário teste e 5 denúncias com diferentes status
+     * Cria um cidadão de teste e 5 denúncias com diferentes status
      */
     public function run(): void
     {
-        // Cria um usuário de teste se não existir
-        $user = User::firstOrCreate(
+        // Cria um cidadão de teste se não existir
+        $user = Citizen::firstOrCreate(
             ['email' => 'teste@cedro.local'],
             [
-                'name' => 'Usuário Teste',
+                'name' => 'Cidadão Teste',
                 'password' => bcrypt('123456'),
-                'user_type' => 'Cidadão',
                 'is_active' => true,
             ]
         );

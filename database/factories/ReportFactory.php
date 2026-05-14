@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\ReportStatus;
 use App\Models\Report;
-use App\Models\User;
+use App\Models\Citizen;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +20,7 @@ class ReportFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'user_id' => Citizen::factory(),
             'title' => fake()->sentence(4),
             'description' => fake()->paragraph(3),
             'category' => fake()->randomElement([

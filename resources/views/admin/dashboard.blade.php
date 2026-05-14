@@ -56,6 +56,9 @@
                 </div>
                 <div class="header-right">
                     <span class="user-greeting">Bem-vindo, {{ auth()->user()->name }}!</span>
+                    <a href="{{ route('secretary.create') }}" style="margin-left: 20px;">
+                        <button type="button">Criar Nova Secretária</button>
+                    </a>
                 </div>
             </header>
 

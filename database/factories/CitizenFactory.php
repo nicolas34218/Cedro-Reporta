@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 /**
  * @extends Factory<Citizen>
  */
-class UserFactory extends Factory
+class CitizenFactory extends Factory
 {
     protected $model = Citizen::class;
 

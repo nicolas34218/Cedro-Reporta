@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Citizen;
+use App\Models\Admin;
+use App\Models\Secretary;
 use App\Models\Report;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,26 +19,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Cria usuário Admin
-        User::create([
+        Admin::create([
             'name' => 'Administrador Sistema',
             'email' => 'admin@cedroreporta.com',
-            'password' => bcrypt('senha123'),
-            'user_type' => 'Admin',
+            'password' => bcrypt('admin123'),
             'is_active' => true,
         ]);
 
         // Cria usuário Secretário
-        User::create([
+        Secretary::create([
             'name' => 'Secretário Prefeitura',
             'email' => 'secretario@cedroreporta.com',
-            'password' => bcrypt('senha123'),
-            'user_type' => 'Secretário',
+            'password' => bcrypt('secretary123'),
+            'category' => null,
             'is_active' => true,
         ]);
 
         // Cria 5 usuários cidadãos para teste
-        $citizens = User::factory(5)->create([
-            'user_type' => 'Cidadão',
+        $citizens = Citizen::factory(5)->create([
             'is_active' => true,
         ]);
 

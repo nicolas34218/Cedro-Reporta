@@ -4,19 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Models\User;
+use App\Models\Citizen;
+use App\Models\Admin;
+use App\Models\Secretary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Controlador de autenticação.
- * Gerencia registro, login e logout de usuários.
+ * Controlador de autenticação para múltiplos tipos de usuários.
+ * Gerencia registro, login e logout de cidadãos, admins e secretários.
  */
 class AuthController extends Controller
 {
     /**
-     * Exibe o formulário de registro.
+     * Exibe o formulário de registro (apenas para cidadãos).
      *
      * @return \Illuminate\View\View
      */
@@ -26,7 +29,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Registra um novo usuário no sistema.
+     * Registra um novo cidadão no sistema.
      *
      * @param RegisterRequest $request
      * @return \Illuminate\Http\RedirectResponse
@@ -34,17 +37,16 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         try {
-            // Cria novo usuário com valores validados
-            $user = User::create([
+            // Cria novo cidadão com valores validados
+            $citizen = Citizen::create([
                 'name' => $request->validated('name'),
                 'email' => $request->validated('email'),
                 'password' => $request->validated('password'),
-                'user_type' => 'Cidadão', // Novo usuário é cidadão por padrão
                 'is_active' => true,
             ]);
 
             // Realiza login automático após o registro
-            Auth::login($user);
+            Auth::login($citizen);
 
             return redirect()
                 ->route('citizen.home')
@@ -68,38 +70,52 @@ class AuthController extends Controller
 
     /**
      * Autentica o usuário no sistema.
+     * Tenta autenticar como cidadão, admin ou secretário.
      *
      * @param LoginRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function login(LoginRequest $request)
     {
-        // Extrai credenciais validadas
         $credentials = $request->validated();
+        $email = $credentials['email'];
+        $password = $credentials['password'];
+        $remember = $request->boolean('remember');
 
-        // Tenta autenticar o usuário
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            throw ValidationException::withMessages([
-                'email' => 'Credenciais inválidas, tente novamente',
-            ]);
-        }
-
-        // Regenera a sessão para segurança
-        $request->session()->regenerate();
-
-        /** @var User $user */
-        $user = Auth::user();
-
-        // Redireciona conforme o tipo de usuário
-        if ($user->canAccessAdminPanel()) {
+        // Tenta autenticar como admin
+        $admin = Admin::where('email', $email)->first();
+        if ($admin && Hash::check($password, $admin->password)) {
+            Auth::guard('admin')->login($admin, $remember);
+            $request->session()->regenerate();
             return redirect()
                 ->route('admin.dashboard')
                 ->with('success', 'Login realizado com sucesso!');
         }
 
-        return redirect()
-            ->route('citizen.home')
-            ->with('success', 'Login realizado com sucesso!');
+        // Tenta autenticar como secretário
+        $secretary = Secretary::where('email', $email)->first();
+        if ($secretary && Hash::check($password, $secretary->password)) {
+            Auth::guard('secretary')->login($secretary, $remember);
+            $request->session()->regenerate();
+            return redirect()
+                ->route('secretary.dashboard')
+                ->with('success', 'Login realizado com sucesso!');
+        }
+
+        // Tenta autenticar como cidadão
+        $citizen = Citizen::where('email', $email)->first();
+        if ($citizen && Hash::check($password, $citizen->password)) {
+            Auth::guard('citizen')->login($citizen, $remember);
+            $request->session()->regenerate();
+            return redirect()
+                ->route('citizen.home')
+                ->with('success', 'Login realizado com sucesso!');
+        }
+
+        // Nenhuma autenticação bem-sucedida
+        throw ValidationException::withMessages([
+            'email' => 'Credenciais inválidas, tente novamente',
+        ]);
     }
 
     /**
@@ -124,3 +140,4 @@ class AuthController extends Controller
             ->with('success', 'Você foi desconectado com sucesso!');
     }
 }
+

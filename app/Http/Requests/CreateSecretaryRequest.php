@@ -2,21 +2,26 @@
 
 namespace App\Http\Requests;
 
+use App\Constants\ReportConstants;
+use App\Models\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Validação para registro de usuário.
+ * Validação para criar nova secretária.
+ * 
+ * Segue os mesmos critérios de validação de senha que o RegisterRequest.
  */
-class RegisterRequest extends FormRequest
+class CreateSecretaryRequest extends FormRequest
 {
     /**
      * Determina se o usuário é autorizado a fazer este request.
+     * Apenas admins podem criar secretárias.
      *
      * @return bool
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check() && auth()->user() instanceof Admin;
     }
 
     /**
@@ -28,9 +33,10 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:citizens',
+            'email' => 'required|string|email|max:255|unique:secretaries',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required',
+            'category' => 'required|string|in:' . ReportConstants::getCategoriesValidation(),
         ];
     }
 
@@ -42,16 +48,18 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome é obrigatório.',
+            'name.required' => 'O nome da secretária é obrigatório.',
             'name.string' => 'O nome deve ser um texto.',
             'name.max' => 'O nome não pode exceder 255 caracteres.',
             'email.required' => 'O e-mail é obrigatório.',
             'email.email' => 'O e-mail deve ser válido.',
-            'email.unique' => 'O e-mail deve ser único no sistema e válido.',
+            'email.unique' => 'Este e-mail já está cadastrado no sistema.',
             'password.required' => 'A senha é obrigatória.',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
             'password.confirmed' => 'A confirmação de senha não corresponde.',
             'password_confirmation.required' => 'A confirmação de senha é obrigatória.',
+            'category.required' => 'Selecione uma categoria para a secretária.',
+            'category.in' => 'A categoria selecionada é inválida.',
         ];
     }
 }

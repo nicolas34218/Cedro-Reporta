@@ -19,7 +19,7 @@ class CitizenController extends Controller
      */
     public function home()
     {
-        $user = auth()->user();
+        $user = auth('citizen')->user();
 
         // Total de denúncias do usuário
         $totalReports = $user->reports()->count();

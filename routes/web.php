@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CitizenController;
+use App\Http\Controllers\SecretaryController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -18,7 +19,7 @@ Route::get('/', function () {
  */
 Route::get('/home', [CitizenController::class, 'home'])
     ->name('citizen.home')
-    ->middleware('auth');
+    ->middleware(['auth:citizen', 'citizen.only']);
 
 /**
  * Rotas de autenticação
@@ -53,7 +54,7 @@ Route::controller(AuthController::class)->group(function () {
 /**
  * Rotas de denúncias do cidadão
  */
-Route::middleware('auth')->prefix('cidadao')->name('citizen.')->controller(ReportController::class)->group(function () {
+Route::middleware(['auth:citizen', 'citizen.only'])->prefix('cidadao')->name('citizen.')->controller(ReportController::class)->group(function () {
     // Formulário de criação de denúncia
     Route::get('/denuncias/nova', 'create')
         ->name('reports.create');
@@ -91,20 +92,41 @@ Route::prefix('admin')->name('admin.')->controller(AdminController::class)->grou
     // Dashboard - resumo das denúncias
     Route::get('/dashboard', 'dashboard')
         ->name('dashboard')
-        ->middleware(['auth', 'admin.only']);
+        ->middleware(['auth:admin', 'admin.only']);
 
     // Lista de denúncias
     Route::get('/reports', 'listReports')
         ->name('reports')
-        ->middleware(['auth', 'admin.only']);
+        ->middleware(['auth:admin', 'admin.only']);
 
     // Detalhes da denúncia
     Route::get('/reports/{id}', 'showReport')
         ->name('report.show')
-        ->middleware(['auth', 'admin.only']);
+        ->middleware(['auth:admin', 'admin.only']);
 
     // Atualizar status da denúncia
     Route::put('/reports/{id}/status', 'updateReportStatus')
         ->name('report.status')
-        ->middleware(['auth', 'admin.only']);
+        ->middleware(['auth:admin', 'admin.only']);
+});
+
+/**
+ * Rotas de secretária
+ * Requer autenticação e acesso de Admin (para criar) ou Secretário (para acessar dashboard)
+ */
+Route::prefix('secretary')->name('secretary.')->controller(SecretaryController::class)->group(function () {
+    // Formulário para criar nova secretária (apenas admin)
+    Route::get('/create', 'create')
+        ->name('create')
+        ->middleware(['auth:admin', 'admin.only']);
+
+    // Armazena nova secretária (apenas admin)
+    Route::post('/store', 'store')
+        ->name('store')
+        ->middleware(['auth:admin', 'admin.only']);
+
+    // Dashboard da secretária com denúncias da categoria
+    Route::get('/dashboard', 'dashboard')
+        ->name('dashboard')
+        ->middleware('auth:secretary');
 });

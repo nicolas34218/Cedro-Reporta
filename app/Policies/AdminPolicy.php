@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\User;
+use App\Models\Admin;
 
 /**
  * Policy para controle de acesso ao painel administrativo.
@@ -12,12 +12,12 @@ class AdminPolicy
     /**
      * Determina se o usuário pode acessar o painel administrativo.
      *
-     * @param User $user
+     * @param Admin $user
      * @return bool
      */
-    public function viewDashboard(User $user): bool
+    public function viewDashboard(Admin $user): bool
     {
-        return $user->canAccessAdminPanel();
+        return true;
     }
 
     /**

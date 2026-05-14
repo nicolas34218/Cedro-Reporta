@@ -1,20 +1,16 @@
 <?php
 
 use App\Models\Report;
-use App\Models\User;
+use App\Models\Citizen;
 use App\Enums\ReportStatus;
 
 describe('Report Filter', function () {
     
     beforeEach(function () {
-        // Cria um usuário
-        $this->user = User::factory()->create([
-            'user_type' => 'Cidadão',
-        ]);
+        // Cria um cidadão
+        $this->user = Citizen::factory()->create();
 
-        $otherUser = User::factory()->create([
-            'user_type' => 'Cidadão',
-        ]);
+        $otherUser = Citizen::factory()->create();
 
         // Cria denúncias com diferentes categorias
         Report::factory()->create([

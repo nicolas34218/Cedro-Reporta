@@ -47,7 +47,10 @@ DB_DATABASE=cedro_reporta
 DB_USERNAME=root
 DB_PASSWORD=
 ```
-6. Execute novamente: `php artisan migrate --seed`
+6. Execute novamente:
+ `
+php artisan migrate:fresh --seed
+php artisan serve
 
 #### Para SQLite (Padrão):
 Não é necessária configuração adicional - o banco é criado automaticamente.
