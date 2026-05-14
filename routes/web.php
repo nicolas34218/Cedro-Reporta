@@ -99,12 +99,12 @@ Route::prefix('admin')->name('admin.')->controller(AdminController::class)->grou
         ->middleware(['auth', 'admin.only']);
 
     // Detalhes da denúncia
-    Route::get('/reports/{id}', 'showReport')
+    Route::get('/reports/{report}', 'showReport')
         ->name('report.show')
         ->middleware(['auth', 'admin.only']);
 
     // Atualizar status da denúncia
-    Route::put('/reports/{id}/status', 'updateReportStatus')
+    Route::put('/reports/{report}/status', 'updateReportStatus')
         ->name('report.status')
         ->middleware(['auth', 'admin.only']);
 });

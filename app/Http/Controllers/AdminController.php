@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ReportStatus;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 /**
  * Controlador do painel administrativo.
@@ -89,12 +91,12 @@ class AdminController extends Controller
     /**
      * Exibe os detalhes de uma denúncia específica.
      *
-     * @param int $id
+     * @param Report $report
      * @return \Illuminate\View\View
      */
-    public function showReport($id)
+    public function showReport(Report $report)
     {
-        $report = Report::with('user')->findOrFail($id);
+        $report->load('user');
 
         return view('admin.report-detail', [
             'report' => $report,
@@ -104,19 +106,25 @@ class AdminController extends Controller
     /**
      * Atualiza o status de uma denúncia.
      *
-     * @param int $id
+     * @param Report $report
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function updateReportStatus($id, Request $request)
+    public function updateReportStatus(Report $report, Request $request)
     {
         $validated = $request->validate([
-            'status' => 'required|in:Aberta,Em Análise,Resolvida,Fechada',
+            'status' => ['required', Rule::in(ReportStatus::getAll())],
         ]);
 
-        $report = Report::findOrFail($id);
-        $report->update($validated);
+        if ($report->status === $validated['status']) {
+            return redirect()->route('admin.report.show', $report)
+                ->with('info', 'O status da denúncia já está definido como ' . $report->status . '.');
+        }
 
-        return back()->with('success', 'Status da denúncia atualizado com sucesso!');
+        $report->status = $validated['status'];
+        $report->save();
+
+        return redirect()->route('admin.report.show', $report)
+            ->with('success', 'Status da denúncia atualizado com sucesso!');
     }
 }
