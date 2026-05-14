@@ -26,9 +26,11 @@ class SecretaryController extends Controller
     {
         // Obtém todas as categorias disponíveis
         $categories = ReportConstants::getCategories();
-        
+        $secretaries = Secretary::latest()->get();
+
         return view('secretary.create', [
             'categories' => $categories,
+            'secretaries' => $secretaries,
         ]);
     }
 
