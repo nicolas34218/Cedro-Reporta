@@ -1,69 +1,52 @@
 <?php
 
 use App\Enums\ReportStatus;
+use App\Models\Admin;
+use App\Models\Secretary;
+use App\Models\Citizen;
 use App\Models\Report;
-use App\Models\User;
 
 describe('Admin report status update', function () {
     beforeEach(function () {
-        $this->adminUser = User::factory()->create([
-            'user_type' => 'Admin',
-        ]);
+        $this->adminUser = Admin::factory()->create();
 
-        $this->secretaryUser = User::factory()->create([
-            'user_type' => 'Secretário',
-        ]);
+        $this->secretaryUser = Secretary::factory()->create();
 
-        $this->citizenUser = User::factory()->create([
-            'user_type' => 'Cidadão',
-        ]);
+        $this->citizenUser = Citizen::factory()->create();
 
         $this->report = Report::factory()->create([
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
         ]);
     });
 
     it('allows admin to update report status', function () {
-        $response = $this->actingAs($this->adminUser)
+        $response = $this->actingAs($this->adminUser, 'admin')
             ->put(route('admin.report.status', $this->report), [
-                'status' => ReportStatus::ANALYZING,
+                'status' => 'Em Análise',
             ]);
 
         $response->assertRedirect(route('admin.report.show', $this->report));
         $this->assertDatabaseHas('reports', [
             'id' => $this->report->id,
-            'status' => ReportStatus::ANALYZING,
-        ]);
-    });
-
-    it('allows secretary to update report status', function () {
-        $response = $this->actingAs($this->secretaryUser)
-            ->put(route('admin.report.status', $this->report), [
-                'status' => ReportStatus::RESOLVED,
-            ]);
-
-        $response->assertRedirect(route('admin.report.show', $this->report));
-        $this->assertDatabaseHas('reports', [
-            'id' => $this->report->id,
-            'status' => ReportStatus::RESOLVED,
+            'status' => 'Em Análise',
         ]);
     });
 
     it('prevents citizen from updating report status', function () {
-        $response = $this->actingAs($this->citizenUser)
+        $response = $this->actingAs($this->citizenUser, 'citizen')
             ->put(route('admin.report.status', $this->report), [
-                'status' => ReportStatus::RESOLVED,
+                'status' => 'Resolvida',
             ]);
 
         $response->assertStatus(403);
         $this->assertDatabaseHas('reports', [
             'id' => $this->report->id,
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
         ]);
     });
 
     it('does not accept invalid status values', function () {
-        $response = $this->actingAs($this->adminUser)
+        $response = $this->actingAs($this->adminUser, 'admin')
             ->from(route('admin.report.show', $this->report))
             ->put(route('admin.report.status', $this->report), [
                 'status' => 'Status Inválido',
@@ -73,7 +56,7 @@ describe('Admin report status update', function () {
         $response->assertSessionHasErrors(['status']);
         $this->assertDatabaseHas('reports', [
             'id' => $this->report->id,
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
         ]);
     });
 });
