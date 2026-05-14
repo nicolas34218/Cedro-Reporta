@@ -132,7 +132,7 @@ describe('Report Filter', function () {
             $response = $this->actingAs($this->user)
                 ->get(route('citizen.reports.search', [
                     'category' => 'Infraestrutura',
-                    'status' => ReportStatus::PENDING
+                    'status' => 'Aberta'
                 ]));
 
             $response->assertStatus(200);
@@ -140,7 +140,7 @@ describe('Report Filter', function () {
             
             expect($reports->count())->toBe(1);
             expect($reports->first()->category)->toBe('Infraestrutura');
-            expect($reports->first()->status)->toBe(ReportStatus::PENDING);
+            expect($reports->first()->status)->toBe('Aberta');
         });
 
         it('applies category and location filters simultaneously', function () {

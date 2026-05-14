@@ -59,6 +59,9 @@
                     <a href="{{ route('secretary.create') }}" style="margin-left: 20px;">
                         <button type="button">Criar Nova Secretária</button>
                     </a>
+                    <a href="{{ route('category.create') }}" style="margin-left: 20px;">
+                        <button type="button">Criar Categoria</button>
+                    </a>
                 </div>
             </header>
 

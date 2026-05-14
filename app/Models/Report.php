@@ -56,16 +56,6 @@ class Report extends Model
     }
 
     /**
-     * Alias para o cidadão (para compatibilidade com código existente).
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
-    {
-        return $this->citizen();
-    }
-
-    /**
      * Relacionamento com a secretária responsável pela denúncia.
      * A denúncia é automaticamente atribuída a uma secretária baseado na categoria.
      *
@@ -74,16 +64,6 @@ class Report extends Model
     public function secretary()
     {
         return $this->belongsTo(Secretary::class, 'secretary_id');
-    }
-
-    /**
-     * Alias para compatibilidade (antes era assignedSecretary).
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function assignedSecretary()
-    {
-        return $this->secretary();
     }
 
     /**

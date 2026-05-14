@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ReportStatus;
 use App\Models\Admin;
 use App\Models\Secretary;
 use App\Models\Citizen;

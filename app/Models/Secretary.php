@@ -39,7 +39,7 @@ class Secretary extends Authenticatable
      */
     public function assignedReports()
     {
-        return $this->hasMany(Report::class, 'assigned_secretary_id');
+        return $this->hasMany(Report::class, 'secretary_id');
     }
 
     /**

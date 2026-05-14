@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\SecretaryController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -129,4 +130,20 @@ Route::prefix('secretary')->name('secretary.')->controller(SecretaryController::
     Route::get('/dashboard', 'dashboard')
         ->name('dashboard')
         ->middleware('auth:secretary');
+});
+
+/**
+ * Rotas de categorias
+ * Requer autenticação e acesso de Admin
+ */
+Route::prefix('category')->name('category.')->controller(CategoryController::class)->group(function () {
+    // Formulário para criar nova categoria (apenas admin)
+    Route::get('/create', 'create')
+        ->name('create')
+        ->middleware(['auth:admin', 'admin.only']);
+
+    // Armazena nova categoria (apenas admin)
+    Route::post('/store', 'store')
+        ->name('store')
+        ->middleware(['auth:admin', 'admin.only']);
 });

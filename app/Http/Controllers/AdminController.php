@@ -31,7 +31,7 @@ class AdminController extends Controller
         ];
 
         // Obtém denúncias recentes (últimas 10)
-        $recentReports = Report::with('user')
+        $recentReports = Report::with('citizen')
             ->latest()
             ->take(10)
             ->get();
@@ -62,7 +62,7 @@ class AdminController extends Controller
      */
     public function listReports(Request $request)
     {
-        $query = Report::with('user');
+        $query = Report::with('citizen');
 
         // Aplica filtros se fornecidos
         if ($request->filled('status')) {
