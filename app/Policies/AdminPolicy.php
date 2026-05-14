@@ -19,26 +19,4 @@ class AdminPolicy
     {
         return true;
     }
-
-    /**
-     * Determina se o usuário pode visualizar relatórios.
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function viewReports(User $user): bool
-    {
-        return $user->canAccessAdminPanel();
-    }
-
-    /**
-     * Determina se o usuário pode atualizar um relatório.
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function updateReport(User $user): bool
-    {
-        return $user->canAccessAdminPanel();
-    }
 }

@@ -31,7 +31,7 @@ class ReportPolicy
      * @param Report $report
      * @return bool
      */
-    public function view(User $user, Report $report): bool
+    public function view(Citizen $user, Report $report): bool
     {
         return $this->isOwner($user, $report);
     }
@@ -41,11 +41,11 @@ class ReportPolicy
      *
      * Um usuário só pode atualizar denúncias que sejam suas.
      *
-     * @param User $user
+     * @param Citizen $user
      * @param Report $report
      * @return bool
      */
-    public function update(User $user, Report $report): bool
+    public function update(Citizen $user, Report $report): bool
     {
         return $this->isOwner($user, $report);
     }
@@ -55,11 +55,11 @@ class ReportPolicy
      *
      * Um usuário só pode deletar denúncias que sejam suas.
      *
-     * @param User $user
+     * @param Citizen $user
      * @param Report $report
      * @return bool
      */
-    public function delete(User $user, Report $report): bool
+    public function delete(Citizen $user, Report $report): bool
     {
         return $this->isOwner($user, $report);
     }
@@ -69,11 +69,11 @@ class ReportPolicy
      *
      * Um usuário só pode acompanhar denúncias que sejam suas.
      *
-     * @param User $user
+     * @param Citizen $user
      * @param Report $report
      * @return bool
      */
-    public function track(User $user, Report $report): bool
+    public function track(Citizen $user, Report $report): bool
     {
         return $this->isOwner($user, $report);
     }

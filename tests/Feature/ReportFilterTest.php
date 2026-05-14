@@ -2,7 +2,6 @@
 
 use App\Models\Report;
 use App\Models\Citizen;
-use App\Enums\ReportStatus;
 
 describe('Report Filter', function () {
     
@@ -17,7 +16,7 @@ describe('Report Filter', function () {
             'user_id' => $this->user->id,
             'title' => 'Buraco na rua',
             'category' => 'Infraestrutura',
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
             'location' => 'Centro - Distrito',
         ]);
 
@@ -25,7 +24,7 @@ describe('Report Filter', function () {
             'user_id' => $this->user->id,
             'title' => 'Semáforo quebrado',
             'category' => 'Trânsito',
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
             'location' => 'Vila Nova - Distrito',
         ]);
 
@@ -33,7 +32,7 @@ describe('Report Filter', function () {
             'user_id' => $this->user->id,
             'title' => 'Rua suja',
             'category' => 'Limpeza Urbana',
-            'status' => ReportStatus::ANALYZING,
+            'status' => 'Em Análise',
             'location' => 'Centro - Distrito',
         ]);
 
@@ -41,7 +40,7 @@ describe('Report Filter', function () {
             'user_id' => $this->user->id,
             'title' => 'Assalto',
             'category' => 'Segurança Pública',
-            'status' => ReportStatus::RESOLVED,
+            'status' => 'Resolvida',
             'location' => 'Periferia - Distrito',
         ]);
 
@@ -50,7 +49,7 @@ describe('Report Filter', function () {
             'user_id' => $otherUser->id,
             'title' => 'Postes iluminação',
             'category' => 'Iluminação',
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
             'location' => 'Centro - Distrito',
         ]);
     });
@@ -105,26 +104,26 @@ describe('Report Filter', function () {
     describe('Filter by Status', function () {
         it('filters reports by single status', function () {
             $response = $this->actingAs($this->user)
-                ->get(route('citizen.reports.search', ['status' => ReportStatus::PENDING]));
+                ->get(route('citizen.reports.search', ['status' => 'Aberta']));
 
             $response->assertStatus(200);
             $reports = $response->viewData('reports');
             
             expect($reports->count())->toBe(2);
             foreach ($reports as $report) {
-                expect($report->status)->toBe(ReportStatus::PENDING);
+                expect($report->status)->toBe('Aberta');
             }
         });
 
         it('filters reports by resolved status', function () {
             $response = $this->actingAs($this->user)
-                ->get(route('citizen.reports.search', ['status' => ReportStatus::RESOLVED]));
+                ->get(route('citizen.reports.search', ['status' => 'Resolvida']));
 
             $response->assertStatus(200);
             $reports = $response->viewData('reports');
             
             expect($reports->count())->toBe(1);
-            expect($reports->first()->status)->toBe(ReportStatus::RESOLVED);
+            expect($reports->first()->status)->toBe('Resolvida');
         });
     });
 
@@ -163,7 +162,7 @@ describe('Report Filter', function () {
             $response = $this->actingAs($this->user)
                 ->get(route('citizen.reports.search', [
                     'category' => 'Infraestrutura',
-                    'status' => ReportStatus::PENDING,
+                    'status' => 'Aberta',
                     'location' => 'Centro'
                 ]));
 
@@ -172,7 +171,7 @@ describe('Report Filter', function () {
             
             expect($reports->count())->toBe(1);
             expect($reports->first()->category)->toBe('Infraestrutura');
-            expect($reports->first()->status)->toBe(ReportStatus::PENDING);
+            expect($reports->first()->status)->toBe('Aberta');
             expect($reports->first()->location)->toContain('Centro');
         });
 
@@ -180,7 +179,7 @@ describe('Report Filter', function () {
             $response = $this->actingAs($this->user)
                 ->get(route('citizen.reports.search', [
                     'category' => 'Infraestrutura',
-                    'status' => ReportStatus::RESOLVED,
+                    'status' => 'Resolvida',
                 ]));
 
             $response->assertStatus(200);

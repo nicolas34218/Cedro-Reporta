@@ -2,7 +2,6 @@
 
 use App\Models\Report;
 use App\Models\Citizen;
-use App\Enums\ReportStatus;
 
 describe('Report Details', function () {
     
@@ -16,7 +15,7 @@ describe('Report Details', function () {
             'title' => 'Denúncia de Teste',
             'description' => 'Esta é uma denúncia para teste de visualização de detalhes',
             'category' => 'Infraestrutura',
-            'status' => ReportStatus::PENDING,
+            'status' => 'Aberta',
             'location' => 'Centro - Distrito',
             'image_path' => null,
         ]);
@@ -32,9 +31,7 @@ describe('Report Details', function () {
     });
 
     it('user cannot view another user report details', function () {
-        $otherUser = User::factory()->create([
-            'user_type' => 'Cidadão',
-        ]);
+        $otherUser = Citizen::factory()->create();
 
         $response = $this->actingAs($otherUser)
             ->get(route('citizen.reports.show', $this->report));
