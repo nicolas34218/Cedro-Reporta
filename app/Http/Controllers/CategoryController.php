@@ -23,7 +23,13 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.categories.create');
+        $categories = Category::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('category.create', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
