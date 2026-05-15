@@ -1,49 +1,41 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Secretária - Cedro Reporta</title>
-</head>
-<body>
-    <h1>Dashboard da Secretária</h1>
+@extends('layouts.admin', ['active' => 'dashboard'])
 
-    <div>
-        <h2>Bem-vindo, {{ auth()->user()->name }}!</h2>
-        <p><strong>Categoria:</strong> {{ $category }}</p>
-    </div>
+@section('title', 'Dashboard Secretária')
+@section('page-title', 'Dashboard da Secretária')
+@section('page-subtitle', 'Visualização das denúncias da sua categoria')
 
-    <!-- Estatísticas -->
-    <section>
-        <h2>Estatísticas de Denúncias - Categoria: {{ $category }}</h2>
-        <div>
-            <div>
-                <h3>Total de Denúncias</h3>
-                <p>{{ $statistics['total_reports'] }}</p>
-            </div>
-            <div>
-                <h3>Pendentes</h3>
-                <p>{{ $statistics['pending_reports'] }}</p>
-            </div>
-            <div>
-                <h3>Em Análise</h3>
-                <p>{{ $statistics['analyzing_reports'] }}</p>
-            </div>
-            <div>
-                <h3>Resolvidas</h3>
-                <p>{{ $statistics['resolved_reports'] }}</p>
-            </div>
+@section('content')
+    <section class="statistics">
+        <div class="stat-card">
+            <h3>TOTAL DE DENÚNCIAS</h3>
+            <p class="stat-number">{{ $statistics['total_reports'] }}</p>
+        </div>
+
+        <div class="stat-card pending">
+            <h3>PENDENTES</h3>
+            <p class="stat-number">{{ $statistics['pending_reports'] }}</p>
+        </div>
+
+        <div class="stat-card in-analysis">
+            <h3>EM ANÁLISE</h3>
+            <p class="stat-number">{{ $statistics['analyzing_reports'] }}</p>
+        </div>
+
+        <div class="stat-card resolved">
+            <h3>RESOLVIDAS</h3>
+            <p class="stat-number">{{ $statistics['resolved_reports'] }}</p>
         </div>
     </section>
 
-    <!-- Denúncias da Categoria -->
-    <section>
-        <h2>Denúncias da Categoria: {{ $category }}</h2>
+    <section class="reports-section">
+        <div class="section-header">
+            <h3>Denúncias da categoria: {{ $category }}</h3>
+        </div>
 
         @if ($reports->isEmpty())
             <p>Nenhuma denúncia cadastrada para esta categoria.</p>
         @else
-            <table border="1" cellpadding="10" cellspacing="0">
+            <table class="reports-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -73,14 +65,5 @@
             </table>
         @endif
     </section>
+@endsection
 
-    <!-- Menu -->
-    <section>
-        <h3>Menu</h3>
-        <form action="{{ route('logout') }}" method="post" style="display: inline;">
-            @csrf
-            <button type="submit">Logout</button>
-        </form>
-    </section>
-</body>
-</html>
