@@ -4,7 +4,12 @@
 @section('page-title', 'Dashboard da Secretária')
 @section('page-subtitle', 'Visualização das denúncias da sua categoria')
 
+@push('styles')
+<link rel="stylesheet" href="/css/secretary/dashboard.css">
+@endpush
+
 @section('content')
+    <!-- Cards de Estatísticas -->
     <section class="statistics">
         <div class="stat-card">
             <h3>TOTAL DE DENÚNCIAS</h3>
@@ -27,42 +32,73 @@
         </div>
     </section>
 
+    <!-- Tabela de Denúncias -->
     <section class="reports-section">
         <div class="section-header">
-            <h3>Denúncias da categoria: {{ $category }}</h3>
+            <h3>Denúncias da categoria: <strong>{{ $category }}</strong></h3>
         </div>
 
         @if ($reports->isEmpty())
-            <p>Nenhuma denúncia cadastrada para esta categoria.</p>
+            <div class="no-reports-message">
+                <i class="fas fa-inbox"></i>
+                <p>Nenhuma denúncia cadastrada para esta categoria.</p>
+            </div>
         @else
-            <table class="reports-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Descrição</th>
-                        <th>Denunciante</th>
-                        <th>Categoria</th>
-                        <th>Status</th>
-                        <th>Localização</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($reports as $report)
+            <div class="reports-table-wrapper">
+                <table class="reports-table">
+                    <thead>
                         <tr>
-                            <td>{{ $report->id }}</td>
-                            <td>{{ $report->title }}</td>
-                            <td>{{ Str::limit($report->description, 50) }}</td>
-                            <td>{{ $report->citizen->name ?? 'Desconhecido' }}</td>
-                            <td>{{ $report->category }}</td>
-                            <td>{{ $report->status }}</td>
-                            <td>{{ $report->location ?? 'Não informado' }}</td>
-                            <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Denunciante</th>
+                            <th>Status</th>
+                            <th>Prioridade</th>
+                            <th>Data</th>
+                            <th>Ações</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($reports as $report)
+                            <tr>
+                                <td class="id-cell">#{{ $report->id }}</td>
+                                <td class="title-cell">{{ Str::limit($report->title, 45) }}</td>
+                                <td class="citizen-cell">
+                                    @if($report->citizen)
+                                        <span title="{{ $report->citizen->email }}">{{ Str::limit($report->citizen->name, 20) }}</span>
+                                    @else
+                                        <span class="text-muted">Desconhecido</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}">
+                                        {{ $report->status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($report->priority)
+                                        <span class="priority-badge priority-{{ strtolower($report->priority) }}">
+                                            {{ $report->priority }}
+                                        </span>
+                                    @else
+                                        <span class="priority-badge priority-unclassified">
+                                            Não classificada
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="actions-cell">
+                                    <a href="{{ route('admin.report.show', $report) }}" class="btn-action btn-view" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('priority.edit', $report) }}" class="btn-action btn-priority" title="Classificar Prioridade">
+                                        <i class="fas fa-flag"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </section>
 @endsection

@@ -6,6 +6,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\SecretaryController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PriorityController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -93,22 +94,22 @@ Route::prefix('admin')->name('admin.')->controller(AdminController::class)->grou
     // Dashboard - resumo das denúncias
     Route::get('/dashboard', 'dashboard')
         ->name('dashboard')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 
     // Lista de denúncias
     Route::get('/reports', 'listReports')
         ->name('reports')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 
     // Detalhes da denúncia
     Route::get('/reports/{report}', 'showReport')
         ->name('report.show')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 
     // Atualizar status da denúncia
     Route::put('/reports/{report}/status', 'updateReportStatus')
         ->name('report.status')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 });
 
 /**
@@ -119,16 +120,21 @@ Route::prefix('secretary')->name('secretary.')->controller(SecretaryController::
     // Formulário para criar nova secretária (apenas admin)
     Route::get('/create', 'create')
         ->name('create')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 
     // Armazena nova secretária (apenas admin)
     Route::post('/store', 'store')
         ->name('store')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 
     // Dashboard da secretária com denúncias da categoria
     Route::get('/dashboard', 'dashboard')
         ->name('dashboard')
+        ->middleware('auth:secretary');
+
+    // Tela de classificação de prioridades das denúncias
+    Route::get('/classify-reports', 'classifyReports')
+        ->name('classify-reports')
         ->middleware('auth:secretary');
 });
 
@@ -140,10 +146,26 @@ Route::prefix('category')->name('category.')->controller(CategoryController::cla
     // Formulário para criar nova categoria (apenas admin)
     Route::get('/create', 'create')
         ->name('create')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
 
     // Armazena nova categoria (apenas admin)
     Route::post('/store', 'store')
         ->name('store')
-        ->middleware(['auth:admin', 'admin.only']);
+        ->middleware(['admin.auth', 'admin.only']);
+});
+
+/**
+ * Rotas de prioridade de denúncias
+ * Requer autenticação e acesso de Admin ou Secretário
+ */
+Route::prefix('priority')->name('priority.')->controller(PriorityController::class)->group(function () {
+    // Formulário para classificar denúncia por prioridade
+    Route::get('/reports/{report}/edit', 'edit')
+        ->name('edit')
+        ->middleware('admin.auth');
+
+    // Atualizar prioridade da denúncia
+    Route::put('/reports/{report}', 'update')
+        ->name('update')
+        ->middleware('admin.auth');
 });

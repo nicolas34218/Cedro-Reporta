@@ -35,6 +35,9 @@ class Report extends Model
         'location',
         'image_path',
         'secretary_id',
+        'priority',
+        'priority_justification',
+        'priority_assigned_at',
     ];
 
     /**
@@ -43,6 +46,7 @@ class Report extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'priority_assigned_at' => 'datetime',
     ];
 
     /**

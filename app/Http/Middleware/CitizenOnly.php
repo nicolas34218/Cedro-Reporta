@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Citizen;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +17,7 @@ class CitizenOnly
     public function handle(Request $request, Closure $next): Response
     {
         // Verifica se está autenticado como Citizen
-        if (Auth::guard('citizen')->check() && Auth::guard('citizen')->user() instanceof Citizen) {
+        if (Auth::guard('citizen')->check()) {
             return $next($request);
         }
 

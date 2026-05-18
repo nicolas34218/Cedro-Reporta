@@ -21,7 +21,7 @@ class CreateSecretaryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user() instanceof Admin;
+        return auth()->guard('admin')->check();
     }
 
     /**

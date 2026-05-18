@@ -106,5 +106,45 @@ class SecretaryController extends Controller
             'category' => $secretary->category,
         ]);
     }
+
+    /**
+     * Exibe a tela de classificação de prioridades das denúncias da secretária.
+     * 
+     * Mostra apenas as denúncias atribuídas à secretária autenticada.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function classifyReports()
+    {
+        /** @var Secretary $secretary */
+        $secretary = Auth::user();
+
+        // Valida se o usuário é uma secretária
+        if (!($secretary instanceof Secretary)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // Obtém todas as denúncias atribuídas a esta secretária
+        $reports = Report::where('secretary_id', $secretary->id)
+            ->with('citizen')
+            ->latest()
+            ->paginate(10);
+
+        // Calcula estatísticas das denúncias atribuídas
+        $statistics = [
+            'total_reports' => $secretary->assignedReports()->count(),
+            'pending_reports' => $secretary->assignedReports()
+                ->where('status', 'Pendente')
+                ->count(),
+            'analyzing_reports' => $secretary->assignedReports()
+                ->where('status', 'Em Análise')
+                ->count(),
+        ];
+
+        return view('admin.reports', [
+            'reports' => $reports,
+            'statistics' => $statistics,
+        ]);
+    }
 }
 

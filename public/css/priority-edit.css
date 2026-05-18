@@ -1,0 +1,462 @@
+/* ================================
+   CLASSIFICAÇÃO DE DENÚNCIAS
+   ================================ */
+
+:root {
+    --bg: #eef3e7;
+    --card: #ffffff;
+    --green: #2f6b3f;
+    --green-dark: #285f36;
+    --border: #d0dcc9;
+    --text: #35503f;
+    --muted: #6c7b6e;
+}
+
+.priority-container {
+    padding: 28px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ================================
+   CARTÃO DE INFORMAÇÕES
+   ================================ */
+
+.priority-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--bg);
+}
+
+.report-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--green-dark);
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background-color: var(--bg);
+    color: var(--green-dark);
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    background-color: #d0dcc9;
+    transform: translateX(-2px);
+}
+
+/* Grid de Informações */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+}
+
+.info-value {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.info-full {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--bg);
+}
+
+.info-full .info-label {
+    margin-bottom: 8px;
+}
+
+.info-full .info-value {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    width: fit-content;
+}
+
+.status-aberta {
+    background-color: #dbeafe;
+    color: #0369a1;
+}
+
+.status-em-análise {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.status-resolvida {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.status-fechada {
+    background-color: #fee2e2;
+    color: #7f1d1d;
+}
+
+/* ================================
+   CARTÃO DO FORMULÁRIO
+   ================================ */
+
+.form-card h3 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--green-dark);
+}
+
+.error-alert {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    color: #7f1d1d;
+}
+
+.error-alert i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.error-alert strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.error-alert ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+}
+
+.error-alert li {
+    margin-bottom: 4px;
+}
+
+/* ================================
+   OPÇÕES DE PRIORIDADE
+   ================================ */
+
+.priority-options-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.priority-radio {
+    position: relative;
+}
+
+.priority-radio input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.priority-radio .radio-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background-color: #fafbf9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.priority-radio input[type="radio"]:checked + .radio-content {
+    background-color: #f0f9ff;
+    border-color: var(--green);
+}
+
+.priority-radio input[type="radio"]:checked + .radio-content .radio-dot {
+    box-shadow: inset 0 0 0 3px #fff, 0 0 0 2px currentColor;
+}
+
+.priority-radio:hover .radio-content {
+    border-color: var(--green);
+    background-color: #f5f7f4;
+}
+
+.radio-dot {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.radio-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.radio-title {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.radio-desc {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.error-message {
+    display: block;
+    color: #b42318;
+    font-size: 12px;
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+/* ================================
+   CAMPO DE JUSTIFICATIVA
+   ================================ */
+
+#justification-container {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 400px;
+        margin-bottom: 20px;
+    }
+}
+
+.justification-field {
+    background-color: #fff8f0;
+    padding: 14px;
+    border-radius: 6px;
+    border: 1px solid #fed7aa;
+}
+
+.justification-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    letter-spacing: 0.3px;
+}
+
+.justification-field textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #f2b827;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 100px;
+    background-color: #fff;
+    color: var(--text);
+    box-sizing: border-box;
+}
+
+.justification-field textarea:focus {
+    outline: none;
+    border-color: #f2a900;
+    box-shadow: 0 0 0 3px rgba(242, 184, 39, 0.1);
+}
+
+.justification-field small {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+}
+
+/* ================================
+   BOTÕES
+   ================================ */
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.btn-save {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background-color: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-save:hover {
+    background-color: var(--green-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(47, 107, 63, 0.2);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background-color: #f0f0f0;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-cancel:hover {
+    background-color: #e0e0e0;
+    border-color: var(--muted);
+}
+
+/* ================================
+   RESPONSIVO
+   ================================ */
+
+@media (max-width: 900px) {
+    .priority-container {
+        padding: 18px;
+    }
+
+    .priority-card {
+        padding: 18px;
+    }
+
+    .report-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .report-header h2 {
+        font-size: 18px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .priority-container {
+        padding: 12px;
+    }
+
+    .priority-card {
+        padding: 14px;
+    }
+
+    .report-header h2 {
+        font-size: 16px;
+    }
+
+    .priority-options-group {
+        gap: 10px;
+    }
+
+    .priority-radio .radio-content {
+        padding: 10px;
+    }
+
+    .radio-text {
+        gap: 1px;
+    }
+
+    .radio-title {
+        font-size: 13px;
+    }
+
+    .radio-desc {
+        font-size: 11px;
+    }
+}
