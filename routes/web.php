@@ -13,7 +13,23 @@ use Illuminate\Support\Facades\Route;
  * Rota inicial / dashboard
  */
 Route::get('/', function () {
-    return redirect('/login');
+    // Se está autenticado como admin
+    if (auth('admin')->check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    
+    // Se está autenticado como secretary
+    if (auth('secretary')->check()) {
+        return redirect()->route('secretary.dashboard');
+    }
+    
+    // Se está autenticado como citizen
+    if (auth('citizen')->check()) {
+        return redirect()->route('citizen.home');
+    }
+    
+    // Se não está autenticado, vai para login
+    return redirect()->route('login');
 })->name('welcome');
 
 /**

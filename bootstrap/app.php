@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth' => \App\Http\Middleware\AdminAuth::class,
             'admin.only' => \App\Http\Middleware\AdminOnly::class,
             'citizen.only' => \App\Http\Middleware\CitizenOnly::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

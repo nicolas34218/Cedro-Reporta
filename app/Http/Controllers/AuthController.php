@@ -46,8 +46,8 @@ class AuthController extends Controller
             ]);
 
             // Realiza login automático após o registro
-            Auth::login($citizen);
-
+            Auth::guard('citizen')->login($citizen);
+            
             return redirect()
                 ->route('citizen.home')
                 ->with('success', 'Cadastro realizado com sucesso! Bem-vindo ao Cedro Reporta.');
