@@ -101,26 +101,45 @@ class ReportController extends Controller
                 'image_path' => $imagePath, // Salva o caminho da imagem
             ]);
 
-            // Atribui automaticamente a denúncia à secretária responsável da categoria
-            $secretary = Secretary::where('category', $validated['category'])
-                ->where('is_active', true)
+            // Busca a categoria para obter as secretárias responsáveis
+            $category = \App\Models\Category::where('name', $validated['category'])
                 ->first();
 
-            if ($secretary) {
-                $report->update([
-                    'secretary_id' => $secretary->id,
-                ]);
+            if ($category) {
+                // Obtém todas as secretárias responsáveis pela categoria
+                $secretaries = $category->secretaries()
+                    ->where('is_active', true)
+                    ->get();
 
-                Log::info('Denúncia atribuída automaticamente à secretária', [
-                    'report_id' => $report->id,
-                    'secretary_id' => $secretary->id,
-                    'secretary_name' => $secretary->name,
-                    'category' => $validated['category'],
-                ]);
+                if ($secretaries->isNotEmpty()) {
+                    // Atribui a primeira secretária como responsável principal
+                    $primarySecretary = $secretaries->first();
+                    $report->update([
+                        'secretary_id' => $primarySecretary->id,
+                    ]);
+
+                    // Notifica TODAS as secretárias responsáveis pela categoria
+                    foreach ($secretaries as $secretary) {
+                        $secretary->notify(new \App\Notifications\NewReportAssigned($report));
+                    }
+
+                    Log::info('Denúncia atribuída automaticamente', [
+                        'report_id' => $report->id,
+                        'primary_secretary_id' => $primarySecretary->id,
+                        'primary_secretary_name' => $primarySecretary->name,
+                        'total_secretaries_notified' => $secretaries->count(),
+                        'category' => $validated['category'],
+                    ]);
+                } else {
+                    Log::warning('Nenhuma secretária ativa encontrada para a categoria', [
+                        'report_id' => $report->id,
+                        'category' => $validated['category'],
+                    ]);
+                }
             } else {
-                Log::warning('Nenhuma secretária encontrada para a categoria', [
+                Log::warning('Categoria não encontrada', [
                     'report_id' => $report->id,
-                    'category' => $validated['category'],
+                    'category_name' => $validated['category'],
                 ]);
             }
 
@@ -185,8 +204,8 @@ class ReportController extends Controller
         // Autoriza o acesso usando a Policy
         $this->authorize('view', $report);
 
-        // Carrega o usuário relacionado
-        $report->load('user');
+        // Carrega o cidadão relacionado
+        $report->load('citizen');
 
         // Usa o trait para formatar a denúncia
         $reportFormatted = $this->formatReport($report, includeDescription: true);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Model para categorias de denúncias.
@@ -47,5 +48,21 @@ class Category extends Model
     public function reports(): HasMany
     {
         return $this->hasMany(Report::class, 'category', 'name');
+    }
+
+    /**
+     * Relacionamento: Uma categoria pode ser responsabilidade de várias secretárias.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+
+    public function secretaries(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Secretary::class,
+            'category_secretary',
+            'category_id',
+            'secretary_id'
+        );
     }
 }

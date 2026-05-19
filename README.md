@@ -94,3 +94,31 @@ php artisan test tests/Feature/ReportFilterTest.php
 - **Banco de Dados**: SQLite (desenvolvimento) / MySQL (produção)
 - **Frontend**: Vite, Tailwind CSS
 - **Testes**: Pest PHP
+
+# Sistema de Atribuição Automática de Denúncias
+
+## 🎯 Funcionalidade Implementada
+
+O sistema agora **atribui automaticamente denúncias aos setores responsáveis** baseado na categoria selecionada pelo cidadão.
+
+### Critérios Atendidos
+
+✅ Atribuição automática de denúncias aos setores responsáveis por categoria  
+✅ Suporte a **múltiplas secretárias por categoria**  
+✅ **Notificações internas** para secretárias quando denúncia é atribuída  
+✅ Campo "Setor Responsável" no formulário (carregamento automático)  
+✅ Interface conforme mockup fornecido  
+
+## 🔧 Instalação
+
+### 1. Migrar o banco de dados
+```bash
+php artisan migrate
+
+### 2. Associar secretárias às categorias
+```bash
+php artisan db:seed --class=CategorySecretarySeeder
+
+### 3. Limpar cache
+```bash
+php artisan config:cache

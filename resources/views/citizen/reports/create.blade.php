@@ -39,17 +39,29 @@
                     <x-error-message field="description" />
                 </div>
 
-                <div class="form-field">
-                    <label for="category">CATEGORIA</label>
-                    <select id="category" name="category">
-                        <option value="">Selecione</option>
-                        <option value="Iluminação" @selected(old('category') === 'Iluminação')>Iluminação</option>
-                        <option value="Buracos" @selected(old('category') === 'Buracos')>Buracos</option>
-                        <option value="Lixo" @selected(old('category') === 'Lixo')>Lixo</option>
-                        <option value="Segurança" @selected(old('category') === 'Segurança')>Segurança</option>
-                        <option value="Outros" @selected(old('category') === 'Outros')>Outros</option>
-                    </select>
-                    <x-error-message field="category" />
+                    <div class="form-field">
+                        <label for="category">CATEGORIA</label>
+                        <select id="category" name="category">
+                            <option value="">Selecione</option>
+                            <option value="Iluminação" @selected(old('category') === 'Iluminação')>Iluminação</option>
+                            <option value="Buracos" @selected(old('category') === 'Buracos')>Buracos</option>
+                            <option value="Lixo" @selected(old('category') === 'Lixo')>Lixo</option>
+                            <option value="Segurança" @selected(old('category') === 'Segurança')>Segurança</option>
+                            <option value="Outros" @selected(old('category') === 'Outros')>Outros</option>
+                        </select>
+                        <x-error-message field="category" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="secretary">SETOR RESPONSÁVEL</label>
+                        <select id="secretary" name="secretary_id">
+                            <option value="">Carregando...</option>
+                        </select>
+                        <small style="display: block; margin-top: 8px; color: #666;">
+                            <i style="color: #2f6b3f;">💡</i> Preenchido automaticamente com base na categoria
+                        </small>
+                        <x-error-message field="secretary_id" />
+                    </div>
                 </div>
             </div>
 
@@ -83,4 +95,56 @@
         <button type="submit" class="btn-submit">Enviar Denúncia</button>
     </form>
 </section>
+
+@push('scripts')
+<script>
+    // Carrega os setores responsáveis automaticamente ao mudar a categoria
+    document.getElementById('category').addEventListener('change', async function() {
+        const categoryId = this.value;
+        const secretarySelect = document.getElementById('secretary');
+        
+        if (!categoryId) {
+            secretarySelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
+            return;
+        }
+
+        try {
+            secretarySelect.innerHTML = '<option value="">Carregando...</option>';
+            
+            // Faz requisição para buscar os setores responsáveis da categoria
+            const response = await fetch(`/api/categories/${categoryId}/secretaries`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao carregar setores');
+            }
+
+            const secretaries = await response.json();
+            
+            if (secretaries.length === 0) {
+                secretarySelect.innerHTML = '<option value="">Nenhum setor responsável configurado</option>';
+                return;
+            }
+
+            // Preenche o select com os setores
+            secretarySelect.innerHTML = '<option value="">Selecione (opcional)</option>';
+            secretaries.forEach(secretary => {
+                const option = document.createElement('option');
+                option.value = secretary.id;
+                option.textContent = secretary.name;
+                secretarySelect.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error('Erro:', error);
+            secretarySelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
+        }
+    });
+</script>
+@endpush
+
 @endsection

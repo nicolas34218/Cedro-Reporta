@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable(['name', 'email', 'password', 'category', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
@@ -62,5 +63,20 @@ class Secretary extends Authenticatable
     public function userType(): string
     {
         return 'Secretário';
+    }
+
+    /**
+     * Relacionamento: Uma secretária pode ser responsável por várias categorias.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Category::class,
+            'category_secretary',
+            'secretary_id',
+            'category_id'
+        );
     }
 }

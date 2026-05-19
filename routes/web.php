@@ -63,10 +63,9 @@ Route::controller(AuthController::class)->group(function () {
         ->name('login.store')
         ->middleware('guest');
 
-    // Logout
+    // Logout - Funciona para cualquier tipo de usuário (admin, secretary, citizen)
     Route::post('/logout', 'logout')
-        ->name('logout')
-        ->middleware('auth');
+        ->name('logout');
 });
 
 /**
@@ -185,3 +184,36 @@ Route::prefix('priority')->name('priority.')->controller(PriorityController::cla
         ->name('update')
         ->middleware('admin.auth');
 });
+
+/**
+ * Rotas API para carregamento dinâmico
+ * Endpoints para requisições AJAX do frontend
+ */
+Route::prefix('api')->middleware(['auth:citizen'])->group(function () {
+    // Retorna todas as secretárias responsáveis por uma categoria
+    Route::get('/categories/{categoryName}/secretaries', function ($categoryName) {
+        try {
+            // Busca a categoria pelo nome
+            $category = \App\Models\Category::where('name', $categoryName)
+                ->first();
+
+            if (!$category) {
+                return response()->json([], 404);
+            }
+
+            // Retorna as secretárias responsáveis por essa categoria (ativas)
+            $secretaries = $category->secretaries()
+                ->where('is_active', true)
+                ->select('id', 'name')
+                ->get();
+
+            return response()->json($secretaries);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao buscar secretárias', [
+                'category' => $categoryName,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'Erro ao carregar setores'], 500);
+        }
+    });
+});   
