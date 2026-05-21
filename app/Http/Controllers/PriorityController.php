@@ -34,10 +34,11 @@ class PriorityController extends Controller
     /**
      * Atualiza a prioridade da denúncia.
      * Valida e salva a classificação no banco de dados.
+     * Retorna JSON para requisições AJAX ou redireciona para requisições normais.
      *
      * @param Request $request
      * @param Report $report
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Report $report)
     {
@@ -53,6 +54,12 @@ class PriorityController extends Controller
 
         // Se for Urgente, validar que justificativa foi fornecida
         if ($validated['priority'] === 'Urgente' && empty($validated['priority_justification'])) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A justificativa é obrigatória para denúncias urgentes.'
+                ], 422);
+            }
             return back()
                 ->withInput()
                 ->withErrors(['priority_justification' => 'A justificativa é obrigatória para denúncias urgentes.']);
@@ -66,10 +73,35 @@ class PriorityController extends Controller
                 'priority_assigned_at' => now(),
             ]);
 
-            return redirect()->route('admin.reports')
+            \Illuminate\Support\Facades\Log::info('Prioridade da denúncia atualizada', [
+                'report_id' => $report->id,
+                'new_priority' => $validated['priority'],
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Denúncia #{$report->id} classificada como {$validated['priority']} com sucesso!",
+                    'priority' => $report->priority
+                ], 200);
+            }
+
+            return redirect()->route('secretary.classify-reports')
                 ->with('success', "Denúncia #{$report->id} classificada como {$validated['priority']} com sucesso!");
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao classificar denúncia', [
+                'report_id' => $report->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro ao classificar denúncia. Tente novamente.'
+                ], 500);
+            }
+
             return back()
                 ->withInput()
                 ->with('error', 'Erro ao classificar denúncia. Tente novamente.');

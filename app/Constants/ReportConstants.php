@@ -39,15 +39,4 @@ class ReportConstants
     {
         return implode(',', self::CATEGORIES);
     }
-
-    /**
-     * Verifica se uma categoria é válida.
-     *
-     * @param string $category
-     * @return bool
-     */
-    public static function isValidCategory(string $category): bool
-    {
-        return in_array($category, self::CATEGORIES, true);
-    }
 }

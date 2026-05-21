@@ -103,6 +103,12 @@ class ReportController extends Controller
             }
 
             // 2. Cria a denúncia já com o secretary_id preenchido (Salva 1 query no banco)
+            Log::info('🔹 Antes de criar a denúncia', [
+                'category' => $validated['category'],
+                'secretary_id' => $secretaryId,
+                'status' => ReportStatus::PENDING,
+            ]);
+
             $report = auth()->user()->reports()->create([
                 'user_id' => auth()->id(),
                 'title' => $validated['title'],
@@ -114,18 +120,40 @@ class ReportController extends Controller
                 'secretary_id' => $secretaryId, // Vinculação feita aqui diretamente!
             ]);
 
+            Log::info('✅ Denúncia criada no banco', [
+                'report_id' => $report->id,
+                'secretary_id' => $report->secretary_id,
+            ]);
+
             // 3. Dispara as notificações se houverem secretárias
             if ($secretariesToNotify->isNotEmpty()) {
-                foreach ($secretariesToNotify as $secretary) {
-                    $secretary->notify(new \App\Notifications\NewReportAssigned($report));
-                }
-
-                Log::info('Denúncia atribuída automaticamente', [
+                Log::info('📨 Enviando notificações', [
                     'report_id' => $report->id,
-                    'primary_secretary_id' => $secretaryId,
-                    'total_secretaries_notified' => $secretariesToNotify->count(),
-                    'category' => $validated['category'],
+                    'total_secretaries' => $secretariesToNotify->count(),
                 ]);
+
+                try {
+                    foreach ($secretariesToNotify as $secretary) {
+                        Log::info('📧 Notificando secretária', [
+                            'secretary_id' => $secretary->id,
+                            'secretary_email' => $secretary->email,
+                        ]);
+                        $secretary->notify(new \App\Notifications\NewReportAssigned($report));
+                    }
+
+                    Log::info('Denúncia atribuída automaticamente', [
+                        'report_id' => $report->id,
+                        'primary_secretary_id' => $secretaryId,
+                        'total_secretaries_notified' => $secretariesToNotify->count(),
+                        'category' => $validated['category'],
+                    ]);
+                } catch (\Exception $notificationException) {
+                    Log::warning('Erro ao enviar notificações (denúncia já criada)', [
+                        'report_id' => $report->id,
+                        'error' => $notificationException->getMessage(),
+                    ]);
+                    // Não relança - denúncia já foi criada com sucesso
+                }
             }
             // --- FIM DA OTIMIZAÇÃO ---
 

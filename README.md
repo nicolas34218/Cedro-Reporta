@@ -122,3 +122,5 @@ php artisan db:seed --class=CategorySecretarySeeder
 ### 3. Limpar cache
 ```bash
 php artisan config:cache
+
+php artisan migrate:fresh --seed --no-interaction

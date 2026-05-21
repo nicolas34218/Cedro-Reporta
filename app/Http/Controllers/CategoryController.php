@@ -97,15 +97,4 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * Lista todas as categorias ativas.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getActiveCategories()
-    {
-        return Category::where('is_active', true)
-            ->orderBy('name')
-            ->get();
-    }
 }

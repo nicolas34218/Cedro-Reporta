@@ -30,5 +30,6 @@
         <x-logout-button />
     @endunless
 
+    @stack('scripts')
 </body>
 </html>

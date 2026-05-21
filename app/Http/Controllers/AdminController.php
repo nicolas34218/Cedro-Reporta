@@ -110,6 +110,14 @@ class AdminController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
+    /**
+     * Atualiza o status da denúncia.
+     * Retorna JSON para requisições AJAX ou redireciona para requisições normais.
+     *
+     * @param Report $report
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
     public function updateReportStatus(Report $report, Request $request)
     {
         $validated = $request->validate([
@@ -117,14 +125,50 @@ class AdminController extends Controller
         ]);
 
         if ($report->status === $validated['status']) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'O status da denúncia já está definido como ' . $report->status . '.'
+                ], 200);
+            }
             return redirect()->route('admin.report.show', $report)
                 ->with('info', 'O status da denúncia já está definido como ' . $report->status . '.');
         }
 
-        $report->status = $validated['status'];
-        $report->save();
+        try {
+            $report->status = $validated['status'];
+            $report->save();
 
-        return redirect()->route('admin.report.show', $report)
-            ->with('success', 'Status da denúncia atualizado com sucesso!');
+            \Illuminate\Support\Facades\Log::info('Status da denúncia atualizado', [
+                'report_id' => $report->id,
+                'new_status' => $validated['status'],
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Status da denúncia atualizado com sucesso!',
+                    'status' => $report->status
+                ], 200);
+            }
+
+            return redirect()->route('admin.report.show', $report)
+                ->with('success', 'Status da denúncia atualizado com sucesso!');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao atualizar status da denúncia', [
+                'report_id' => $report->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro ao atualizar status. Tente novamente.'
+                ], 500);
+            }
+
+            return back()->with('error', 'Erro ao atualizar status. Tente novamente.');
+        }
     }
 }

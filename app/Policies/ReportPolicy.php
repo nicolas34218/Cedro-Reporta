@@ -36,33 +36,7 @@ class ReportPolicy
         return $this->isOwner($user, $report);
     }
 
-    /**
-     * Determina se o usuário pode atualizar uma denúncia.
-     *
-     * Um usuário só pode atualizar denúncias que sejam suas.
-     *
-     * @param Citizen $user
-     * @param Report $report
-     * @return bool
-     */
-    public function update(Citizen $user, Report $report): bool
-    {
-        return $this->isOwner($user, $report);
-    }
 
-    /**
-     * Determina se o usuário pode deletar uma denúncia.
-     *
-     * Um usuário só pode deletar denúncias que sejam suas.
-     *
-     * @param Citizen $user
-     * @param Report $report
-     * @return bool
-     */
-    public function delete(Citizen $user, Report $report): bool
-    {
-        return $this->isOwner($user, $report);
-    }
 
     /**
      * Determina se o usuário pode acompanhar uma denúncia.

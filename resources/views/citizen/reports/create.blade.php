@@ -98,52 +98,89 @@
 
 @push('scripts')
 <script>
-    // Carrega os setores responsáveis automaticamente ao mudar a categoria
-    document.getElementById('category').addEventListener('change', async function() {
-        const categoryId = this.value;
-        const secretarySelect = document.getElementById('secretary');
-        
-        if (!categoryId) {
-            secretarySelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
-            return;
-        }
-
-        try {
-            secretarySelect.innerHTML = '<option value="">Carregando...</option>';
+    console.log('✨ Script de categoria carregado!');
+    console.log('📍 Procurando elemento com ID: category');
+    
+    const categorySelect = document.getElementById('category');
+    const secretarySelect = document.getElementById('secretary');
+    
+    console.log('✅ category encontrado:', categorySelect ? 'SIM' : 'NÃO');
+    console.log('✅ secretary encontrado:', secretarySelect ? 'SIM' : 'NÃO');
+    
+    if (!categorySelect || !secretarySelect) {
+        console.error('❌ Elementos não encontrados! Abortando script.');
+    } else {
+        // Carrega os setores responsáveis automaticamente ao mudar a categoria
+        categorySelect.addEventListener('change', async function() {
+            const categoryId = this.value;
             
-            // Faz requisição para buscar os setores responsáveis da categoria
-            const response = await fetch(`/api/categories/${categoryId}/secretaries`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao carregar setores');
-            }
-
-            const secretaries = await response.json();
+            console.log('🔍 Categoria mudou para:', categoryId);
             
-            if (secretaries.length === 0) {
-                secretarySelect.innerHTML = '<option value="">Nenhum setor responsável configurado</option>';
+            if (!categoryId) {
+                secretarySelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
                 return;
             }
 
-            // Preenche o select com os setores
-            secretarySelect.innerHTML = '<option value="">Selecione (opcional)</option>';
-            secretaries.forEach(secretary => {
-                const option = document.createElement('option');
-                option.value = secretary.id;
-                option.textContent = secretary.name;
-                secretarySelect.appendChild(option);
-            });
+            try {
+                secretarySelect.innerHTML = '<option value="">Carregando...</option>';
+                
+                const url = `/api/categories/${categoryId}/secretaries`;
+                console.log('📡 Fazendo fetch para:', url);
+                
+                // Faz requisição para buscar os setores responsáveis da categoria
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
 
-        } catch (error) {
-            console.error('Erro:', error);
-            secretarySelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
-        }
-    });
+                console.log('📊 Status da resposta:', response.status);
+                console.log('📦 Response OK?', response.ok);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Erro na resposta:', errorText);
+                    throw new Error(`Erro ao carregar setores (Status: ${response.status})`);
+                }
+
+                const secretaries = await response.json();
+                console.log('✅ Secretárias recebidas:', secretaries);
+                
+                if (secretaries.length === 0) {
+                    console.warn('⚠️ Nenhuma secretária encontrada para esta categoria');
+                    secretarySelect.innerHTML = '<option value="">Nenhum setor responsável configurado</option>';
+                    return;
+                }
+
+                // Preenche o select com os setores
+                secretarySelect.innerHTML = '<option value="">Selecione (opcional)</option>';
+                secretaries.forEach(secretary => {
+                    console.log(`➕ Adicionando secretária: ${secretary.name} (ID: ${secretary.id})`);
+                    const option = document.createElement('option');
+                    option.value = secretary.id;
+                    option.textContent = secretary.name;
+                    secretarySelect.appendChild(option);
+                });
+
+                // Se há apenas 1 secretária, seleciona automaticamente
+                if (secretaries.length === 1) {
+                    secretarySelect.value = secretaries[0].id;
+                    console.log('🎯 Secretária auto-selecionada:', secretaries[0].name);
+                } else {
+                    console.log('⚙️ Múltiplas secretárias disponíveis, usuário deve escolher');
+                }
+
+                console.log('🎉 Select preenchido com sucesso');
+
+            } catch (error) {
+                console.error('🚨 Erro ao carregar setores:', error);
+                secretarySelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
+            }
+        });
+        
+        console.log('✅ Event listener adicionado com sucesso');
+    }
 </script>
 @endpush
 

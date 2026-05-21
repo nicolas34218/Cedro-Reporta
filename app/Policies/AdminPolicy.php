@@ -6,17 +6,10 @@ use App\Models\Admin;
 
 /**
  * Policy para controle de acesso ao painel administrativo.
+ * 
+ * Este arquivo é mantido para extensões futuras de controle de acesso.
  */
 class AdminPolicy
 {
-    /**
-     * Determina se o usuário pode acessar o painel administrativo.
-     *
-     * @param Admin $user
-     * @return bool
-     */
-    public function viewDashboard(Admin $user): bool
-    {
-        return true;
-    }
+    // Policies podem ser adicionadas aqui quando necessário
 }

@@ -70,9 +70,9 @@
                                 <option value="Baixa" {{ $report->priority === 'Baixa' ? 'selected' : '' }}>Baixa</option>
                             </select>
 
-                            <select class="status-select" onchange="updateStatus({{ $report->id }}, this.value)">
+                            <select class="status-select" onchange="updateStatus({{ $report->id }}, this.value, '{{ Auth::guard('secretary')->check() ? 'secretary' : 'admin' }}')">
                                 <option value="">Selecione Status</option>
-                                <option value="Aberta" {{ $report->status === 'Aberta' ? 'selected' : '' }}>Aberta</option>
+                                <option value="Pendente" {{ $report->status === 'Pendente' ? 'selected' : '' }}>Pendente</option>
                                 <option value="Em Análise" {{ $report->status === 'Em Análise' ? 'selected' : '' }}>Em Análise</option>
                                 <option value="Resolvida" {{ $report->status === 'Resolvida' ? 'selected' : '' }}>Resolvida</option>
                                 <option value="Fechada" {{ $report->status === 'Fechada' ? 'selected' : '' }}>Fechada</option>
@@ -87,60 +87,100 @@
 
 @push('scripts')
 <script>
-    function updatePriority(reportId, priority) {
-        if (!priority) {
-            return; // Não faz nada se não houver seleção
+    function getCsrfToken() {
+        const token = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (!token) {
+            console.error('CSRF token não encontrado!');
+            throw new Error('Token CSRF não encontrado');
         }
-
-    function updateStatus(reportId, status) {
-    if (!status) {
-        return; // Não faz nada se não houver seleção
+        return token;
     }
 
-        // Fazer requisição PUT para atualizar o status
-        fetch(`/admin/reports/${reportId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({
-                status: status
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao atualizar status');
-            }
-            console.log(`Status do relatório ${reportId} atualizado para ${status}`);
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao atualizar status. Tente novamente.');
-        });
-    }    
+    function updatePriority(reportId, priority) {
+        if (!priority) {
+            console.log('Nenhuma prioridade selecionada');
+            return;
+        }
 
-        // Fazer requisição PUT para atualizar a prioridade
+        console.log(`🔄 Enviando requisição para atualizar prioridade do relatório ${reportId} para: ${priority}`);
+
+        const payload = { priority: priority };
+        console.log('Payload:', payload);
+        console.log('URL:', `/priority/reports/${reportId}`);
+        console.log('CSRF Token:', getCsrfToken().substring(0, 20) + '...');
+
         fetch(`/priority/reports/${reportId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                priority: priority
-            })
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
         })
-        .then(response => {
+        .then(async response => {
+            const data = await response.clone().json().catch(() => response.text());
+            console.log(`📨 Resposta recebida - Status: ${response.status}`, data);
+            
             if (!response.ok) {
-                throw new Error('Erro ao atualizar prioridade');
+                throw new Error(`Erro ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
             }
-            // Mostrar feedback ao usuário (opcional)
-            console.log(`Prioridade do relatório ${reportId} atualizada para ${priority}`);
+            
+            console.log(`✅ Prioridade atualizada com sucesso!`);
+            alert(`✅ Prioridade atualizada para ${priority} com sucesso!`);
+            location.reload();
         })
         .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao atualizar prioridade. Tente novamente.');
+            console.error('❌ Erro na requisição:', error);
+            alert(`❌ Erro ao atualizar prioridade:\n${error.message}`);
+        });
+    }
+
+    function updateStatus(reportId, status, userType = 'admin') {
+        if (!status) {
+            console.log('Nenhum status selecionado');
+            return;
+        }
+
+        console.log(`🔄 Enviando requisição para atualizar status do relatório ${reportId} para: ${status}`);
+
+        // Determina a URL baseado no tipo de usuário
+        const statusUrl = userType === 'secretary' 
+            ? `/secretary/reports/${reportId}/status` 
+            : `/admin/reports/${reportId}/status`;
+
+        const payload = { status: status };
+        console.log('Payload:', payload);
+        console.log('URL:', statusUrl);
+        console.log('User Type:', userType);
+        console.log('CSRF Token:', getCsrfToken().substring(0, 20) + '...');
+
+        fetch(statusUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        })
+        .then(async response => {
+            const data = await response.clone().json().catch(() => response.text());
+            console.log(`📨 Resposta recebida - Status: ${response.status}`, data);
+            
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
+            }
+            
+            console.log(`✅ Status atualizado com sucesso!`);
+            alert(`✅ Status atualizado para ${status} com sucesso!`);
+            location.reload();
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição:', error);
+            alert(`❌ Erro ao atualizar status:\n${error.message}`);
         });
     }
 </script>

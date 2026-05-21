@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * Model para categorias de denÃºncias.
+ * Model para categorias de denúncias.
  * 
  * @property int $id
- * @property string $name Nome da categoria (ex: IluminaÃ§Ã£o PÃºblica)
- * @property string|null $description DescriÃ§Ã£o da categoria
- * @property bool $is_active Se a categoria estÃ¡ ativa
+ * @property string $name Nome da categoria (ex: Iluminação Pública)
+ * @property string|null $description Descrição da categoria
+ * @property bool $is_active Se a categoria está ativa
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
@@ -30,7 +29,7 @@ class Category extends Model
     ];
 
     /**
-     * ConversÃ£o de tipos de campos.
+     * Conversão de tipos de campos.
      * 
      * @var array<string, string>
      */
@@ -41,7 +40,8 @@ class Category extends Model
     ];
 
     /**
-     * Relacionamento: Uma categoria tem muitas denÃºncias.
+     * Relacionamento: Uma categoria tem muitas denúncias.
+     * Busca reports onde o campo 'category' (string) corresponde ao nome da categoria.
      * 
      * @return HasMany
      */
@@ -51,18 +51,13 @@ class Category extends Model
     }
 
     /**
-     * Relacionamento: Uma categoria pode ser responsabilidade de vÃ¡rias secretÃ¡rias.
+     * Relacionamento: Uma categoria pode ser responsabilidade de várias secretárias.
+     * Busca secretaries onde o campo 'category' (string) corresponde ao nome da categoria.
      * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return HasMany
      */
-
-    public function secretaries(): BelongsToMany
+    public function secretaries(): HasMany
     {
-        return $this->belongsToMany(
-            Secretary::class,
-            'category_secretary',
-            'category_id',
-            'secretary_id'
-        );
+        return $this->hasMany(Secretary::class, 'category', 'name');
     }
 }

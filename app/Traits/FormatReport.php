@@ -39,12 +39,4 @@ trait FormatReport
 
         return $data;
     }
-
-    /**
-     * Formata múltiplas denúncias.
-     */
-    protected function formatReports($reports, bool $includeDescription = false): array
-    {
-        return $reports->map(fn($report) => $this->formatReport($report, $includeDescription))->toArray();
-    }
 }

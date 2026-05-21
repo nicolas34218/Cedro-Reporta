@@ -154,6 +154,16 @@ Route::prefix('secretary')->name('secretary.')->controller(SecretaryController::
 });
 
 /**
+ * Rotas para atualizar denúncias pelo Secretário
+ * Requer autenticação apenas de Secretário
+ */
+Route::middleware('auth:secretary')->controller(\App\Http\Controllers\AdminController::class)->group(function () {
+    // Atualizar status da denúncia (SECRETÁRIO)
+    Route::put('/secretary/reports/{report}/status', 'updateReportStatus')
+        ->name('secretary.report.status');
+});
+
+/**
  * Rotas de categorias
  * Requer autenticação e acesso de Admin
  */
@@ -171,31 +181,41 @@ Route::prefix('category')->name('category.')->controller(CategoryController::cla
 
 /**
  * Rotas de prioridade de denúncias
- * Requer autenticação e acesso de Admin ou Secretário
+ * Requer autenticação apenas de Secretário
  */
 Route::prefix('priority')->name('priority.')->controller(PriorityController::class)->group(function () {
     // Formulário para classificar denúncia por prioridade
     Route::get('/reports/{report}/edit', 'edit')
         ->name('edit')
-        ->middleware('admin.auth');
+        ->middleware('auth:secretary');
 
-    // Atualizar prioridade da denúncia
+    // Atualizar prioridade da denúncia (APENAS SECRETÁRIO)
     Route::put('/reports/{report}', 'update')
         ->name('update')
-        ->middleware('admin.auth');
+        ->middleware('auth:secretary');
 });
 
 /**
  * Rotas API para carregamento dinâmico
  * Endpoints para requisições AJAX do frontend
  */
-Route::prefix('api')->middleware(['auth:citizen'])->group(function () {
+Route::prefix('api')->group(function () {
     // Retorna todas as secretárias responsáveis por uma categoria
     Route::get('/categories/{categoryName}/secretaries', function ($categoryName) {
         try {
+            \Illuminate\Support\Facades\Log::info('API chamada', [
+                'endpoint' => 'categories.secretaries',
+                'category' => $categoryName,
+            ]);
+
             // Busca a categoria pelo nome
             $category = \App\Models\Category::where('name', $categoryName)
                 ->first();
+
+            \Illuminate\Support\Facades\Log::info('Categoria buscada', [
+                'category_name' => $categoryName,
+                'found' => $category ? true : false,
+            ]);
 
             if (!$category) {
                 return response()->json([], 404);
@@ -207,13 +227,19 @@ Route::prefix('api')->middleware(['auth:citizen'])->group(function () {
                 ->select('id', 'name')
                 ->get();
 
+            \Illuminate\Support\Facades\Log::info('Secretárias encontradas', [
+                'category' => $categoryName,
+                'count' => $secretaries->count(),
+            ]);
+
             return response()->json($secretaries);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Erro ao buscar secretárias', [
                 'category' => $categoryName,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'Erro ao carregar setores'], 500);
+            return response()->json(['error' => 'Erro ao carregar setores', 'message' => $e->getMessage()], 500);
         }
     });
 });   
