@@ -8,8 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Validação para criar nova secretária.
- * 
- * Segue os mesmos critérios de validação de senha que o RegisterRequest.
+ * * Segue os mesmos critérios de validação de senha que o RegisterRequest.
  */
 class CreateSecretaryRequest extends FormRequest
 {
@@ -32,7 +31,8 @@ class CreateSecretaryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            // Adicionado a regra unique na tabela secretaries para a coluna name
+            'name' => 'required|string|max:255|unique:secretaries,name',
             'email' => 'required|string|email|max:255|unique:secretaries',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required',
@@ -51,6 +51,8 @@ class CreateSecretaryRequest extends FormRequest
             'name.required' => 'O nome da secretária é obrigatório.',
             'name.string' => 'O nome deve ser um texto.',
             'name.max' => 'O nome não pode exceder 255 caracteres.',
+            'name.unique' => 'Já existe uma secretaria cadastrada com este nome.', // Mensagem adicionada
+            
             'email.required' => 'O e-mail é obrigatório.',
             'email.email' => 'O e-mail deve ser válido.',
             'email.unique' => 'Este e-mail já está cadastrado no sistema.',

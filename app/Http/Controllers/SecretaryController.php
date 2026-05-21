@@ -51,6 +51,7 @@ class SecretaryController extends Controller
                 'password' => $request->validated('password'),
                 'category' => $request->validated('category'),
                 'is_active' => true,
+                'admin_id' => auth()->id(),
             ]);
 
             return redirect()
@@ -147,4 +148,3 @@ class SecretaryController extends Controller
         ]);
     }
 }
-

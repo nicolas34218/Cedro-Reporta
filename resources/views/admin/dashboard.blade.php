@@ -1,101 +1,90 @@
 @extends('layouts.admin', ['active' => 'dashboard'])
 
-@section('title', 'Dashboard Admin')
-@section('page-title', 'Dashboard')
-@section('page-subtitle', 'Painel do administrador geral')
+@push('styles')
+<link rel='stylesheet' href='/css/admin/reports.css'>
+<style>
+    /* Estilos extras para garantir que os cards fiquem perfeitos no Admin */
+    .report-category { font-size: 0.875rem; color: #4f46e5; font-weight: 600; margin-right: 15px; }
+    .report-citizen { font-size: 0.875rem; color: #6b7280; margin-right: 15px; }
+    .report-card-action a:hover { background-color: #2563eb; }
+</style>
+@endpush
 
 @section('content')
-    <section class="statistics">
+    <div class="classify-header">
+        <h1 class="page-title">Painel de Controle</h1>
+        <p class="page-subtitle">Visão geral das denúncias e estatísticas de todos os setores do sistema.</p>
+    </div>
+
+    <section class="statistics-section">
         <div class="stat-card">
-            <h3>TOTAL DE DENÚNCIAS</h3>
-            <p class="stat-number">{{ $statistics['total_reports'] }}</p>
-            <small>{{ $statistics['total_reports'] > 0 ? 'Ativas' : 'Nenhuma' }}</small>
+            <p class="stat-label">TOTAL DE DENÚNCIAS</p>
+            <h2 class="stat-number">{{ $statistics['total_reports'] ?? 0 }}</h2>
+            <div class="stat-underline" style="background-color: #3b82f6;"></div>
         </div>
 
         <div class="stat-card pending">
-            <h3>PENDENTES</h3>
-            <p class="stat-number">{{ $statistics['open_reports'] }}</p>
-            <small>{{ number_format(($statistics['open_reports'] / max($statistics['total_reports'], 1)) * 100) }}% do total</small>
+            <p class="stat-label">ABERTAS</p>
+            <h2 class="stat-number">{{ $statistics['open_reports'] ?? 0 }}</h2>
+            <div class="stat-underline" style="background-color: #ef4444;"></div>
         </div>
 
-        <div class="stat-card in-analysis">
-            <h3>EM ANDAMENTO</h3>
-            <p class="stat-number">{{ $statistics['in_analysis'] }}</p>
-            <small>{{ number_format(($statistics['in_analysis'] / max($statistics['total_reports'], 1)) * 100) }}% do total</small>
+        <div class="stat-card in-progress">
+            <p class="stat-label">EM ANÁLISE</p>
+            <h2 class="stat-number">{{ $statistics['in_analysis'] ?? 0 }}</h2>
+            <div class="stat-underline" style="background-color: #f59e0b;"></div>
         </div>
 
         <div class="stat-card resolved">
-            <h3>RESOLVIDAS</h3>
-            <p class="stat-number">{{ $statistics['resolved'] }}</p>
-            <small>{{ number_format(($statistics['resolved'] / max($statistics['total_reports'], 1)) * 100) }}% do total</small>
+            <p class="stat-label">RESOLVIDAS</p>
+            <h2 class="stat-number">{{ $statistics['resolved'] ?? 0 }}</h2>
+            <div class="stat-underline" style="background-color: #10b981;"></div>
         </div>
     </section>
 
-    <section class="reports-section">
-        <div class="section-header">
-            <h3>Gerenciamento de Denúncias</h3>
-            <div class="filters">
-                <input type="text" class="search-box" placeholder="Buscar...">
-                <select class="filter-select">
-                    <option>Todos os status</option>
-                    <option>Aberta</option>
-                    <option>Em Análise</option>
-                    <option>Resolvida</option>
-                    <option>Fechada</option>
-                </select>
-                <select class="filter-select">
-                    <option>Todas as categorias</option>
-                    <option>Iluminação</option>
-                    <option>Buracos</option>
-                    <option>Lixo</option>
-                    <option>Outros</option>
-                </select>
+    <section class="reports-list-section">
+        <h3 class="section-title" style="margin-top: 20px;">DENÚNCIAS MAIS RECENTES</h3>
+
+        @if($recentReports->isEmpty())
+            <div class="no-reports-message">
+                <i class="fas fa-inbox"></i>
+                <p>Nenhuma denúncia registrada no sistema ainda.</p>
             </div>
-        </div>
-
-        <table class="reports-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>TÍTULO</th>
-                    <th>CATEGORIA</th>
-                    <th>BAIRRO</th>
-                    <th>DATA</th>
-                    <th>STATUS</th>
-                    <th>AÇÕES</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentReports as $report)
-                    <tr>
-                        <td>#{{ $report->id }}</td>
-                        <td>{{ substr($report->title, 0, 40) }}...</td>
-                        <td>
-                            <span class="category-badge">{{ $report->category }}</span>
-                        </td>
-                        <td>{{ $report->district ?? 'Sem bairro' }}</td>
-                        <td>{{ $report->created_at->format('d/m/Y') }}</td>
-                        <td>
-                            <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}">
-                                {{ $report->status }}
+        @else
+        <div class="reports-cards-container">
+            @foreach($recentReports as $report)
+                <div class="report-card">
+                    <div class="report-card-content">
+                        <h4 class="report-title">#{{ $report->id }} - {{ $report->title }}</h4>
+                        
+                        <div class="report-meta" style="margin-top: 8px; margin-bottom: 12px;">
+                            <span class="report-category">
+                                <i class="fas fa-tags"></i> {{ $report->category }}
                             </span>
-                        </td>
-                        <td>
-                            <a href="{{ route('admin.report.show', $report->id) }}" class="action-btn">Ver</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">
-                            Nenhuma denúncia encontrada
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                            <span class="report-location">
+                                <i class="fas fa-map-pin"></i> {{ $report->location ?? 'Sem localização' }}
+                            </span>
+                            <span class="report-date">
+                                <i class="far fa-calendar-alt"></i> {{ $report->created_at->format('d/m/Y H:i') }}
+                            </span>
+                            <span class="report-citizen">
+                                <i class="fas fa-user"></i> {{ $report->citizen->name ?? 'Anônimo' }}
+                            </span>
+                        </div>
 
-        <div class="pagination-info">
-            Exibindo 5 de {{ $statistics['total_reports'] }} registros
+                        <span class="status-badge status-{{ strtolower(str_replace([' ', 'á'], ['-', 'a'], $report->status)) }}" style="display: inline-block;">
+                            {{ $report->status }}
+                        </span>
+                    </div>
+
+                    <div class="report-card-action" style="display: flex; align-items: center; justify-content: flex-end;">
+                        <a href="{{ route('admin.report.show', $report->id) }}" style="padding: 10px 20px; background-color: #3b82f6; color: white; text-decoration: none; font-weight: bold; border-radius: 6px; transition: background-color 0.2s;">
+                            Ver Detalhes &rarr;
+                        </a>
+                    </div>
+                </div>
+            @endforeach
         </div>
+        @endif
     </section>
 @endsection

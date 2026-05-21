@@ -10,7 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['name', 'email', 'password', 'category', 'is_active'])]
+#[Fillable(['name', 'email', 'password', 'category', 'is_active', 'admin_id'])]
 #[Hidden(['password', 'remember_token'])]
 class Secretary extends Authenticatable
 {
@@ -79,4 +79,10 @@ class Secretary extends Authenticatable
             'category_id'
         );
     }
+
+    public function creator() 
+    {
+    return $this->belongsTo(Admin::class, 'admin_id'); 
+    }
+
 }

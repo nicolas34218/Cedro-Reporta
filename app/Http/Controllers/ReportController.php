@@ -59,20 +59,10 @@ class ReportController extends Controller
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 try {
                     $file = $request->file('image');
-                    
-                    // Gera nome único para o arquivo
                     $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                     
-                    // Cria a pasta se não existir
                     Storage::disk('local')->makeDirectory('reports');
-                    
-                    // Armazena a imagem no storage (pasta: reports)
-                    $imagePath = Storage::disk('local')->putFileAs(
-                        'reports',
-                        $file,
-                        $filename,
-                        'private'
-                    );
+                    $imagePath = Storage::disk('local')->putFileAs('reports', $file, $filename, 'private');
                     
                     Log::info('Imagem enviada com sucesso', [
                         'filename' => $filename,
@@ -83,67 +73,62 @@ class ReportController extends Controller
                     Log::error('Erro ao processar upload de imagem', [
                         'user_id' => auth()->id(),
                         'error' => $imageException->getMessage(),
-                        'file' => $request->file('image')->getClientOriginalName() ?? 'unknown',
                     ]);
-                    // Continua sem imagem ao invés de falhar completamente
-                    $imagePath = null;
                 }
             }
 
-            // Cria a denúncia com o cidadão autenticado
+            // --- INÍCIO DA OTIMIZAÇÃO ---
+            // 1. Busca primeiro a secretaria responsável ANTES de criar a denúncia
+            $secretaryId = null;
+            $secretariesToNotify = collect();
+
+            $category = \App\Models\Category::where('name', $validated['category'])->first();
+
+            if ($category) {
+                // Pega todas as ativas
+                $secretariesToNotify = $category->secretaries()->where('is_active', true)->get();
+                
+                if ($secretariesToNotify->isNotEmpty()) {
+                    // Guarda o ID da primeira para vincular à denúncia
+                    $secretaryId = $secretariesToNotify->first()->id;
+                } else {
+                    Log::warning('Nenhuma secretária ativa encontrada para a categoria', [
+                        'category' => $validated['category'],
+                    ]);
+                }
+            } else {
+                Log::warning('Categoria não encontrada no banco de dados', [
+                    'category_name' => $validated['category'],
+                ]);
+            }
+
+            // 2. Cria a denúncia já com o secretary_id preenchido (Salva 1 query no banco)
             $report = auth()->user()->reports()->create([
                 'user_id' => auth()->id(),
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'category' => $validated['category'],
-                'status' => ReportStatus::PENDING, // Status inicial sempre é "Pendente"
+                'status' => ReportStatus::PENDING, 
                 'location' => $location,
-                'image_path' => $imagePath, // Salva o caminho da imagem
+                'image_path' => $imagePath,
+                'secretary_id' => $secretaryId, // Vinculação feita aqui diretamente!
             ]);
 
-            // Busca a categoria para obter as secretárias responsáveis
-            $category = \App\Models\Category::where('name', $validated['category'])
-                ->first();
-
-            if ($category) {
-                // Obtém todas as secretárias responsáveis pela categoria
-                $secretaries = $category->secretaries()
-                    ->where('is_active', true)
-                    ->get();
-
-                if ($secretaries->isNotEmpty()) {
-                    // Atribui a primeira secretária como responsável principal
-                    $primarySecretary = $secretaries->first();
-                    $report->update([
-                        'secretary_id' => $primarySecretary->id,
-                    ]);
-
-                    // Notifica TODAS as secretárias responsáveis pela categoria
-                    foreach ($secretaries as $secretary) {
-                        $secretary->notify(new \App\Notifications\NewReportAssigned($report));
-                    }
-
-                    Log::info('Denúncia atribuída automaticamente', [
-                        'report_id' => $report->id,
-                        'primary_secretary_id' => $primarySecretary->id,
-                        'primary_secretary_name' => $primarySecretary->name,
-                        'total_secretaries_notified' => $secretaries->count(),
-                        'category' => $validated['category'],
-                    ]);
-                } else {
-                    Log::warning('Nenhuma secretária ativa encontrada para a categoria', [
-                        'report_id' => $report->id,
-                        'category' => $validated['category'],
-                    ]);
+            // 3. Dispara as notificações se houverem secretárias
+            if ($secretariesToNotify->isNotEmpty()) {
+                foreach ($secretariesToNotify as $secretary) {
+                    $secretary->notify(new \App\Notifications\NewReportAssigned($report));
                 }
-            } else {
-                Log::warning('Categoria não encontrada', [
+
+                Log::info('Denúncia atribuída automaticamente', [
                     'report_id' => $report->id,
-                    'category_name' => $validated['category'],
+                    'primary_secretary_id' => $secretaryId,
+                    'total_secretaries_notified' => $secretariesToNotify->count(),
+                    'category' => $validated['category'],
                 ]);
             }
+            // --- FIM DA OTIMIZAÇÃO ---
 
-            // Log de sucesso
             Log::info('Denúncia criada com sucesso', [
                 'report_id' => $report->id,
                 'user_id' => auth()->id(),
@@ -154,17 +139,15 @@ class ReportController extends Controller
             return redirect()
                 ->route('citizen.reports.index')
                 ->with('success', 'Denúncia registrada com sucesso! ID: #' . $report->id);
+
         } catch (\Exception $e) {
-            // Log de erro detalhado (sem expor informações sensíveis ao usuário)
             Log::error('Erro ao criar denúncia', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
-            // Retorna com mensagem de erro apropriada
             $errorMessage = 'Ocorreu um erro ao registrar a denúncia. Tente novamente.';
             if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
                 $errorMessage = 'Email já cadastrado no sistema.';
