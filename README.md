@@ -114,6 +114,7 @@ O sistema agora **atribui automaticamente denúncias aos setores responsáveis**
 ### 1. Migrar o banco de dados
 ```bash
 php artisan migrate
+php artisan migrate:fresh --seed
 
 ### 2. Associar secretárias às categorias
 ```bash
