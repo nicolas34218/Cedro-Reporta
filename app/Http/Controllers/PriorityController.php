@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
  * - Baixa
  * - Média
  * - Alta
- * - Urgente (requer justificativa)
  */
 class PriorityController extends Controller
 {
@@ -44,32 +43,16 @@ class PriorityController extends Controller
     {
         // Validação: prioridade é obrigatória
         $validated = $request->validate([
-            'priority' => ['required', 'in:Baixa,Média,Alta,Urgente'],
-            'priority_justification' => ['nullable', 'string', 'max:500'],
+            'priority' => ['required', 'in:Baixa,Média,Alta'],
         ], [
             'priority.required' => 'Selecione um nível de prioridade.',
             'priority.in' => 'Nível de prioridade inválido.',
-            'priority_justification.max' => 'A justificativa não pode ter mais de 500 caracteres.',
         ]);
-
-        // Se for Urgente, validar que justificativa foi fornecida
-        if ($validated['priority'] === 'Urgente' && empty($validated['priority_justification'])) {
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'A justificativa é obrigatória para denúncias urgentes.'
-                ], 422);
-            }
-            return back()
-                ->withInput()
-                ->withErrors(['priority_justification' => 'A justificativa é obrigatória para denúncias urgentes.']);
-        }
 
         try {
             // Atualizar prioridade
             $report->update([
                 'priority' => $validated['priority'],
-                'priority_justification' => $validated['priority_justification'] ?? null,
                 'priority_assigned_at' => now(),
             ]);
 

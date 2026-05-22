@@ -45,10 +45,20 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Cria secretárias, uma para cada categoria
+        $slugs = [
+            'Iluminação' => 'iluminacao',
+            'Buracos' => 'buracos',
+            'Lixo' => 'lixo',
+            'Segurança' => 'seguranca',
+            'Saúde' => 'saude',
+        ];
+
         foreach ($categories as $cat) {
+            $slug = $slugs[$cat['name']] ?? strtolower(str_replace(' ', '', $cat['name']));
+            
             Secretary::create([
-                'name' => 'Secretária ' . $cat['name'],
-                'email' => 'secretaria.' . strtolower(str_replace(' ', '.', $cat['name'])) . '@cedroreporta.com',
+                'name' => 'Secretaria ' . $cat['name'],
+                'email' => 'secretaria.' . $slug . '@cedroreporta.com',
                 'password' => bcrypt('secretary123'),
                 'category' => $cat['name'], // Associa a secretária à categoria
                 'is_active' => true,

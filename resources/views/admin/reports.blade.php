@@ -64,7 +64,6 @@
                         <div class="report-card-action">
                             <select class="priority-select" onchange="updatePriority({{ $report->id }}, this.value)">
                                 <option value="">Selecione Prioridade</option>
-                                <option value="Urgente" {{ $report->priority === 'Urgente' ? 'selected' : '' }}>Urgente</option>
                                 <option value="Alta" {{ $report->priority === 'Alta' ? 'selected' : '' }}>Alta</option>
                                 <option value="Média" {{ $report->priority === 'Média' ? 'selected' : '' }}>Média</option>
                                 <option value="Baixa" {{ $report->priority === 'Baixa' ? 'selected' : '' }}>Baixa</option>

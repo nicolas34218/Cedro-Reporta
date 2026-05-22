@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reports', function (Blueprint $table) {
-            // Adiciona coluna de prioridade (Baixa, Média, Alta, Urgente)
-            $table->enum('priority', ['Baixa', 'Média', 'Alta', 'Urgente'])
+            // Adiciona coluna de prioridade (Baixa, Média, Alta)
+            $table->enum('priority', ['Baixa', 'Média', 'Alta'])
                 ->nullable()
                 ->default(null)
                 ->comment('Nível de prioridade da denúncia');
 
-            // Adiciona coluna para justificativa (obrigatória para Urgente)
+            // Adiciona coluna para justificativa
             $table->text('priority_justification')
                 ->nullable()
-                ->comment('Justificativa para denúncias urgentes');
+                ->comment('Justificativa adicional para a prioridade');
 
             // Adiciona timestamp de quando a prioridade foi atribuída
             $table->timestamp('priority_assigned_at')
