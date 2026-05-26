@@ -78,8 +78,6 @@
                     </div>
 
                     <div class="report-card-action" style="display: flex; align-items: center; justify-content: flex-end;">
-                        <a href="{{ route('admin.report.show', $report->id) }}" style="padding: 10px 20px; background-color: #3b82f6; color: white; text-decoration: none; font-weight: bold; border-radius: 6px; transition: background-color 0.2s;">
-                            Ver Detalhes &rarr;
                         </a>
                     </div>
                 </div>

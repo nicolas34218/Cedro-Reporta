@@ -111,20 +111,11 @@ Route::prefix('admin')->name('admin.')->controller(AdminController::class)->grou
         ->name('dashboard')
         ->middleware(['admin.auth', 'admin.only']);
 
-    // Lista de denúncias
-    Route::get('/reports', 'listReports')
-        ->name('reports')
-        ->middleware(['admin.auth', 'admin.only']);
+    // // Detalhes da denúncia
+    // Route::get('/reports/{report}', 'showReport')
+    //     ->name('report.show')
+    //     ->middleware(['admin.auth', 'admin.only']);
 
-    // Detalhes da denúncia
-    Route::get('/reports/{report}', 'showReport')
-        ->name('report.show')
-        ->middleware(['admin.auth', 'admin.only']);
-
-    // Atualizar status da denúncia
-    Route::put('/reports/{report}/status', 'updateReportStatus')
-        ->name('report.status')
-        ->middleware(['admin.auth', 'admin.only']);
 });
 
 /**

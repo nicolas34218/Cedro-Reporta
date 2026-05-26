@@ -40,10 +40,6 @@
                     <i class="fas fa-chart-line"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('admin.reports') }}" class="nav-item {{ $active === 'reports' ? 'active' : '' }}">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Denúncias</span>
-                </a>
                 <a href="{{ route('secretary.create') }}" class="nav-item {{ $active === 'secretaries' ? 'active' : '' }}">
                     <i class="fas fa-users"></i>
                     <span>Secretarias</span>
