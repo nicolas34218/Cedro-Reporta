@@ -129,7 +129,7 @@ public function classifyReports()
             ->where('status', 'Em Análise')->count(),
     ];
 
-        return view('secretary.reports', [
+        return view('secretary.classify_reports', [
             'reports' => $reports,
             'statistics' => $statistics,
         ]);
