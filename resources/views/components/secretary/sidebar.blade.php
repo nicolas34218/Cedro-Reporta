@@ -4,7 +4,7 @@
     $isSecretary = Auth::guard('secretary')->check();
 @endphp
 
-<aside class="admin-sidebar">
+<aside class="secretary-sidebar">
     <div class="sidebar-logo">
         <div class="logo-inner">
             <div class="logo-badge">⚠</div>
@@ -35,7 +35,7 @@
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <p class="nav-section-title">PRINCIPAL</p>
-                <a href="{{ route('admin.dashboard') }}" class="nav-item {{ $active === 'dashboard' ? 'active' : '' }}">
+                <a href="{{ route('secretary.dashboard') }}" class="nav-item {{ $active === 'dashboard' ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i>
                     <span>Dashboard</span>
                 </a>

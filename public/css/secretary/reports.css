@@ -1,0 +1,268 @@
+:root {
+    --bg: #eef3e7;
+    --sidebar: #1f5a35;
+    --sidebar-dark: #184728;
+    --card: #ffffff;
+    --text: #35503f;
+    --muted: #6c7b6e;
+    --border: #b9c8ae;
+    --accent: #f2b827;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.secretary-layout {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.secretary-sidebar {
+    width: 260px;
+    background: var(--sidebar-dark);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 0;
+    flex-shrink: 0;
+    z-index: 100;
+}
+
+.secretary-main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg);
+}
+
+.secretary-header {
+    height: 64px;
+    background: var(--sidebar-dark);
+    color: #fff;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.secretary-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.secretary-badge {
+    background: var(--accent);
+    color: var(--sidebar-dark);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.secretary-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.secretary-header-right {
+    display: flex;
+    align-items: center;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: var(--sidebar-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.user-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #eaf3eb;
+}
+
+.secretary-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.secretary-content {
+    width: 100%;
+}
+
+/* Sidebar Logo */
+.sidebar-logo {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 12px;
+}
+
+.logo-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-badge {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: var(--sidebar-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.logo-text strong {
+    color: var(--accent);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+    flex: 1;
+    padding: 0;
+}
+
+.nav-section {
+    padding: 0;
+}
+
+.nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 12px 24px 8px;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.nav-item:hover i {
+    opacity: 1;
+}
+
+.nav-item.active {
+    background: rgba(242, 184, 39, 0.1);
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+    padding-left: 21px; /* adjustment for border */
+}
+
+.nav-item.active i {
+    color: var(--accent);
+    opacity: 1;
+}
+
+.logout-form {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+    width: 100%;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .secretary-layout {
+        flex-direction: column;
+    }
+
+    .secretary-sidebar {
+        width: 100%;
+    }
+
+    .secretary-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

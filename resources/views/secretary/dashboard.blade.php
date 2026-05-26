@@ -87,7 +87,6 @@
                                 </td>
                                 <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="actions-cell">
-                                    <a href="{{ route('admin.report.show', $report) }}" class="btn-action btn-view" title="Visualizar">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{{ route('priority.edit', $report) }}" class="btn-action btn-priority" title="Classificar Prioridade">

@@ -142,7 +142,7 @@ class SecretaryController extends Controller
                 ->count(),
         ];
 
-        return view('admin.reports', [
+        return view('secretary.reports', [
             'reports' => $reports,
             'statistics' => $statistics,
         ]);
