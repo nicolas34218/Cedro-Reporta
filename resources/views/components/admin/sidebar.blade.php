@@ -2,6 +2,14 @@
 
 @php
     $isSecretary = Auth::guard('secretary')->check();
+    $unclassifiedCount = 0;
+
+    // Se for secretária, busca quantas denúncias ela tem sem prioridade definida
+    if ($isSecretary) {
+        $unclassifiedCount = \App\Models\Report::where('secretary_id', Auth::guard('secretary')->id())
+            ->whereNull('priority')
+            ->count();
+    }
 @endphp
 
 <aside class="admin-sidebar">
@@ -13,7 +21,6 @@
     </div>
 
     @if($isSecretary)
-        <!-- Menu para Secretárias -->
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <p class="nav-section-title">PRINCIPAL</p>
@@ -21,9 +28,15 @@
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
+                
                 <a href="{{ route('secretary.classify-reports') }}" class="nav-item {{ $active === 'classify' ? 'active' : '' }}">
                     <i class="fas fa-flag"></i>
                     <span>Classificar Denúncias</span>
+                    @if($unclassifiedCount > 0)
+                        <span id="sidebar-unclassified-count" style="background-color: #ef4444; color: white; font-size: 12px; font-weight: bold; padding: 2px 8px; border-radius: 999px; margin-left: auto;">
+                            {{ $unclassifiedCount }}
+                        </span>
+                    @endif
                 </a>
                     <i class="fas fa-sync"></i>
                     <span>Atualizar Status</span>
@@ -31,7 +44,6 @@
             </div>
         </nav>
     @else
-        <!-- Menu para Admins -->
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <p class="nav-section-title">PRINCIPAL</p>

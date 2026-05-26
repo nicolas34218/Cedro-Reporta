@@ -33,21 +33,6 @@
                 </div>
 
                 <div class="field">
-                    <label for="category">Categoria</label>
-                    <select id="category" name="category">
-                        <option value="">Selecione uma categoria</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category }}" @selected(old('category') === $category)>
-                                {{ $category }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('category')
-                        <small class="error">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="field">
                     <label for="password">Senha</label>
                     <input type="password" id="password" name="password">
                     @error('password')
@@ -68,13 +53,13 @@
         </div>
 
         <div class="secretary-list-column">
-            <h2 class="list-title">SECRETARIAS EXISTENTES({{ $secretaries->count() }})</h2>
+            <h2 class="list-title">SECRETARIAS EXISTENTES ({{ $secretaries->count() }})</h2>
 
             <div class="secretary-list">
                 @forelse ($secretaries as $secretary)
                     <article class="secretary-item">
                         <strong>{{ $secretary->name }}</strong>
-                        <p>{{ $secretary->category }}</p>
+                        <p style="font-size: 13px; color: #666;">{{ $secretary->email }}</p>
                     </article>
                 @empty
                     <article class="secretary-item empty-state">
