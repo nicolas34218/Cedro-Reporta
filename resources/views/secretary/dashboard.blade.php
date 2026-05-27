@@ -5,8 +5,15 @@
 @section('page-subtitle', 'Visualização das denúncias da sua categoria')
 
 @push('styles')
+<link rel="stylesheet" href="/css/secretary/filters.css"> 
 <link rel="stylesheet" href="/css/secretary/dashboard.css">
+
 <style>
+    .title{
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+    }
     /* Estilos extras para o select de prioridade na tabela e o novo card */
     .priority-select { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; outline: none; transition: border-color 0.3s; font-size: 0.85rem; }
     .priority-select:focus { border-color: #3b82f6; }
@@ -17,6 +24,7 @@
 @endpush
 
 @section('content')
+    <h1 class="title">Todos os Reports</h1>
     <section class="statistics">
         <div class="stat-card">
             <h3>TOTAL DE DENÚNCIAS</h3>
@@ -46,6 +54,70 @@
             <p class="stat-number">{{ $statistics['resolved_reports'] ?? 0 }}</p>
         </div>
     </section>
+
+    <!-- FILTER BAR - Container Principal -->
+<section class="filters-section">
+    
+    <!-- Header do filtro -->
+    <div class="filters-header">
+        <h4 class="filters-title">
+            <i class="fas fa-filter"></i>
+            Filtrar Denúncias
+        </h4>
+        <button class="filters-reset-btn" onclick="resetFilters()">
+            <i class="fas fa-redo"></i>
+            Limpar Filtros
+        </button>
+    </div>
+
+    <!-- Formulário de filtros -->
+    <form class="filters-form" id="filtersForm">
+        <div class="filters-grid">
+            
+            <!-- Filtro 1: Prioridade -->
+            <div class="filter-group">
+                <label for="priorityFilter" class="filter-label">
+                    Prioridade
+                </label>
+                <select id="priorityFilter" class="filter-select" name="priority">
+                    <option value="">Todas as prioridades</option>
+                    <option value="alta">🟠 Alta</option>
+                    <option value="media">🟡 Média</option>
+                    <option value="baixa">🟢 Baixa</option>
+                </select>
+            </div>
+
+            <!-- Filtro 2: Status -->
+            <div class="filter-group">
+                <label for="statusFilter" class="filter-label">
+                    Status
+                </label>
+                <select id="statusFilter" class="filter-select" name="status">
+                    <option value="">Todos os status</option>
+                    <option value="aberta">📋 Aberta</option>
+                    <option value="analise">🔍 Em Análise</option>
+                    <option value="resolvida">✅ Resolvida</option>
+                </select>
+            </div>
+
+            <!-- Botão de Aplicar Filtros -->
+            <div class="filter-group filter-actions">
+                <button type="submit" class="filter-button-apply">
+                    <i class="fas fa-search"></i>
+                    Aplicar Filtros
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- Badge: Filtros Ativos -->
+    <div class="filters-active" id="activeFiltersDisplay" style="display: none;">
+        <span class="active-filter-label">Filtros ativos:</span>
+        <div class="active-filters-tags" id="activeFiltersTags"></div>
+    </div>
+
+</section>
 
     <section class="reports-section">
         <div class="section-header">
@@ -107,6 +179,7 @@
 @endsection
 
 @push('scripts')
+<script src="/js/secretary/filters.js"></script>
 <script>
     // Função para atualizar a Prioridade em tempo real
     function updatePriority(reportId, selectElement) {
