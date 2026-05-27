@@ -57,14 +57,14 @@
                     <p>Registre problemas e acompanhe as soluções</p>
                 </div>
             </div>
-            <a href="{{ route('citizen.reports.create') }}" class="hero-btn">+ Nova Denúncia</a>
+            <a href="{{ route('citizen.reports.create') }}" class="hero-btn">+ Novo Report</a>
         </div>
 
         <!-- cards de resumo -->
         <div class="summary-grid">
             <article class="summary-card">
                 <strong>{{ $totalReports }}</strong>
-                <span>MINHAS DENÚNCIAS</span>
+                <span>MEUS REGISTROS</span>
             </article>
             <article class="summary-card warning">
                 <strong>{{ $pendingReports }}</strong>
@@ -80,11 +80,11 @@
 
         <div class="feature-list">
             <a href="{{ route('citizen.reports.create') }}" class="feature-item">
-                <span>📝 Registrar Denúncia</span>
+                <span>📝 Registrar Report</span>
                 <span>›</span>
             </a>
             <a href="{{ route('citizen.reports.index') }}" class="feature-item">
-                <span>📄 Visualizar Denúncia</span>
+                <span>📄 Visualizar Report</span>
                 <span>›</span>
             </a>
         </div>
