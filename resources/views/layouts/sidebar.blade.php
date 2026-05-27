@@ -9,25 +9,25 @@
 
     <nav class="sidebar-nav">
         <a href="{{ route('admin.dashboard') }}"
-           class="nav-item {{ $active === 'dashboard' ? 'active' : '' }}">
+            class="nav-item {{ $active === 'dashboard' ? 'active' : '' }}">
             <span class="icon">📊</span>
             <span>Dashboard</span>
         </a>
 
         <a href="{{ route('admin.reports') }}"
-           class="nav-item {{ $active === 'reports' ? 'active' : '' }}">
+            class="nav-item {{ $active === 'reports' ? 'active' : '' }}">
             <span class="icon">📋</span>
             <span>Denúncias</span>
         </a>
 
         <a href="{{ route('secretary.create') }}"
-           class="nav-item {{ $active === 'secretaries' ? 'active' : '' }}">
+            class="nav-item {{ $active === 'secretaries' ? 'active' : '' }}">
             <span class="icon">👥</span>
             <span>Secretarias</span>
         </a>
 
         <a href="{{ route('category.create') }}"
-           class="nav-item {{ $active === 'categories' ? 'active' : '' }}">
+            class="nav-item {{ $active === 'categories' ? 'active' : '' }}">
             <span class="icon">🏷️</span>
             <span>Categorias</span>
         </a>

@@ -77,19 +77,20 @@ public function dashboard()
     // Obtém todas as denúncias onde o secretary_id é igual ao ID da secretária logada
     $reports = Report::where('secretary_id', $secretary->id)
         ->with('citizen')
-        ->latest()
+        ->orderByRaw("FIELD(priority, 'Alta', 'Média', 'Baixa') ASC")
+        ->orderBy('id', 'ASC')
         ->get();
 
     // Recalcula as estatísticas explicitamente usando o ID da secretária
-    $statistics = [
-        'total_reports' => Report::where('secretary_id', $secretary->id)->count(),
-        'pending_reports' => Report::where('secretary_id', $secretary->id)
-            ->where('status', 'Pendente') // Verifique se este é o status exato no seu Enum/Banco
+$statistics = [
+        'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
+        'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+            ->where('status', 'Pendente')
             ->count(),
-        'analyzing_reports' => Report::where('secretary_id', $secretary->id)
+        'analyzing_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
             ->where('status', 'Em Análise')
             ->count(),
-        'resolved_reports' => Report::where('secretary_id', $secretary->id)
+        'resolved_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
             ->where('status', 'Resolvida')
             ->count(),
     ];
@@ -97,7 +98,7 @@ public function dashboard()
     return view('secretary.dashboard', [
         'reports' => $reports,
         'statistics' => $statistics,
-        'category' => $secretary->name, // Ajustado para mostrar o nome da secretaria, já que categoria não existe mais
+        'category' => $secretary->name, 
     ]);
 }
 
@@ -115,7 +116,7 @@ public function classifyReports()
 
     // Filtra denúncias da secretária logada que ainda não têm prioridade OU que você deseja classificar
     $reports = \App\Models\Report::where('secretary_id', $secretary->id)
-        ->whereIn('status', ['Aberta', 'Em Análise']) // Ajuste conforme os status que você permite classificar
+        ->whereNull('priority') 
         ->latest()
         ->get();
 

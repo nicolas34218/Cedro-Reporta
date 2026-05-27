@@ -1,5 +1,5 @@
 ﻿/* ================================
-   PÁGINA DE CLASSIFICAÇÃO DE DENÚNCIAS
+    PÁGINA DE CLASSIFICAÇÃO DE DENÚNCIAS
    ================================ */
 
 :root {
@@ -14,7 +14,7 @@
 }
 
 /* ================================
-   HEADER - TÍTULO E SUBTÍTULO
+    HEADER - TÍTULO E SUBTÍTULO
    ================================ */
 
 .classify-header {
@@ -38,7 +38,7 @@
 }
 
 /* ================================
-   CARDS DE ESTATÍSTICAS
+    CARDS DE ESTATÍSTICAS
    ================================ */
 
 .statistics-section {
@@ -100,7 +100,7 @@
 }
 
 /* ================================
-   SEÇÃO DE DENÚNCIAS
+    SEÇÃO DE DENÚNCIAS
    ================================ */
 
 .reports-list-section {
@@ -208,44 +208,9 @@
     white-space: nowrap;
 }
 
-.status-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    width: fit-content;
-}
-
-.status-aberta {
-    background-color: #dbeafe;
-    color: #0369a1;
-}
-
-.status-em-análise {
-    background-color: #fef3c7;
-    color: #b45309;
-}
-
-.status-resolvida {
-    background-color: #dcfce7;
-    color: #15803d;
-}
-
-.status-fechada {
-    background-color: #fee2e2;
-    color: #7f1d1d;
-}
-
-.status-pendente {
-    background-color: #fef3c7;
-    color: #b45309;
-}
 
 /* ================================
-   SELETOR DE PRIORIDADE
+    SELETOR DE PRIORIDADE
    ================================ */
 
 .report-card-action {
@@ -313,7 +278,7 @@
 }
 
 /* ================================
-   RESPONSIVO
+    RESPONSIVO
    ================================ */
 
 @media (max-width: 1200px) {
@@ -350,51 +315,5 @@
     .report-meta {
         font-size: 12px;
         gap: 12px;
-    }
-}
-
-@media (max-width: 600px) {
-    .page-title {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .page-subtitle {
-        font-size: 13px;
-    }
-
-    .classify-header {
-        margin-bottom: 28px;
-    }
-
-    .stat-card {
-        padding: 20px;
-    }
-
-    .stat-number {
-        font-size: 36px;
-    }
-
-    .report-card {
-        padding: 16px;
-    }
-
-    .report-title {
-        font-size: 14px;
-    }
-
-    .report-meta {
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .status-badge {
-        padding: 4px 10px;
-        font-size: 10px;
-    }
-
-    .priority-select {
-        padding: 6px 10px;
-        font-size: 12px;
     }
 }

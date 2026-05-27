@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Model para categorias de denúncias.
+ * Model para categorias de denï¿½ncias.
  * 
  * @property int $id
- * @property string $name Nome da categoria (ex: Iluminação Pública)
- * @property string|null $description Descrição da categoria
- * @property bool $is_active Se a categoria está ativa
+ * @property string $name Nome da categoria (ex: Iluminaï¿½ï¿½o Pï¿½blica)
+ * @property string|null $description Descriï¿½ï¿½o da categoria
+ * @property bool $is_active Se a categoria estï¿½ ativa
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
@@ -29,7 +29,7 @@ class Category extends Model
     ];
 
     /**
-     * Conversão de tipos de campos.
+     * Conversï¿½o de tipos de campos.
      * 
      * @var array<string, string>
      */
@@ -40,7 +40,7 @@ class Category extends Model
     ];
 
     /**
-     * Relacionamento: Uma categoria tem muitas denúncias.
+     * Relacionamento: Uma categoria tem muitas denï¿½ncias.
      * Busca reports onde o campo 'category' (string) corresponde ao nome da categoria.
      * 
      * @return HasMany
@@ -51,7 +51,7 @@ class Category extends Model
     }
 
     /**
-     * Relacionamento: Uma categoria pode ser responsabilidade de várias secretárias.
+     * Relacionamento: Uma categoria pode ser responsabilidade de vï¿½rias secretï¿½rias.
      * Busca secretaries onde o campo 'category' (string) corresponde ao nome da categoria.
      * 
      * @return HasMany
@@ -60,4 +60,5 @@ class Category extends Model
     {
         return $this->hasMany(Secretary::class, 'category', 'name');
     }
+    
 }

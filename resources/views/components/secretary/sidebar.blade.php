@@ -25,9 +25,6 @@
                     <i class="fas fa-flag"></i>
                     <span>Classificar Denúncias</span>
                 </a>
-                    <i class="fas fa-sync"></i>
-                    <span>Atualizar Status</span>
-                </a>
             </div>
         </nav>
     @else

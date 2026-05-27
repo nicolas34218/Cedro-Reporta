@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['active' => 'dashboard'])
+@extends('layouts.secretary', ['active' => 'dashboard'])
 
 @section('title', 'Dashboard Secretária')
 @section('page-title', 'Dashboard da Secretária')
@@ -68,7 +68,6 @@
                             <th>Status</th>
                             <th>Prioridade Atual</th>
                             <th>Data</th>
-                            <th>Ações (Classificar)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,11 +96,7 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>
-
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
+                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>                             
                             </tr>
                         @endforeach
                     </tbody>

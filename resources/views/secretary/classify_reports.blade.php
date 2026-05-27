@@ -1,6 +1,6 @@
 <!-- Página de Classificar denúncias - Tela Secretária -->
 
-@extends('layouts.secretary', ['active' => 'classify'])
+@extends('layouts.admin', ['active' => 'classify'])
 
 @push('styles')
 <link rel='stylesheet' href='/css/secretary/reports.css'>
@@ -68,14 +68,6 @@
                                 <option value="Média" {{ $report->priority === 'Média' ? 'selected' : '' }}>Média</option>
                                 <option value="Baixa" {{ $report->priority === 'Baixa' ? 'selected' : '' }}>Baixa</option>
                             </select>
-
-                            <select class="status-select" onchange="updateStatus({{ $report->id }}, this.value, '{{ Auth::guard('secretary')->check() ? 'secretary' : 'admin' }}')">
-                                <option value="">Selecione Status</option>
-                                <option value="Pendente" {{ $report->status === 'Pendente' ? 'selected' : '' }}>Pendente</option>
-                                <option value="Em Análise" {{ $report->status === 'Em Análise' ? 'selected' : '' }}>Em Análise</option>
-                                <option value="Resolvida" {{ $report->status === 'Resolvida' ? 'selected' : '' }}>Resolvida</option>
-                                <option value="Fechada" {{ $report->status === 'Fechada' ? 'selected' : '' }}>Fechada</option>
-                            </select>
                         </div>
                     </div>
                 @endforeach
@@ -133,53 +125,6 @@
         .catch(error => {
             console.error('❌ Erro na requisição:', error);
             alert(`❌ Erro ao atualizar prioridade:\n${error.message}`);
-        });
-    }
-
-    function updateStatus(reportId, status, userType = 'admin') {
-        if (!status) {
-            console.log('Nenhum status selecionado');
-            return;
-        }
-
-        console.log(`🔄 Enviando requisição para atualizar status do relatório ${reportId} para: ${status}`);
-
-        // Determina a URL baseado no tipo de usuário
-        const statusUrl = userType === 'secretary' 
-            ? `/secretary/reports/${reportId}/status` 
-            : `/admin/reports/${reportId}/status`;
-
-        const payload = { status: status };
-        console.log('Payload:', payload);
-        console.log('URL:', statusUrl);
-        console.log('User Type:', userType);
-        console.log('CSRF Token:', getCsrfToken().substring(0, 20) + '...');
-
-        fetch(statusUrl, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(payload)
-        })
-        .then(async response => {
-            const data = await response.clone().json().catch(() => response.text());
-            console.log(`📨 Resposta recebida - Status: ${response.status}`, data);
-            
-            if (!response.ok) {
-                throw new Error(`Erro ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
-            }
-            
-            console.log(`✅ Status atualizado com sucesso!`);
-            alert(`✅ Status atualizado para ${status} com sucesso!`);
-            location.reload();
-        })
-        .catch(error => {
-            console.error('❌ Erro na requisição:', error);
-            alert(`❌ Erro ao atualizar status:\n${error.message}`);
         });
     }
 </script>

@@ -41,14 +41,12 @@
 
                     <div class="form-field">
                         <label for="category">CATEGORIA</label>
-                        <select id="category" name="category">
-                            <option value="">Selecione</option>
-                            <option value="Iluminação" @selected(old('category') === 'Iluminação')>Iluminação</option>
-                            <option value="Buracos" @selected(old('category') === 'Buracos')>Buracos</option>
-                            <option value="Lixo" @selected(old('category') === 'Lixo')>Lixo</option>
-                            <option value="Segurança" @selected(old('category') === 'Segurança')>Segurança</option>
-                            <option value="Outros" @selected(old('category') === 'Outros')>Outros</option>
-                        </select>
+                            <select name="category" id="category" class="form-control" required>
+                                <option value="">Selecione uma categoria</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->name }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
                         <x-error-message field="category" />
                     </div>
 
