@@ -58,13 +58,14 @@
                                     <input type="hidden" name="status" value="{{ request('status') }}">
                                     <input type="hidden" name="location" value="{{ request('location') }}">
 
-                                    <select name="category" class="sidebar-select" onchange="this.form.submit()">
-                                        <option value="">Todas as categorias</option>
-                                        <option value="Iluminação" @selected(request('category') === 'Iluminação')>Iluminação</option>
-                                        <option value="Buracos" @selected(request('category') === 'Buracos')>Buracos</option>
-                                        <option value="Lixo" @selected(request('category') === 'Lixo')>Lixo</option>
-                                        <option value="Segurança" @selected(request('category') === 'Segurança')>Segurança</option>
-                                        <option value="Outros" @selected(request('category') === 'Outros')>Outros</option>
+                                    <select name="category" id="sidebar-category" class="form-control">
+                                        <option value="">Todas as Categorias</option>
+                                        
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->name }}" @selected(request('category') == $category->name)>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </form>
                             </div>

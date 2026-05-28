@@ -2,14 +2,14 @@
 
 @section('title', 'Dashboard Secretária')
 @section('page-title', 'Dashboard da Secretária')
-@section('page-subtitle', 'Visualização das denúncias da sua categoria')
+@section('page-subtitle', 'Visualização das denúncias do seu setor')
 
 @push('styles')
 <link rel="stylesheet" href="/css/secretary/filters.css"> 
 <link rel="stylesheet" href="/css/secretary/dashboard.css">
 
 <style>
-    .title{
+    .title {
         font-size: 2rem;
         font-weight: 800;
         margin-bottom: 20px;
@@ -24,7 +24,8 @@
 @endpush
 
 @section('content')
-    <h1 class="title">Todos os Reports</h1>
+    <h1 class="title">Todos os Relatórios</h1>
+    
     <section class="statistics">
         <div class="stat-card">
             <h3>TOTAL DE DENÚNCIAS</h3>
@@ -55,79 +56,67 @@
         </div>
     </section>
 
-    <!-- FILTER BAR - Container Principal -->
-<section class="filters-section">
-    
-    <!-- Header do filtro -->
-    <div class="filters-header">
-        <h4 class="filters-title">
-            <i class="fas fa-filter"></i>
-            Filtrar Denúncias
-        </h4>
-        <button class="filters-reset-btn" onclick="resetFilters()">
-            <i class="fas fa-redo"></i>
-            Limpar Filtros
-        </button>
-    </div>
-
-    <!-- Formulário de filtros -->
-    <form class="filters-form" id="filtersForm">
-        <div class="filters-grid">
-            
-            <!-- Filtro 1: Prioridade -->
-            <div class="filter-group">
-                <label for="priorityFilter" class="filter-label">
-                    Prioridade
-                </label>
-                <select id="priorityFilter" class="filter-select" name="priority">
-                    <option value="">Todas as prioridades</option>
-                    <option value="alta">🟠 Alta</option>
-                    <option value="media">🟡 Média</option>
-                    <option value="baixa">🟢 Baixa</option>
-                </select>
-            </div>
-
-            <!-- Filtro 2: Status -->
-            <div class="filter-group">
-                <label for="statusFilter" class="filter-label">
-                    Status
-                </label>
-                <select id="statusFilter" class="filter-select" name="status">
-                    <option value="">Todos os status</option>
-                    <option value="aberta">📋 Aberta</option>
-                    <option value="analise">🔍 Em Análise</option>
-                    <option value="resolvida">✅ Resolvida</option>
-                </select>
-            </div>
-
-            <!-- Botão de Aplicar Filtros -->
-            <div class="filter-group filter-actions">
-                <button type="submit" class="filter-button-apply">
-                    <i class="fas fa-search"></i>
-                    Aplicar Filtros
-                </button>
-            </div>
-
+    <section class="filters-section">
+        <div class="filters-header">
+            <h4 class="filters-title">
+                <i class="fas fa-filter"></i>
+                Filtrar Denúncias
+            </h4>
+            <a href="{{ url()->current() }}" class="filters-reset-btn" style="text-decoration: none;">
+                <i class="fas fa-redo"></i>
+                Limpar Filtros
+            </a>
         </div>
-    </form>
 
-    <!-- Badge: Filtros Ativos -->
-    <div class="filters-active" id="activeFiltersDisplay" style="display: none;">
-        <span class="active-filter-label">Filtros ativos:</span>
-        <div class="active-filters-tags" id="activeFiltersTags"></div>
-    </div>
+        <form class="filters-form" method="GET" action="{{ url()->current() }}">
+            <div class="filters-grid" style="grid-template-columns: repeat(3, 1fr);"> <div class="filter-group">
+                    <label for="priorityFilter" class="filter-label">Prioridade</label>
+                    <select id="priorityFilter" class="filter-select" name="priority">
+                        <option value="">Todas as prioridades</option>
+                        <option value="Alta" @selected(request('priority') == 'Alta')>🟠 Alta</option>
+                        <option value="Média" @selected(request('priority') == 'Média')>🟡 Média</option>
+                        <option value="Baixa" @selected(request('priority') == 'Baixa')>🟢 Baixa</option>
+                    </select>
+                </div>
 
-</section>
+                <div class="filter-group">
+                    <label for="statusFilter" class="filter-label">Status</label>
+                    <select id="statusFilter" class="filter-select" name="status">
+                        <option value="">Todos os status</option>
+                        <option value="Pendente" @selected(request('status') == 'Pendente')>📋 Pendente</option>
+                        <option value="Em Análise" @selected(request('status') == 'Em Análise')>🔍 Em Análise</option>
+                        <option value="Resolvida" @selected(request('status') == 'Resolvida')>✅ Resolvida</option>
+                    </select>
+                </div>
+
+                <div class="filter-group filter-actions">
+                    <button type="submit" class="filter-button-apply">
+                        <i class="fas fa-search"></i>
+                        Aplicar Filtros
+                    </button>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="filters-active" id="activeFiltersDisplay" style="{{ request()->anyFilled(['priority', 'status']) ? 'display: block;' : 'display: none;' }}">
+            <span class="active-filter-label">Filtros ativos:</span>
+            <div class="active-filters-tags" id="activeFiltersTags">
+                @if(request('priority')) <span class="badge">Prioridade: {{ request('priority') }}</span> @endif
+                @if(request('status')) <span class="badge">Status: {{ request('status') }}</span> @endif
+            </div>
+        </div>
+    </section>
 
     <section class="reports-section">
         <div class="section-header">
-            <h3>Denúncias da categoria: <strong>{{ $category }}</strong></h3>
+            <h3>Denúncias Atribuídas ao Setor: <strong>{{ $category }}</strong></h3>
         </div>
 
         @if ($reports->isEmpty())
             <div class="no-reports-message">
                 <i class="fas fa-inbox"></i>
-                <p>Nenhuma denúncia cadastrada para esta categoria.</p>
+                <p>Nenhuma denúncia cadastrada ou encontrada para estes filtros.</p>
             </div>
         @else
             <div class="reports-table-wrapper">
@@ -168,7 +157,7 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>                             
+                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>                            
                             </tr>
                         @endforeach
                     </tbody>
@@ -181,7 +170,7 @@
 @push('scripts')
 <script src="/js/secretary/filters.js"></script>
 <script>
-    // Função para atualizar a Prioridade em tempo real
+    // Função para atualizar a Prioridade em tempo real (mantida intacta)
     function updatePriority(reportId, selectElement) {
         const priority = selectElement.value;
         if (!priority) return;
@@ -197,44 +186,36 @@
         .then(response => {
             if (!response.ok) throw new Error('Erro ao atualizar prioridade');
             
-            // VERIFICA: A denúncia NÃO TINHA classificação antes?
             if (selectElement.getAttribute('data-is-classified') === 'false') {
-                // Marca que agora está classificada
                 selectElement.setAttribute('data-is-classified', 'true');
                 
-                // 1. Atualiza o Card Superior do Dashboard
                 const topBadge = document.getElementById('top-unclassified-count');
                 if (topBadge) {
                     let currentTopCount = parseInt(topBadge.innerText) || 0;
                     topBadge.innerText = Math.max(0, currentTopCount - 1);
                 }
 
-                // 2. Atualiza a bolinha de Notificação do Menu Lateral (Sidebar)
                 const sidebarBadge = document.getElementById('sidebar-unclassified-count');
                 if (sidebarBadge) {
                     let currentSideCount = parseInt(sidebarBadge.innerText) || 0;
                     let newCount = Math.max(0, currentSideCount - 1);
                     if (newCount === 0) {
-                        sidebarBadge.style.display = 'none'; // Some se chegar a zero
+                        sidebarBadge.style.display = 'none';
                     } else {
                         sidebarBadge.innerText = newCount;
                     }
                 }
             }
 
-            // (Opcional) Atualiza o texto na coluna "Prioridade Atual" para não ter que recarregar a tela
             const labelSpan = document.getElementById(`priority-label-${reportId}`);
             if(labelSpan) {
-                // Remove formatações velhas e adiciona a nova
                 labelSpan.innerHTML = `<span class="priority-badge priority-${priority.toLowerCase()}">${priority}</span>`;
             }
 
-            // Efeito visual na borda para a secretária saber que funcionou
             const originalBorder = selectElement.style.borderColor;
-            selectElement.style.borderColor = '#10b981'; // verde sucesso
+            selectElement.style.borderColor = '#10b981';
             setTimeout(() => { selectElement.style.borderColor = originalBorder; }, 1500);
 
-            console.log(`Sucesso: Prioridade atualizada para ${priority}`);
         })
         .catch(error => {
             console.error('Erro:', error);

@@ -77,24 +77,34 @@ class CategoryController extends Controller
         ]);
 
         try {
-            // Criar categoria
+            // Usa transação para garantir que, se der erro, NADA é salvo pela metade
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
             $category = Category::create([
                 'name' => trim($validated['name']),
                 'description' => trim($validated['description']),
                 'is_active' => true,
+                // SALVA O ID DA SECRETARIA DIRETAMENTE AQUI (Se for relação 1 para N)
+                'secretary_id' => $validated['secretary_id'], 
             ]);
 
-            // Vincula a secretaria escolhida à categoria criada
-            $category->secretaries()->attach($validated['secretary_id']);
+            // Se você REALMENTE usar uma tabela Pivot (Muitos-para-Muitos), descomente a linha abaixo e remova o secretary_id de cima:
+            // $category->secretaries()->attach($validated['secretary_id']);
+
+            \Illuminate\Support\Facades\DB::commit();
 
             return redirect()->route('admin.dashboard')
                 ->with('success', "Categoria '{$category->name}' criada com sucesso!");
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack(); // Desfaz a criação da categoria se der erro
+            
+            // Log do erro real para você saber o que falhou!
+            \Illuminate\Support\Facades\Log::error('Erro real ao criar categoria: ' . $e->getMessage());
+            
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Erro ao criar categoria. Tente novamente.');
+                ->with('error', 'Erro ao vincular categoria e secretaria. (Verifique os logs)');
         }
     }
-
 }

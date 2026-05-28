@@ -11,19 +11,14 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Controlador de funcionalidades da secretária.
- * 
- * Gerencia o cadastro de secretárias pelo admin e o dashboard das secretárias.
+ * * Gerencia o cadastro de secretárias pelo admin e o dashboard das secretárias.
  */
 class SecretaryController extends Controller
 {
     /**
-     * Exibe o formulário para criar nova secretária.
-     * Apenas admins podem acessar.
+     * Exibe o formulário de criação de secretarias.
      *
      * @return \Illuminate\View\View
-     */
-/**
-     * Exibe o formulário de criação de secretarias.
      */
     public function create()
     {
@@ -32,7 +27,6 @@ class SecretaryController extends Controller
 
         return view('secretary.create', [
             'secretaries' => $secretaries,
-            // Não enviamos mais $categories para a view
         ]);
     }
 
@@ -50,7 +44,6 @@ class SecretaryController extends Controller
                 'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
                 'is_active' => true,
                 'admin_id' => auth()->id(), // Mantém o registro de quem criou
-                // 'category' foi removido daqui!
             ]);
 
             return redirect()->route('secretary.create')
@@ -64,71 +57,86 @@ class SecretaryController extends Controller
 
     /**
      * Exibe o dashboard da secretária com denúncias da sua categoria.
-     * 
-     * Mostra apenas as denúncias que pertencem à categoria associada à secretária.
+     * * Mostra apenas as denúncias que pertencem à categoria associada à secretária.
      *
+     * @param Request $request
      * @return \Illuminate\View\View
      */
-public function dashboard()
-{
-    /** @var Secretary $secretary */
-    $secretary = Auth::user();
+    public function dashboard(Request $request) 
+    {
+        /** @var Secretary $secretary */
+        $secretary = Auth::user();
 
-    // Obtém todas as denúncias onde o secretary_id é igual ao ID da secretária logada
-    $reports = Report::where('secretary_id', $secretary->id)
-        ->with('citizen')
-        ->orderByRaw("FIELD(priority, 'Alta', 'Média', 'Baixa') ASC")
-        ->orderBy('id', 'ASC')
-        ->get();
+        // 1. Inicia a query base apenas com as denúncias desta secretária
+        $query = Report::where('secretary_id', $secretary->id);
 
-    // Recalcula as estatísticas explicitamente usando o ID da secretária
-$statistics = [
-        'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
-        'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
-            ->where('status', 'Pendente')
-            ->count(),
-        'analyzing_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
-            ->where('status', 'Em Análise')
-            ->count(),
-        'resolved_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
-            ->where('status', 'Resolvida')
-            ->count(),
-    ];
+        // 2. Aplica os filtros, SE a secretária os tiver selecionado
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
+        }
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->input('priority'));
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
 
-    return view('secretary.dashboard', [
-        'reports' => $reports,
-        'statistics' => $statistics,
-        'category' => $secretary->name, 
-    ]);
-}
+        // 3. Executa a query com a ordenação (Prioridade > ID)
+        $reports = $query->with('citizen')
+            ->orderByRaw("FIELD(priority, 'Alta', 'Média', 'Baixa') ASC")
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        // 4. Recalcula as estatísticas explicitamente usando o ID da secretária
+        $statistics = [
+            'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
+            'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+                ->where('status', 'Pendente')
+                ->count(),
+            'analyzing_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+                ->where('status', 'Em Análise')
+                ->count(),
+            'resolved_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+                ->where('status', 'Resolvida')
+                ->count(),
+        ];
+
+        // 5. Busca as categorias do banco de dados para os botões de filtro
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+
+        return view('secretary.dashboard', [
+            'reports' => $reports,
+            'statistics' => $statistics,
+            'category' => $secretary->name,
+            'categories' => $categories, // <-- Passamos as categorias para a View aqui!
+        ]);
+    }
 
     /**
      * Exibe a tela de classificação de prioridades das denúncias da secretária.
-     * 
-     * Mostra apenas as denúncias atribuídas à secretária autenticada.
+     * * Mostra apenas as denúncias atribuídas à secretária autenticada.
      *
      * @return \Illuminate\View\View
      */
-public function classifyReports()
-{
-    /** @var Secretary $secretary */
-    $secretary = Auth::user();
+    public function classifyReports()
+    {
+        /** @var Secretary $secretary */
+        $secretary = Auth::user();
 
-    // Filtra denúncias da secretária logada que ainda não têm prioridade OU que você deseja classificar
-    $reports = \App\Models\Report::where('secretary_id', $secretary->id)
-        ->whereNull('priority') 
-        ->latest()
-        ->get();
+        // Filtra denúncias da secretária logada que ainda não têm prioridade OU que você deseja classificar
+        $reports = \App\Models\Report::where('secretary_id', $secretary->id)
+            ->whereNull('priority') 
+            ->latest()
+            ->get();
 
-    // Recalcula as estatísticas especificamente para o que aparece nesta tela
-
-    $statistics = [
-        'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
-        'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
-            ->where('status', 'Pendente')->count(), // Alterado de 'Aberta' para 'Pendente'
-        'analyzing_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
-            ->where('status', 'Em Análise')->count(),
-    ];
+        // Recalcula as estatísticas especificamente para o que aparece nesta tela
+        $statistics = [
+            'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
+            'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+                ->where('status', 'Pendente')->count(), 
+            'analyzing_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+                ->where('status', 'Em Análise')->count(),
+        ];
 
         return view('secretary.classify_reports', [
             'reports' => $reports,

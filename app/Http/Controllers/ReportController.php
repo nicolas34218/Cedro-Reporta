@@ -48,16 +48,14 @@ class ReportController extends Controller
                 $imagePath = Storage::disk('local')->putFileAs('reports', $file, $filename, 'private');
             }
 
-            // 3. Validação de Categoria e Secretaria
+            // 3. Validação de Categoria
             $category = \App\Models\Category::where('name', $validated['category'])->first();
             if (!$category) {
                 return back()->with('error', 'Categoria inválida.');
             }
 
-            $secretary = $category->secretaries()->first();
-            if (!$secretary) {
-                return back()->with('error', 'Não foi configurado um setor responsável para esta categoria.');
-            }
+            $secretaryId = $category->secretary_id;
+            $secretary = $secretaryId ? \App\Models\Secretary::find($secretaryId) : null;
 
             // 4. Criação da Denúncia
             $report = auth()->user()->reports()->create([
@@ -68,18 +66,16 @@ class ReportController extends Controller
                 'status' => ReportStatus::PENDING,
                 'location' => $location,
                 'image_path' => $imagePath,
-                'secretary_id' => $secretary->id,
+                'secretary_id' => $secretaryId, // Agora aceita ser null
             ]);
 
-            // 5. Notificações
-            $secretariesToNotify = $category->secretaries;
-            if ($secretariesToNotify->isNotEmpty()) {
-                foreach ($secretariesToNotify as $sec) {
-                    try {
-                        $sec->notify(new \App\Notifications\NewReportAssigned($report));
-                    } catch (\Exception $notifyError) {
-                        Log::error('Erro ao notificar secretária: ' . $notifyError->getMessage());
-                    }
+            // 5. Notificações (Só notifica se realmente existir uma secretaria vinculada)
+            if ($secretary) {
+                try {
+                    // Notifica diretamente a única secretaria responsável
+                    $secretary->notify(new \App\Notifications\NewReportAssigned($report));
+                } catch (\Exception $notifyError) {
+                    \Illuminate\Support\Facades\Log::error('Erro ao notificar secretária: ' . $notifyError->getMessage());
                 }
             }
 
@@ -93,10 +89,17 @@ class ReportController extends Controller
         }
     }
 
-    public function index()
+public function index()
     {
         $reports = auth()->user()->reports()->orderByDesc('created_at')->paginate(10);
-        return view('citizen.reports.index', ['reports' => $reports]);
+        
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+
+        return view('citizen.reports.index', [
+            'reports' => $reports,
+            'categories' => $categories,
+            'statuses' => ReportStatus::getAll(),
+        ]);
     }
 
     public function show(Report $report)
@@ -117,9 +120,10 @@ class ReportController extends Controller
         return view('citizen.reports.track-status', ['report' => $report]);
     }
 
-    public function search(Request $request)
+public function search(Request $request)
     {
         $query = auth()->user()->reports();
+
         if ($request->filled('q')) {
             $term = $request->input('q');
             $query->where(function ($sub) use ($term) {
@@ -138,10 +142,12 @@ class ReportController extends Controller
         $query->filter($filters);
         $reports = $query->orderByDesc('created_at')->paginate(10);
 
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+
         return view('citizen.reports.index', [
             'reports' => $reports,
             'filters' => $filters,
-            'categories' => \App\Models\Category::all(),
+            'categories' => $categories, 
             'statuses' => ReportStatus::getAll(),
         ]);
     }

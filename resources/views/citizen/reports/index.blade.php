@@ -1,4 +1,3 @@
-<!-- Tela Minhas Denúncias -->
 @extends('layouts.citizen-reports')
 
 @section('title', 'Visualizar Denúncias')
@@ -17,8 +16,7 @@
         </div>
     @endif
 
-    <!-- Topbar com busca -->
-<form 
+    <form 
     id="reports-filter-form" 
     action="{{ route('citizen.reports.search') }}" 
     method="get" 
@@ -52,59 +50,26 @@
                 value="{{ request('location') }}"
             >
         </div>
-
         <div class="filter-badges">
             <button 
                 type="button" 
                 class="badge-btn @if(!request('category')) active @endif" 
                 data-value=""
             >
-            Todos
+                Todos
             </button>
 
-            <button 
-                type="button" 
-                class="badge-btn @if(request('category')=='Iluminação') active @endif" 
-                data-value="Iluminação"
-            >
-                Iluminação
-            </button>
-
-            <button 
-                type="button" 
-                class="badge-btn @if(request('category')=='Buracos') active @endif" 
-                data-value="Buracos"
-            >
-                Buraco
-            </button>
-
-            <button 
-                type="button" 
-                class="badge-btn @if(request('category')=='Lixo') active @endif" 
-                data-value="Lixo"
-            >
-                Lixo
-            </button>
-
-            <button 
-                type="button" 
-                class="badge-btn @if(request('category')=='Segurança') active @endif" 
-                data-value="Segurança">
-
-                Segurança
-            </button>
-
-            <button 
-                type="button" 
-                class="badge-btn @if(request('category')=='Outros') active @endif" 
-                data-value="Outros">
-                
-                Outros
-            </button>
-    </div>
+            @foreach($categories as $category)
+                <button 
+                    type="button" 
+                    class="badge-btn @if(request('category') == $category->name) active @endif" 
+                    data-value="{{ $category->name }}">
+                    {{ $category->name }}
+                </button>
+            @endforeach
+        </div>
 </form>
 
-    <!-- Contagem de resultados -->
     <div class="results-info">
         <p>
             Exibindo
@@ -114,7 +79,6 @@
         </p>
     </div>
 
-    <!-- Lista de denúncias -->
     <div class="reports-list">
         @forelse ($reports as $report)
             <article class="report-card">
@@ -189,11 +153,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (searchBox) {
         searchBox.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
-                // comportamento padrão: o browser submete o form GET
             }
         });
     }
 });
 </script>
-
 @endsection
