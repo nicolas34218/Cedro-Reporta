@@ -43,7 +43,6 @@ class SecretaryController extends Controller
                 'email' => $validated['email'],
                 'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
                 'is_active' => true,
-                'admin_id' => auth()->id(), // Mantém o registro de quem criou
             ]);
 
             return redirect()->route('secretary.create')
@@ -108,7 +107,7 @@ class SecretaryController extends Controller
             'reports' => $reports,
             'statistics' => $statistics,
             'category' => $secretary->name,
-            'categories' => $categories, // <-- Passamos as categorias para a View aqui!
+            'categories' => $categories, 
         ]);
     }
 
@@ -136,6 +135,8 @@ class SecretaryController extends Controller
                 ->where('status', 'Pendente')->count(), 
             'analyzing_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
                 ->where('status', 'Em Análise')->count(),
+            'resolved_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
+                ->where('status', 'Resolvida')->count(),
         ];
 
         return view('secretary.classify_reports', [

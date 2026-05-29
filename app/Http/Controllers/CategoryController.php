@@ -28,7 +28,6 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get();
 
-        // CAMINHO CORRIGIDO: Voltando para a view original!
         return view('category.create', [
             'categories' => $categories,
             'secretaries' => $secretaries,
