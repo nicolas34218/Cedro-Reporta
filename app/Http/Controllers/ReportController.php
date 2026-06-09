@@ -21,12 +21,49 @@ class ReportController extends Controller
     public function create()
     {
         $categories = \App\Models\Category::orderBy('name', 'asc')->get();
-        return view('citizen.reports.create', compact('categories'));
+        $captchaQuestion = $this->generateCaptchaQuestion();
+
+        return view('citizen.reports.create', [
+            'categories' => $categories,
+            'captchaQuestion' => $captchaQuestion,
+            'formAction' => route('citizen.reports.store'),
+            'visitorMode' => false,
+        ]);
+    }
+
+    public function createVisitor()
+    {
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+        $captchaQuestion = $this->generateCaptchaQuestion();
+
+        return view('citizen.reports.create', [
+            'categories' => $categories,
+            'captchaQuestion' => $captchaQuestion,
+            'formAction' => route('visitor.reports.store'),
+            'visitorMode' => true,
+        ]);
     }
 
     public function store(ReportRequest $request)
     {
+        return $this->handleReportSubmission($request, 'citizen.reports.index', false);
+    }
+
+    public function storeVisitor(ReportRequest $request)
+    {
+        return $this->handleReportSubmission($request, 'visitor.reports.create', true);
+    }
+
+    private function handleReportSubmission(ReportRequest $request, string $redirectRoute, bool $visitorMode)
+    {
         try {
+            if (!$this->validateCaptchaAnswer($request)) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['captcha_answer' => 'A resposta do Captcha está incorreta.'])
+                    ->with('error', 'Por favor, confirme que você não é um robô.');
+            }
+
             $validated = $request->validated();
 
             // 1. Localização
@@ -51,42 +88,75 @@ class ReportController extends Controller
             // 3. Validação de Categoria
             $category = \App\Models\Category::where('name', $validated['category'])->first();
             if (!$category) {
-                return back()->with('error', 'Categoria inválida.');
+                return back()->withInput()->with('error', 'Categoria inválida.');
             }
 
             $secretaryId = $category->secretary_id;
             $secretary = $secretaryId ? \App\Models\Secretary::find($secretaryId) : null;
 
             // 4. Criação da Denúncia
-            $report = auth()->user()->reports()->create([
-                'user_id' => auth()->id(),
+            $report = Report::create([
+                'user_id' => auth()->check() ? auth()->id() : null,
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'category' => $validated['category'],
                 'status' => ReportStatus::PENDING,
                 'location' => $location,
                 'image_path' => $imagePath,
-                'secretary_id' => $secretaryId, // Agora aceita ser null
+                'secretary_id' => $secretaryId,
             ]);
 
-            // 5. Notificações (Só notifica se realmente existir uma secretaria vinculada)
+            // 5. Notificações da secretaria
             if ($secretary) {
                 try {
-                    // Notifica diretamente a única secretaria responsável
                     $secretary->notify(new \App\Notifications\NewReportAssigned($report));
                 } catch (\Exception $notifyError) {
-                    \Illuminate\Support\Facades\Log::error('Erro ao notificar secretária: ' . $notifyError->getMessage());
+                    Log::error('Erro ao notificar secretária: ' . $notifyError->getMessage());
                 }
             }
 
+            if ($visitorMode) {
+                return redirect()
+                    ->route('visitor.reports.create')
+                    ->with('success', 'Denúncia registrada com sucesso! ID: #' . $report->id)
+                    ->with('visitor_notice', 'Sua denúncia foi registrada como visitante. Você não poderá receber notificações automáticas nem acompanhar o status pelo sistema.');
+            }
+
             return redirect()
-                ->route('citizen.reports.index')
+                ->route($redirectRoute)
                 ->with('success', 'Denúncia registrada com sucesso! ID: #' . $report->id);
 
         } catch (\Exception $e) {
             Log::error('Erro fatal ao criar denúncia: ' . $e->getMessage());
             return back()->withInput()->with('error', 'Ocorreu um erro ao registrar a denúncia.');
         }
+    }
+
+    private function validateCaptchaAnswer(ReportRequest $request): bool
+    {
+        $expected = session('report_captcha_answer');
+        $answer = $request->input('captcha_answer');
+
+        session()->forget('report_captcha_answer');
+
+        return $expected !== null && is_numeric($answer) && intval($answer) === intval($expected);
+    }
+
+    private function generateCaptchaQuestion(): string
+    {
+        $left = random_int(1, 9);
+        $right = random_int(1, 9);
+        $operators = ['+', '-'];
+        $operator = $operators[random_int(0, count($operators) - 1)];
+
+        if ($operator === '-' && $left < $right) {
+            [$left, $right] = [$right, $left];
+        }
+
+        $answer = $operator === '+' ? $left + $right : $left - $right;
+        session(['report_captcha_answer' => $answer]);
+
+        return "Quanto é {$left} {$operator} {$right}?";
     }
 
 public function index()

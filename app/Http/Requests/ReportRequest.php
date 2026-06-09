@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Constants\ReportConstants;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -20,7 +19,7 @@ class ReportRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -30,6 +29,7 @@ class ReportRequest extends FormRequest
      * - O título, descrição, categoria, endereço e bairro são obrigatórios
      * - A descrição deve ter no mínimo 10 caracteres
      * - Imagens devem estar nos formatos PNG, JPG ou JPEG com máximo de 2MB
+     * - Captcha deve ser preenchido para evitar bots
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -38,10 +38,11 @@ class ReportRequest extends FormRequest
         return [
             'title' => 'required|string|min:5|max:255',
             'description' => 'required|string|min:10|max:1000',
-            'category' => 'required|string|in:' . ReportConstants::getCategoriesValidation(),
+            'category' => 'required|string|exists:categories,name',
             'address_reference' => 'required|string|min:3|max:255',
             'district' => 'required|string|min:3|max:100',
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'captcha_answer' => $this->isVisitorReport() ? 'required|numeric' : 'nullable|numeric',
         ];
     }
 
@@ -57,6 +58,7 @@ class ReportRequest extends FormRequest
             'category' => $this->input('category') ? trim($this->input('category')) : null,
             'address_reference' => $this->input('address_reference') ? trim($this->input('address_reference')) : null,
             'district' => $this->input('district') ? trim($this->input('district')) : null,
+            'captcha_answer' => $this->input('captcha_answer') ? trim($this->input('captcha_answer')) : null,
         ]);
     }
 
@@ -65,6 +67,11 @@ class ReportRequest extends FormRequest
      *
      * @return array<string, string>
      */
+    private function isVisitorReport(): bool
+    {
+        return $this->routeIs('visitor.reports.store');
+    }
+
     public function messages(): array
     {
         return [
@@ -75,7 +82,7 @@ class ReportRequest extends FormRequest
             'description.min' => 'A descrição deve ter no mínimo 10 caracteres.',
             'description.max' => 'A descrição não pode exceder 1000 caracteres.',
             'category.required' => 'A categoria é obrigatória.',
-            'category.in' => 'A categoria selecionada é inválida.',
+            'category.exists' => 'A categoria selecionada é inválida.',
             'address_reference.required' => 'O endereço/referência é obrigatório.',
             'address_reference.min' => 'O endereço deve ter no mínimo 3 caracteres.',
             'address_reference.max' => 'O endereço não pode exceder 255 caracteres.',
@@ -85,6 +92,8 @@ class ReportRequest extends FormRequest
             'image.image' => 'O arquivo deve ser uma imagem.',
             'image.mimes' => 'A imagem deve estar nos formatos PNG, JPG ou JPEG.',
             'image.max' => 'A imagem não pode exceder 2MB.',
+            'captcha_answer.required' => 'A validação anti-bot é obrigatória.',
+            'captcha_answer.numeric' => 'A resposta do Captcha deve ser um número válido.',
         ];
     }
 }

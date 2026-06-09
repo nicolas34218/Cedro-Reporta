@@ -16,7 +16,11 @@
                 <span class="brand-name">Cedro<span>Reporta</span></span>
             </div>
             <div class="user-area">
-                <span class="user-name">{{ auth()->user()->name }}</span>
+                @if(auth()->check())
+                    <span class="user-name">{{ auth()->user()->name }}</span>
+                @else
+                    <span class="user-name">Visitante</span>
+                @endif
             </div>
         </div>
     </header>

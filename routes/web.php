@@ -69,6 +69,17 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 /**
+ * Rotas de denúncias como visitante
+ */
+Route::controller(ReportController::class)->group(function () {
+    Route::get('/visitante/denuncias/nova', 'createVisitor')
+        ->name('visitor.reports.create');
+
+    Route::post('/visitante/denuncias', 'storeVisitor')
+        ->name('visitor.reports.store');
+});
+
+/**
  * Rotas de denúncias do cidadão
  */
 Route::middleware(['auth:citizen', 'citizen.only'])->prefix('cidadao')->name('citizen.')->controller(ReportController::class)->group(function () {

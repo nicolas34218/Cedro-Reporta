@@ -81,7 +81,7 @@ php artisan test tests/Feature/ReportFilterTest.php
 | Tipo | Email | Senha |
 |------|-------|-------|
 | Admin | admin@cedroreporta.com | admin123 |
-| Secretário | secretario@cedroreporta.com | senha123 |
+| Secretário | secretaria.(-NOME DA SECRETARIA-)@cedroreporta.com | secretary123 |
 | Cidadão | teste@gmail.com | teste123 |
 
 

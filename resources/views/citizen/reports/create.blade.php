@@ -1,11 +1,11 @@
-<!-- Tela Criar Denúncia -->
+﻿<!-- Tela Criar Denúncia -->
  
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/citizen-report-create.css') }}">
 @endpush
 @extends('layouts.citizen')
 
-@section('title', 'Registrar Denúncia')
+@section('title', $visitorMode ? 'Registrar Denúncia como Visitante' : 'Registrar Denúncia')
 
 @section('content')
 <section class="report-create-page">
@@ -15,12 +15,24 @@
         </div>
     @endif
 
+    @if(session('visitor_notice'))
+        <div class="alert alert-info" style="margin-bottom: 16px; padding: 12px 16px; border-radius: 12px; background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd;">
+            {{ session('visitor_notice') }}
+        </div>
+    @endif
+
     <div class="report-create-topbar">
-        <a href="{{ route('citizen.home') }}" class="btn-back">← Voltar</a>
-        <h1>Nova Denúncia</h1>
+        <a href="{{ auth()->check() ? route('citizen.home') : route('welcome') }}" class="btn-back">← Voltar</a>
+        <h1>{{ $visitorMode ? 'Registrar Denúncia como Visitante' : 'Nova Denúncia' }}</h1>
     </div>
 
-    <form action="{{ route('citizen.reports.store') }}" method="post" class="report-form" enctype="multipart/form-data">
+    @if($visitorMode)
+        <div class="visitor-note" style="margin-bottom: 24px; padding: 16px; border-radius: 12px; background: #f8fafc; color: #334155; border: 1px solid #cbd5e1;">
+            Você está enviando uma denúncia como visitante. Sua denúncia será registrada, mas você não poderá receber notificações automáticas nem acompanhar o status pelo sistema.
+        </div>
+    @endif
+
+    <form action="{{ $formAction }}" method="post" class="report-form" enctype="multipart/form-data">
         @csrf
 
         <div class="report-grid">
@@ -39,28 +51,35 @@
                     <x-error-message field="description" />
                 </div>
 
-                    <div class="form-field">
-                        <label for="category">CATEGORIA</label>
-                            <select name="category" id="category" class="form-control" required>
-                                <option value="">Selecione uma categoria</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->name }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        <x-error-message field="category" />
-                    </div>
-
-                    <div class="form-field">
-                        <label for="secretary">SETOR RESPONSÁVEL</label>
-                        <select id="secretary" name="secretary_id">
-                            <option value="">Carregando...</option>
-                        </select>
-                        <small style="display: block; margin-top: 8px; color: #666;">
-                            <i style="color: #2f6b3f;">💡</i> Preenchido automaticamente com base na categoria
-                        </small>
-                        <x-error-message field="secretary_id" />
-                    </div>
+                <div class="form-field">
+                    <label for="category">CATEGORIA</label>
+                    <select name="category" id="category" class="form-control" required>
+                        <option value="">Selecione uma categoria</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->name }}" {{ old('category') === $category->name ? 'selected' : '' }}>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <x-error-message field="category" />
                 </div>
+
+                <div class="form-field">
+                    <label for="secretary">SETOR RESPONSÁVEL</label>
+                    <select id="secretary" name="secretary_id">
+                        <option value="">Carregando...</option>
+                    </select>
+                    <small style="display: block; margin-top: 8px; color: #666;">
+                        <i style="color: #2f6b3f;">💡</i> Preenchido automaticamente com base na categoria
+                    </small>
+                    <x-error-message field="secretary_id" />
+                </div>
+
+                @if($visitorMode)
+                    <div class="form-field">
+                        <label for="captcha_answer">Confirmação anti-bot: {{ $captchaQuestion }}</label>
+                        <input id="captcha_answer" name="captcha_answer" type="text" value="{{ old('captcha_answer') }}">
+                        <x-error-message field="captcha_answer" />
+                    </div>
+                @endif
             </div>
 
             <div class="form-column">
@@ -181,5 +200,3 @@
     }
 </script>
 @endpush
-
-@endsection
