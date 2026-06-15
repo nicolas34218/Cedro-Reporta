@@ -79,6 +79,14 @@ Route::controller(ReportController::class)->group(function () {
         ->name('visitor.reports.store');
 });
 
+
+/**
+ * Entrar como visitante
+ */
+Route::get('/visitante', function () {
+    return view('citizen.home-visitante');
+})->name('visitor.home');
+
 /**
  * Rotas de denúncias do cidadão
  */

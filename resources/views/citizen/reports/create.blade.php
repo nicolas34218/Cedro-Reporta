@@ -109,6 +109,29 @@
             </div>
         </div>
 
+        <div class="anonymous-box">
+
+            <div class="anonymous-header">
+
+                <input
+                    type="checkbox"
+                    id="anonymous"
+                    name="anonymous"
+                    value="1">
+
+                <label for="anonymous">
+                    Manter denúncia anônima
+                </label>
+
+            </div>
+
+            <p>
+                Seus dados pessoais não serão exibidos para
+                a secretaria responsável pela denúncia.
+            </p>
+
+        </div>
+
         <button type="submit" class="btn-submit">Enviar Denúncia</button>
     </form>
 </section>

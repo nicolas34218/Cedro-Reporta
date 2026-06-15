@@ -115,6 +115,47 @@
     cursor: pointer;
 }
 
+.anonymous-box{
+    margin-top:30px;
+
+    padding:20px;
+
+    border:1px solid #d7e2d7;
+
+    border-radius:12px;
+
+    background:#f8faf8;
+}
+
+.anonymous-header{
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:10px;
+}
+
+.anonymous-header label{
+    font-weight:600;
+
+    color:#1f5132;
+}
+
+.anonymous-box p{
+    color:#666;
+
+    font-size:14px;
+
+    line-height:1.5;
+}
+
+.anonymous-box.active{
+    border-color:#2f6b3f;
+    background:#eefbf0;
+}
+
 @media (max-width: 1024px) {
     .report-grid {
         grid-template-columns: 1fr;

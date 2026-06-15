@@ -82,6 +82,11 @@
                 <div class="divider">ou</div>
 
                 <a href="{{ route('register') }}" class="secondary">Criar conta</a>
+
+                <a href="{{ route('visitor.home') }}" class="visitor-btn">
+                    <i class="bi bi-person"></i>
+                    Entrar como Visitante
+                </a>
             </div>
         </div>
     </div>

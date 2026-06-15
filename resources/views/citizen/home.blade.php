@@ -3,7 +3,19 @@
 
 @section('title', 'Tela principal')
 
+
 @section('content')
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
 <div class="home-page-wrapper">
     <!-- Hamburger Button -->
     <button id="home-sidebar-toggle" class="home-hamburger" aria-label="Abrir menu" aria-expanded="false">
@@ -16,30 +28,8 @@
     <div class="home-sidebar-overlay" id="home-sidebar-overlay"></div>
 
     <section class="home-dashboard">
-        <!-- Sidebar lateral -->
-        <aside class="home-sidebar" id="home-sidebar">
-            <button id="home-sidebar-close" class="home-sidebar-close" aria-label="Fechar menu">×</button>
-        <div class="sidebar-menu">
-            <h3 class="sidebar-title">MENU</h3>
-
-            <a href="{{ route('citizen.home') }}" class="sidebar-link active">
-                <span class="dot">◼</span> Home
-            </a>
-
-            <a href="{{ route('citizen.reports.index') }}" class="sidebar-link">
-                <span class="dot">≡</span> Minhas Denúncias
-            </a>
-
-            <a href="{{ route('citizen.reports.track-status', 1) }}" class="sidebar-link">
-                <span class="dot">◉</span> Acompanhar Status
-            </a>
-        </div>
-
-        <form action="{{ route('logout') }}" method="post" class="sidebar-logout">
-            @csrf
-            <button type="submit" class="sidebar-logout-btn">🚪 Sair</button>
-        </form>
-    </aside>
+        <!-- Sidebar lateral Reutilizável -->
+        <x-citizen.sidebar />
 
     <!-- Conteúdo principal -->
     <main class="home-content">
@@ -47,33 +37,27 @@
         <p class="home-subtitle">Bem-vindo(a) de volta</p>
 
         <!-- card principal -->
-        <div class="hero-card">
-            <div class="hero-left">
-                <div class="hero-badge">
-                    <img src="{{ asset('logo-cedro.png') }}" alt="Logo CedroReporta">
-                </div>
-                <div>
-                    <h2>Faça sua cidade melhor</h2>
-                    <p>Registre problemas e acompanhe as soluções</p>
-                </div>
-            </div>
-            <a href="{{ route('citizen.reports.create') }}" class="hero-btn">+ Novo Report</a>
-        </div>
+       <x-citizen.hero-card
+            title="Faça sua cidade melhor"
+            description="Registre problemas e acompanhe as soluções"
+            buttonText="+ Novo Report"
+            :buttonLink="route('citizen.reports.create')" />
 
         <!-- cards de resumo -->
         <div class="summary-grid">
-            <article class="summary-card">
-                <strong>{{ $totalReports }}</strong>
-                <span>MEUS REGISTROS</span>
-            </article>
-            <article class="summary-card warning">
-                <strong>{{ $pendingReports }}</strong>
-                <span>PENDENTES</span>
-            </article>
-            <article class="summary-card info">
-                <strong>{{ $inProgressReports }}</strong>
-                <span>EM ANDAMENTO</span>
-            </article>
+            <x-citizen.summary-card
+                :value="$totalReports"
+                label="MEUS REGISTROS" />
+
+            <x-citizen.summary-card
+                :value="$pendingReports"
+                label="PENDENTES"
+                type="warning" />
+
+            <x-citizen.summary-card
+                :value="$inProgressReports"
+                label="EM ANDAMENTO"
+                type="info" />
         </div>
 
         <h3 class="features-title">FUNCIONALIDADES</h3>

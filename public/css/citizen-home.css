@@ -638,6 +638,33 @@ body{
     font-size: 12px;
   }
 
+  /* Aviso do Visitante */
+  .visitor-warning{
+    display:flex;
+    gap:16px;
+    padding:18px;
+    margin-bottom:24px;
+    border-radius:14px;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+}
+
+.visitor-warning-icon{
+    font-size:24px;
+    color:#2563eb;
+}
+
+.visitor-warning-content h3{
+    margin:0;
+    font-size:16px;
+    color:#1e3a8a;
+}
+
+.visitor-warning-content p{
+    margin-top:6px;
+    color:#475569;
+}
+
   /* =========== MOBILE: CONTENT =========== */
   .home-content{
     padding: 16px;
