@@ -1,16 +1,12 @@
 <aside class="home-sidebar" id="home-sidebar">
-    <button
-        id="home-sidebar-close"
-        class="home-sidebar-close"
-        aria-label="Fechar menu">
-        ×
-    </button>
 
     <div class="sidebar-menu">
         <h3 class="sidebar-title">MENU</h3>
 
-        <a href="{{ route('citizen.home') }}"
-           class="sidebar-link">
+        <a href="{{ ($visitorMode ?? false)
+            ? route('visitor.home')
+            : route('citizen.home') }}"
+            class="sidebar-link">
 
             <i class="bi bi-house-door"></i>
             <span>Home</span>
@@ -34,8 +30,10 @@
 
         @endunless
 
-        <a href="{{ route('citizen.reports.create') }}"
-           class="sidebar-link">
+        <a href="{{ ($visitorMode ?? false)
+            ? route('visitor.reports.create')
+            : route('citizen.reports.create') }}"
+            class="sidebar-link">
 
             <i class="bi bi-plus-circle"></i>
             <span>Nova Denúncia</span>
@@ -43,14 +41,33 @@
 
     </div>
 
-    @unless($visitorMode ?? false)
-        <form action="{{ route('logout') }}" method="post" class="sidebar-logout">
+    <!-- Área de logout ou registro, dependendo do modo visitante -->
+
+   @if($visitorMode ?? false)
+
+        <div class="sidebar-logout">
+            <a href="{{ route('register') }}"
+            class="visitor-register-btn">
+                Criar Conta
+            </a>
+        </div>
+
+    @else
+
+        <form action="{{ route('logout') }}"
+            method="post"
+            class="sidebar-logout">
             @csrf
 
-            <button type="submit" class="sidebar-logout-btn">
+            <button type="submit"
+                    class="sidebar-logout-btn">
+
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sair</span>
+
             </button>
         </form>
-    @endunless
+
+    @endif
+
 </aside>

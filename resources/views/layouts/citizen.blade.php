@@ -31,10 +31,7 @@
         @yield('content')
     </main>
 
-    <!-- botão de logout reutilizável (oculto em certas rotas) -->
-    @unless(request()->routeIs('citizen.reports.show', 'citizen.reports.track-status', 'citizen.home'))
-        <x-logout-button />
-    @endunless
+   
 
     @stack('scripts')
 </body>

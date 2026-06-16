@@ -6,7 +6,7 @@
 
 <div class="home-page-wrapper">
 
-    <section class="home-dashboard">
+    <section class="home-dashboard sidebar-open">
 
         <x-citizen.sidebar :visitorMode="true" />
 
@@ -23,8 +23,16 @@
             </p>
 
             <div class="visitor-alert">
-                Algumas funcionalidades estão bloqueadas.
-                Crie uma conta para acompanhar suas denúncias.
+
+                <strong>
+                    Algumas funcionalidades estão bloqueadas
+                </strong>
+
+                <p>
+                    Crie uma conta para acompanhar denúncias,
+                    receber notificações e verificar status da denúncia.
+                </p>
+
             </div>
 
             <div class="hero-card">
@@ -43,7 +51,7 @@
                 </div>
 
                 <a
-                    href="{{ route('citizen.reports.create') }}"
+                    href="{{ route('visitor.reports.create') }}"
                     class="hero-btn">
 
                     Nova Denúncia

@@ -8,25 +8,28 @@
         <div class="hero-badge">
 
             <img
-                src="{{ asset('logo-cedro.png') }}"
-                alt="Logo CedroReporta">
+                src="{{ public('logo-cedro.png') }}"
+                alt="Prefeitura">
 
         </div>
 
         <div>
 
-            <h2>{{ $title }}</h2>
+            <h2>Faça sua cidade melhor</h2>
 
-            <p>{{ $description }}</p>
+            <p>
+                Registre problemas urbanos e acompanhe as melhorias.
+            </p>
 
         </div>
 
     </div>
 
-    <a href="{{ $buttonLink }}"
-       class="hero-btn">
+    <a
+        href="{{ route('visitor.reports.create') }}"
+        class="hero-btn">
 
-        {{ $buttonText }}
+        Nova Denúncia
 
     </a>
 
