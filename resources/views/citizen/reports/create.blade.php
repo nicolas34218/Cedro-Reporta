@@ -8,6 +8,7 @@
 @section('title', $visitorMode ? 'Registrar Denúncia como Visitante' : 'Registrar Denúncia')
 
 @section('content')
+
 <section class="report-create-page">
     @if (session('error'))
         <div class="alert alert-error" style="margin-bottom: 16px; padding: 12px 16px; border-radius: 12px; background: #fdecec; color: #991b1b; border: 1px solid #fca5a5;">
@@ -73,13 +74,19 @@
                     <x-error-message field="secretary_id" />
                 </div>
 
-                @if($visitorMode)
                     <div class="form-field">
-                        <label for="captcha_answer">Confirmação anti-bot: {{ $captchaQuestion }}</label>
-                        <input id="captcha_answer" name="captcha_answer" type="text" value="{{ old('captcha_answer') }}">
+                        <label for="captcha_answer">
+                            Confirmação anti-bot: {{ $captchaQuestion }}
+                        </label>
+
+                        <input
+                            id="captcha_answer"
+                            name="captcha_answer"
+                            type="text"
+                            value="{{ old('captcha_answer') }}">
+
                         <x-error-message field="captcha_answer" />
                     </div>
-                @endif
             </div>
 
             <div class="form-column">

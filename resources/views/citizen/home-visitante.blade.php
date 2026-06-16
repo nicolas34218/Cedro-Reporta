@@ -37,26 +37,8 @@
 
             <div class="hero-card">
 
-                <div class="hero-left">
+                <x-citizen.hero-card :visitorMode="true" />
 
-                    <div>
-                        <h2>Faça sua cidade melhor</h2>
-
-                        <p>
-                            Registre problemas urbanos de forma rápida.
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <a
-                    href="{{ route('visitor.reports.create') }}"
-                    class="hero-btn">
-
-                    Nova Denúncia
-
-                </a>
 
             </div>
 

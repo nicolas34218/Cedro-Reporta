@@ -1,5 +1,9 @@
 <aside class="home-sidebar" id="home-sidebar">
 
+@props([
+    'visitorMode' => false
+])
+
     <div class="sidebar-menu">
         <h3 class="sidebar-title">MENU</h3>
 

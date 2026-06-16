@@ -8,7 +8,7 @@
         <div class="hero-badge">
 
             <img
-                src="{{ public('logo-cedro.png') }}"
+                src="{{ asset('logo-cedro.png') }}"
                 alt="Prefeitura">
 
         </div>
@@ -26,7 +26,9 @@
     </div>
 
     <a
-        href="{{ route('visitor.reports.create') }}"
+        href="{{ $visitorMode
+        ? route('visitor.reports.create')
+        : route('citizen.reports.create') }}"
         class="hero-btn">
 
         Nova Denúncia

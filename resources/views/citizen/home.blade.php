@@ -6,15 +6,7 @@
 
 @section('content')
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Home</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</head>
+@extends('layouts.citizen')
 
 <div class="home-page-wrapper">
     <!-- Hamburger Button -->
@@ -37,11 +29,7 @@
         <p class="home-subtitle">Bem-vindo(a) de volta</p>
 
         <!-- card principal -->
-       <x-citizen.hero-card
-            title="Faça sua cidade melhor"
-            description="Registre problemas e acompanhe as soluções"
-            buttonText="+ Novo Report"
-            :buttonLink="route('citizen.reports.create')" />
+       <x-citizen.hero-card :visitorMode="false" />
 
         <!-- cards de resumo -->
         <div class="summary-grid">
@@ -63,10 +51,16 @@
         <h3 class="features-title">FUNCIONALIDADES</h3>
 
         <div class="feature-list">
-            <a href="{{ route('citizen.reports.create') }}" class="feature-item">
-                <span>📝 Registrar Report</span>
-                <span>›</span>
+            <a
+                href="{{ ($visitorMode ?? false)
+                ? route('visitor.reports.create')
+                : route('citizen.reports.create') }}"
+                class="hero-btn">
+
+                Nova Denúncia
+
             </a>
+
             <a href="{{ route('citizen.reports.index') }}" class="feature-item">
                 <span>📄 Visualizar Report</span>
                 <span>›</span>
