@@ -104,6 +104,7 @@ class ReportController extends Controller
                 'location' => $location,
                 'image_path' => $imagePath,
                 'secretary_id' => $secretaryId,
+                'is_anonymous' => !$visitorMode && $request->boolean('anonymous'),
             ]);
 
             // 5. Notificações da secretaria

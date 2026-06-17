@@ -137,7 +137,9 @@
                                 <td class="id-cell">#{{ $report->id }}</td>
                                 <td class="title-cell">{{ Str::limit($report->title, 45) }}</td>
                                 <td class="citizen-cell">
-                                    @if($report->citizen)
+                                    @if($report->is_anonymous)
+                                        <span class="text-muted">Anônimo</span>
+                                    @elseif($report->citizen)
                                         <span title="{{ $report->citizen->email }}">{{ Str::limit($report->citizen->name, 20) }}</span>
                                     @else
                                         <span class="text-muted">Desconhecido</span>

@@ -38,6 +38,7 @@ class Report extends Model
         'priority',
         'priority_justification',
         'priority_assigned_at',
+        'is_anonymous',
     ];
 
     /**
@@ -47,6 +48,7 @@ class Report extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'priority_assigned_at' => 'datetime',
+        'is_anonymous' => 'boolean',
     ];
 
     /**

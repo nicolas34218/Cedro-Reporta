@@ -43,6 +43,7 @@ class ReportRequest extends FormRequest
             'district' => 'required|string|min:3|max:100',
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'captcha_answer' => $this->isVisitorReport() ? 'required|numeric' : 'nullable|numeric',
+            'anonymous' => 'nullable|boolean',
         ];
     }
 

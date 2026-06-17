@@ -116,6 +116,7 @@
             </div>
         </div>
 
+        @unless($visitorMode)
         <div class="anonymous-box">
 
             <div class="anonymous-header">
@@ -124,7 +125,8 @@
                     type="checkbox"
                     id="anonymous"
                     name="anonymous"
-                    value="1">
+                    value="1"
+                    {{ old('anonymous') ? 'checked' : '' }}>
 
                 <label for="anonymous">
                     Manter denúncia anônima
@@ -138,6 +140,7 @@
             </p>
 
         </div>
+        @endunless
 
         <button type="submit" class="btn-submit">Enviar Denúncia</button>
     </form>

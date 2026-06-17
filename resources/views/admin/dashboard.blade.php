@@ -68,7 +68,7 @@
                                 <i class="far fa-calendar-alt"></i> {{ $report->created_at->format('d/m/Y H:i') }}
                             </span>
                             <span class="report-citizen">
-                                <i class="fas fa-user"></i> {{ $report->citizen->name ?? 'Anônimo' }}
+                                <i class="fas fa-user"></i> {{ $report->is_anonymous ? 'Anônimo' : ($report->citizen->name ?? 'Anônimo') }}
                             </span>
                         </div>
 
