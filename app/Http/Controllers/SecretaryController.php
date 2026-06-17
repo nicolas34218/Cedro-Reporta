@@ -144,4 +144,14 @@ class SecretaryController extends Controller
             'statistics' => $statistics,
         ]);
     }
+
+        /**
+        * Exibe a tela de transferência de denúncias para outras secretárias.
+        *
+        * @return \Illuminate\View\View
+        */
+    public function transferReports()
+    {
+        return view('secretary.transfer.transfer_reports');
+    }
 }

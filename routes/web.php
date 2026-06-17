@@ -161,6 +161,11 @@ Route::prefix('secretary')->name('secretary.')->controller(SecretaryController::
     Route::get('/classify-reports', 'classifyReports')
         ->name('classify-reports')
         ->middleware('auth:secretary');
+
+    // Tela de transferência de denúncias para outras secretárias
+    Route::get('/transfer-reports', 'transferReports')
+        ->name('transfer.index')
+        ->middleware('auth:secretary');
 });
 
 /**

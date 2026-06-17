@@ -44,7 +44,7 @@
             <div class="card">
                 <div class="top">
                     <span>Município de Cedro — CE</span>
-                    <img src="{{ asset('images/brasao-cedro.png') }}" alt="Brasão de Cedro" class="brand-mark">
+                    <img src="{{ asset('logo-cedro.png') }}" alt="Brasão de Cedro" class="brand-mark">
                 </div>
 
                 <h2>Bem-vindo(a) de volta</h2>

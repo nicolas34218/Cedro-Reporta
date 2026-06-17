@@ -21,9 +21,16 @@
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
+                
                 <a href="{{ route('secretary.classify-reports') }}" class="nav-item {{ $active === 'classify' ? 'active' : '' }}">
                     <i class="fas fa-flag"></i>
                     <span>Classificar Denúncias</span>
+                </a>
+
+                <a href="{{ route('secretary.transfer.index') }}"
+                    class="nav-item {{ $active === 'transfer' ? 'active' : '' }}">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transferir Denúncia</span>
                 </a>
             </div>
         </nav>
