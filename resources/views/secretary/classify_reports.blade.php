@@ -1,6 +1,6 @@
 <!-- Página de Classificar denúncias - Tela Secretária -->
 
-@extends('layouts.admin', ['active' => 'classify'])
+@extends('layouts.secretary', ['active' => 'classify'])
 
 @push('styles')
 <link rel='stylesheet' href='/css/secretary/reports.css'>
