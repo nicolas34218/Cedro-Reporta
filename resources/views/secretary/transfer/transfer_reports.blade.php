@@ -3,7 +3,7 @@
       href="{{ asset('css/secretary/secretary-transfer.css') }}">
 @endpush
 
-@extends('layouts.secretary')
+@extends('layouts.secretary', ['active' => 'transfer'])
 
 @section('title', 'Transferir Denúncias')
 
