@@ -39,8 +39,11 @@ class ReportRequest extends FormRequest
             'title' => 'required|string|min:5|max:255',
             'description' => 'required|string|min:10|max:1000',
             'category' => 'required|string|exists:categories,name',
-            'address_reference' => 'required|string|min:3|max:255',
-            'district' => 'required|string|min:3|max:100',
+            'address_reference' => 'nullable|string|min:3|max:255',
+            'district' => 'nullable|string|min:3|max:100',
+            'location_address' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90|required_with:longitude',
+            'longitude' => 'nullable|numeric|between:-180,180|required_with:latitude',
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'captcha_answer' => $this->isVisitorReport() ? 'required|numeric' : 'nullable|numeric',
             'anonymous' => 'nullable|boolean',
@@ -59,8 +62,25 @@ class ReportRequest extends FormRequest
             'category' => $this->input('category') ? trim($this->input('category')) : null,
             'address_reference' => $this->input('address_reference') ? trim($this->input('address_reference')) : null,
             'district' => $this->input('district') ? trim($this->input('district')) : null,
+            'location_address' => $this->input('location_address') ? trim($this->input('location_address')) : null,
+            'latitude' => $this->input('latitude') !== null && $this->input('latitude') !== '' ? trim((string) $this->input('latitude')) : null,
+            'longitude' => $this->input('longitude') !== null && $this->input('longitude') !== '' ? trim((string) $this->input('longitude')) : null,
             'captcha_answer' => $this->input('captcha_answer') ? trim($this->input('captcha_answer')) : null,
         ]);
+    }
+
+    /**
+     * Aplica regras condicionais para permitir mapa ou endereço manual.
+     */
+    public function withValidator($validator): void
+    {
+        $validator->sometimes('address_reference', 'required|string|min:3|max:255', function ($input): bool {
+            return empty($input->latitude) && empty($input->longitude);
+        });
+
+        $validator->sometimes('district', 'required|string|min:3|max:100', function ($input): bool {
+            return empty($input->latitude) && empty($input->longitude);
+        });
     }
 
     /**
@@ -90,6 +110,12 @@ class ReportRequest extends FormRequest
             'district.required' => 'O bairro é obrigatório.',
             'district.min' => 'O bairro deve ter no mínimo 3 caracteres.',
             'district.max' => 'O bairro não pode exceder 100 caracteres.',
+            'latitude.numeric' => 'A latitude deve ser um número válido.',
+            'latitude.between' => 'A latitude selecionada é inválida.',
+            'latitude.required_with' => 'A latitude deve ser enviada junto com a longitude.',
+            'longitude.numeric' => 'A longitude deve ser um número válido.',
+            'longitude.between' => 'A longitude selecionada é inválida.',
+            'longitude.required_with' => 'A longitude deve ser enviada junto com a latitude.',
             'image.image' => 'O arquivo deve ser uma imagem.',
             'image.mimes' => 'A imagem deve estar nos formatos PNG, JPG ou JPEG.',
             'image.max' => 'A imagem não pode exceder 2MB.',

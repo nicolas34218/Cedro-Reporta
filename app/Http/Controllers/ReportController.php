@@ -10,6 +10,7 @@ use App\Models\Citizen;
 use App\Models\Secretary;
 use App\Traits\FormatReport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -54,6 +55,25 @@ class ReportController extends Controller
         return $this->handleReportSubmission($request, 'visitor.reports.create', true);
     }
 
+    public function resolveLocation(Request $request)
+    {
+        $validated = $request->validate([
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        $location = $this->reverseGeocodeLocation(
+            (float) $validated['latitude'],
+            (float) $validated['longitude']
+        );
+
+        return response()->json([
+            'latitude' => (float) $validated['latitude'],
+            'longitude' => (float) $validated['longitude'],
+            'address' => $location,
+        ]);
+    }
+
     private function handleReportSubmission(ReportRequest $request, string $redirectRoute, bool $visitorMode)
     {
         try {
@@ -67,14 +87,7 @@ class ReportController extends Controller
             $validated = $request->validated();
 
             // 1. Localização
-            $location = null;
-            if (!empty($validated['address_reference']) || !empty($validated['district'])) {
-                $parts = array_filter([
-                    $validated['address_reference'] ?? '',
-                    $validated['district'] ?? ''
-                ]);
-                $location = implode(' - ', $parts);
-            }
+            $locationData = $this->buildLocationData($validated);
 
             // 2. Upload de Imagem
             $imagePath = null;
@@ -101,7 +114,10 @@ class ReportController extends Controller
                 'description' => $validated['description'],
                 'category' => $validated['category'],
                 'status' => ReportStatus::PENDING,
-                'location' => $location,
+                'location' => $locationData['location'],
+                'location_address' => $locationData['location_address'],
+                'latitude' => $locationData['latitude'],
+                'longitude' => $locationData['longitude'],
                 'image_path' => $imagePath,
                 'secretary_id' => $secretaryId,
                 'is_anonymous' => !$visitorMode && $request->boolean('anonymous'),
@@ -158,6 +174,76 @@ class ReportController extends Controller
         session(['report_captcha_answer' => $answer]);
 
         return "Quanto é {$left} {$operator} {$right}?";
+    }
+
+    private function buildLocationData(array $validated): array
+    {
+        $latitude = $validated['latitude'] ?? null;
+        $longitude = $validated['longitude'] ?? null;
+        $locationAddress = $validated['location_address'] ?? null;
+
+        if ($latitude !== null && $longitude !== null) {
+            $latitude = (float) $latitude;
+            $longitude = (float) $longitude;
+
+            if (!$locationAddress) {
+                $locationAddress = $this->reverseGeocodeLocation($latitude, $longitude);
+            }
+
+            return [
+                'location' => $locationAddress ?: sprintf('Coordenadas: %.7f, %.7f', $latitude, $longitude),
+                'location_address' => $locationAddress,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+            ];
+        }
+
+        $parts = array_filter([
+            $validated['address_reference'] ?? '',
+            $validated['district'] ?? '',
+        ]);
+
+        $location = !empty($parts) ? implode(' - ', $parts) : null;
+
+        return [
+            'location' => $location,
+            'location_address' => $location,
+            'latitude' => null,
+            'longitude' => null,
+        ];
+    }
+
+    private function reverseGeocodeLocation(float $latitude, float $longitude): ?string
+    {
+        try {
+            $response = Http::timeout(5)
+                ->acceptJson()
+                ->withHeaders([
+                    'User-Agent' => 'CedroReporta/1.0',
+                ])
+                ->get('https://nominatim.openstreetmap.org/reverse', [
+                    'format' => 'jsonv2',
+                    'lat' => $latitude,
+                    'lon' => $longitude,
+                    'zoom' => 18,
+                    'addressdetails' => 1,
+                ]);
+
+            if ($response->successful()) {
+                $displayName = $response->json('display_name');
+                if (is_string($displayName) && trim($displayName) !== '') {
+                    return $displayName;
+                }
+            }
+        } catch (\Throwable $throwable) {
+            Log::warning('Falha ao resolver localização no mapa', [
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'error' => $throwable->getMessage(),
+            ]);
+        }
+
+        return null;
     }
 
 public function index()

@@ -252,4 +252,8 @@ Route::prefix('api')->group(function () {
             return response()->json(['error' => 'Erro ao carregar setores', 'message' => $e->getMessage()], 500);
         }
     });
+
+    // Resolve coordenadas em um endereço legível para o mapa da denúncia
+    Route::get('/reports/location/resolve', [ReportController::class, 'resolveLocation'])
+        ->name('reports.location.resolve');
 });   

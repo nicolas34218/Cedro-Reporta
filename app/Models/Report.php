@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $category
  * @property string $status
  * @property string|null $location
+ * @property string|null $location_address
+ * @property float|null $latitude
+ * @property float|null $longitude
  * @property string|null $image_path
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -33,6 +36,9 @@ class Report extends Model
         'category',
         'status',
         'location',
+        'location_address',
+        'latitude',
+        'longitude',
         'image_path',
         'secretary_id',
         'priority',
@@ -49,6 +55,8 @@ class Report extends Model
         'updated_at' => 'datetime',
         'priority_assigned_at' => 'datetime',
         'is_anonymous' => 'boolean',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     /**
