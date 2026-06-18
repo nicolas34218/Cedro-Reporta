@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Cria categorias
         $categories = [
             ['name' => 'Iluminação', 'description' => 'Problemas de iluminação pública'],
             ['name' => 'Buracos', 'description' => 'Buracos em ruas e avenidas'],
@@ -27,14 +26,6 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Segurança', 'description' => 'Problemas de segurança pública'],
             ['name' => 'Saúde', 'description' => 'Problemas relacionados à saúde'],
         ];
-
-        foreach ($categories as $cat) {
-            Category::create([
-                'name' => $cat['name'],
-                'description' => $cat['description'],
-                'is_active' => true,
-            ]);
-        }
 
         // Cria usuário Admin
         Admin::create([
@@ -53,15 +44,26 @@ class DatabaseSeeder extends Seeder
             'Saúde' => 'saude',
         ];
 
+        $secretariesByCategory = [];
+
         foreach ($categories as $cat) {
             $slug = $slugs[$cat['name']] ?? strtolower(str_replace(' ', '', $cat['name']));
-            
-            Secretary::create([
+
+            $secretariesByCategory[$cat['name']] = Secretary::create([
                 'name' => 'Secretaria ' . $cat['name'],
                 'email' => 'secretaria.' . $slug . '@cedroreporta.com',
                 'password' => bcrypt('secretary123'),
-                'category' => $cat['name'], // Associa a secretária à categoria
                 'is_active' => true,
+            ]);
+        }
+
+        // Cria categorias já vinculadas à secretaria responsável
+        foreach ($categories as $cat) {
+            Category::create([
+                'name' => $cat['name'],
+                'description' => $cat['description'],
+                'is_active' => true,
+                'secretary_id' => $secretariesByCategory[$cat['name']]->id,
             ]);
         }
 
@@ -77,10 +79,10 @@ class DatabaseSeeder extends Seeder
         foreach ($citizens as $citizen) {
             for ($i = 0; $i < 3; $i++) {
                 $categoryName = fake()->randomElement($categoryNames);
-                
+
                 // Busca a secretária responsável pela categoria
-                $secretary = Secretary::where('category', $categoryName)->first();
-                
+                $secretary = $secretariesByCategory[$categoryName] ?? null;
+
                 Report::create([
                     'user_id' => $citizen->id,
                     'title' => fake()->sentence(4),

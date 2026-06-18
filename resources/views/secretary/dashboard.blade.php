@@ -129,6 +129,7 @@
                             <th>Status</th>
                             <th>Prioridade Atual</th>
                             <th>Data</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -159,7 +160,12 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>                            
+                                <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>
+                                <td>
+                                    <a href="{{ route('secretary.transfer.create', $report) }}" class="priority-select" style="text-decoration: none; display: inline-block;">
+                                        Transferir
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

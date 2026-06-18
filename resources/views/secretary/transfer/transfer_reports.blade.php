@@ -11,104 +11,90 @@
 
 <div class="transfer-page">
 
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-error">{{ session('error') }}</div>
+    @endif
+
     <div class="transfer-header">
-
-        <h1>Transferência de Denúncias</h1>
-
+        <h1>Encaminhamentos Recebidos</h1>
         <p>
-            Caso a ocorrência não seja de competência desta secretaria,
-            selecione o órgão responsável e informe a justificativa da transferência.
+            Denúncias que outras secretarias encaminharam para a sua área, aguardando sua avaliação.
         </p>
-
-        <div class="transfer-warning">
-            Esta ação altera a secretaria responsável pela denúncia.
-        </div>
-
     </div>
 
-    <div class="transfer-report-card">
-
-        <h3>Ocorrência selecionada para transferência</h3>
-
-        <div class="report-preview">
-
-            <h4>Buraco grande na Av. Brasil próximo à escola</h4>
-
-            <p>
-                Tem um buraco bem grande aqui na via que está ficando perigoso...
-            </p>
-
-            <small>
-                📍 Bairro Centro
-                •
-                05/04/2026
-            </small>
-
+    @if ($incomingTransfers->isEmpty())
+        <div class="no-reports-message">
+            Nenhum encaminhamento pendente para avaliar.
         </div>
+    @else
+        @foreach ($incomingTransfers as $transfer)
+            <div class="history-card incoming-card">
+                <h4>#{{ $transfer->report->id }} — {{ $transfer->report->title }}</h4>
+                <p>Origem: <strong>{{ $transfer->fromSecretary->name }}</strong></p>
+                <p>Justificativa: {{ $transfer->justification }}</p>
+                <small>{{ $transfer->created_at->format('d/m/Y \à\s H:i') }}</small>
 
+                <div class="transfer-decision-actions">
+                    <form method="POST" action="{{ route('secretary.transfer.accept', $transfer) }}">
+                        @csrf
+                        <button type="submit" class="btn-transfer">Aceitar</button>
+                    </form>
+
+                    <form method="POST" action="{{ route('secretary.transfer.reject', $transfer) }}" class="reject-form">
+                        @csrf
+                        <textarea name="rejection_reason" rows="2" placeholder="Motivo da rejeição" required></textarea>
+                        <button type="submit" class="btn-cancel">Rejeitar</button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
+    @endif
+
+    <div class="transfer-header" style="margin-top:40px;">
+        <h1>Minhas Denúncias</h1>
+        <p>
+            Caso uma ocorrência não seja de competência desta secretaria, selecione-a para transferir.
+        </p>
     </div>
 
-    <div class="transfer-form">
-
-        <div class="form-group">
-
-            <label>
-                <i class="fas fa-building"></i>
-                Secretaria de Destino
-            </label>
-
-            <select>
-
-                <option>
-                    Selecione uma secretaria
-                </option>
-
-            </select>
-
+    @if ($transferableReports->isEmpty())
+        <div class="no-reports-message">
+            Nenhuma denúncia disponível para transferência.
         </div>
-
-        <div class="form-group">
-
-            <label>
-                <i class="fas fa-file-alt"></i>
-                Justificativa da Transferência *
-            </label>
-
-            <textarea
-                rows="5"
-                placeholder="Informe o motivo da transferência"
-                required>
-            </textarea>
-
+    @else
+        <div class="reports-table-wrapper">
+            <table class="reports-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($transferableReports as $report)
+                        <tr>
+                            <td>#{{ $report->id }}</td>
+                            <td>{{ Str::limit($report->title, 45) }}</td>
+                            <td>{{ $report->status }}</td>
+                            <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>
+                            <td>
+                                <a href="{{ route('secretary.transfer.create', $report) }}" class="btn-transfer" style="text-decoration:none; display:inline-block;">
+                                    Transferir
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-
-        <div class="transfer-actions">
-
-            <button class="btn-transfer">
-                Transferir Denúncia
-            </button>
-
-            <button class="btn-cancel">
-                Cancelar
-            </button>
-
-        </div>
-
-    </div>
-
-    <div class="transfer-history">
-
-        <h3>Histórico</h3>
-
-        <div class="history-card">
-
-            Transferida de Limpeza Urbana para Infraestrutura
-            Motivo: Competência relacionada à manutenção viária.
-            05/04/2026 às 10:22
-
-        </div>
-
-    </div>
+    @endif
 
 </div>
 

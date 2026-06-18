@@ -104,8 +104,8 @@ class ReportController extends Controller
                 return back()->withInput()->with('error', 'Categoria inválida.');
             }
 
-            $secretaryId = $category->secretary_id;
-            $secretary = $secretaryId ? \App\Models\Secretary::find($secretaryId) : null;
+            $secretary = $category->secretary;
+            $secretaryId = $secretary?->id;
 
             // 4. Criação da Denúncia
             $report = Report::create([

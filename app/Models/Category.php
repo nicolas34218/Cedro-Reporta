@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -26,6 +27,7 @@ class Category extends Model
         'name',
         'description',
         'is_active',
+        'secretary_id',
     ];
 
     /**
@@ -51,14 +53,13 @@ class Category extends Model
     }
 
     /**
-     * Relacionamento: Uma categoria pode ser responsabilidade de v�rias secret�rias.
-     * Busca secretaries onde o campo 'category' (string) corresponde ao nome da categoria.
-     * 
-     * @return HasMany
+     * Relacionamento: Uma categoria pertence a uma única secretaria responsável.
+     *
+     * @return BelongsTo
      */
-    public function secretaries(): HasMany
+    public function secretary(): BelongsTo
     {
-        return $this->hasMany(Secretary::class, 'category', 'name');
+        return $this->belongsTo(Secretary::class, 'secretary_id');
     }
-    
+
 }

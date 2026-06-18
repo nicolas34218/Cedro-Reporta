@@ -162,10 +162,32 @@ Route::prefix('secretary')->name('secretary.')->controller(SecretaryController::
         ->name('classify-reports')
         ->middleware('auth:secretary');
 
-    // Tela de transferência de denúncias para outras secretárias
-    Route::get('/transfer-reports', 'transferReports')
-        ->name('transfer.index')
-        ->middleware('auth:secretary');
+});
+
+/**
+ * Rotas de transferência de denúncias entre secretarias
+ * Requer autenticação apenas de Secretário
+ */
+Route::prefix('secretary')->name('secretary.transfer.')->controller(\App\Http\Controllers\ReportTransferController::class)->middleware('auth:secretary')->group(function () {
+    // Encaminhamentos recebidos + denúncias disponíveis para transferir
+    Route::get('/transfer-reports', 'index')
+        ->name('index');
+
+    // Formulário de transferência de uma denúncia específica
+    Route::get('/reports/{report}/transfer', 'create')
+        ->name('create');
+
+    // Registra o encaminhamento da denúncia (exige justificativa)
+    Route::post('/reports/{report}/transfer', 'store')
+        ->name('store');
+
+    // Secretaria de destino aceita o encaminhamento
+    Route::post('/transfers/{transfer}/accept', 'accept')
+        ->name('accept');
+
+    // Secretaria de destino rejeita o encaminhamento (exige justificativa)
+    Route::post('/transfers/{transfer}/reject', 'reject')
+        ->name('reject');
 });
 
 /**
@@ -236,8 +258,8 @@ Route::prefix('api')->group(function () {
                 return response()->json([], 404);
             }
 
-            // Retorna as secretárias responsáveis por essa categoria (ativas)
-            $secretaries = $category->secretaries()
+            // Retorna a secretaria responsável por essa categoria (ativa), em formato de lista
+            $secretaries = \App\Models\Secretary::where('id', $category->secretary_id)
                 ->where('is_active', true)
                 ->select('id', 'name')
                 ->get();

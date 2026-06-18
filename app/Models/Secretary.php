@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'email', 'password', 'category', 'is_active', 'admin_id'])]
+#[Fillable(['name', 'email', 'password', 'is_active', 'admin_id'])]
 #[Hidden(['password', 'remember_token'])]
 class Secretary extends Authenticatable
 {
@@ -44,18 +44,6 @@ class Secretary extends Authenticatable
     }
 
     /**
-     * Escopo para filtrar por categoria.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $category
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeByCategory($query, string $category)
-    {
-        return $query->where('category', $category);
-    }
-
-    /**
      * Identificador do tipo de usuário.
      *
      * @return string
@@ -67,22 +55,37 @@ class Secretary extends Authenticatable
 
     /**
      * Relacionamento: Uma secretária pode ser responsável por várias categorias.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     *
+     * @return HasMany
      */
-    public function categories(): BelongsToMany
+    public function categories(): HasMany
     {
-        return $this->belongsToMany(
-            Category::class,
-            'category_secretary',
-            'secretary_id',
-            'category_id'
-        );
+        return $this->hasMany(Category::class, 'secretary_id');
     }
 
-    public function creator() 
+    public function creator()
     {
-    return $this->belongsTo(Admin::class, 'admin_id'); 
+    return $this->belongsTo(Admin::class, 'admin_id');
+    }
+
+    /**
+     * Transferências de denúncias recebidas de outras secretarias.
+     *
+     * @return HasMany
+     */
+    public function incomingTransfers(): HasMany
+    {
+        return $this->hasMany(ReportTransfer::class, 'to_secretary_id');
+    }
+
+    /**
+     * Transferências de denúncias enviadas para outras secretarias.
+     *
+     * @return HasMany
+     */
+    public function outgoingTransfers(): HasMany
+    {
+        return $this->hasMany(ReportTransfer::class, 'from_secretary_id');
     }
 
 }

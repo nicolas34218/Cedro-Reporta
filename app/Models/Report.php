@@ -81,6 +81,16 @@ class Report extends Model
     }
 
     /**
+     * Histórico de transferências desta denúncia entre secretarias.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transfers()
+    {
+        return $this->hasMany(ReportTransfer::class)->latest();
+    }
+
+    /**
      * Scope para filtrar denúncias por categoria.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query

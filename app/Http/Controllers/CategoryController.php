@@ -83,12 +83,8 @@ class CategoryController extends Controller
                 'name' => trim($validated['name']),
                 'description' => trim($validated['description']),
                 'is_active' => true,
-                // SALVA O ID DA SECRETARIA DIRETAMENTE AQUI (Se for relação 1 para N)
-                'secretary_id' => $validated['secretary_id'], 
+                'secretary_id' => $validated['secretary_id'],
             ]);
-
-            // Se você REALMENTE usar uma tabela Pivot (Muitos-para-Muitos), descomente a linha abaixo e remova o secretary_id de cima:
-            // $category->secretaries()->attach($validated['secretary_id']);
 
             \Illuminate\Support\Facades\DB::commit();
 
