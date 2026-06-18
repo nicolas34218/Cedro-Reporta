@@ -66,29 +66,45 @@ class SecretaryController extends Controller
         /** @var Secretary $secretary */
         $secretary = Auth::user();
 
-        // 1. Inicia a query base apenas com as denúncias desta secretária
-        $query = Report::where('secretary_id', $secretary->id);
+        // 1. Inicia a query base apenas com as denúncias diretas desta secretária
+        $directQuery = Report::where('secretary_id', $secretary->id);
 
-        // 2. Aplica os filtros, SE a secretária os tiver selecionado
+        // 2. Query das denúncias compartilhadas com esta secretária
+        $sharedQuery = Report::whereHas('shares', function ($query) use ($secretary) {
+            $query->where('to_secretary_id', $secretary->id);
+        })->where('secretary_id', '!=', $secretary->id);
+
+        // 3. Aplica os filtros, SE a secretária os tiver selecionado
         if ($request->filled('category')) {
-            $query->where('category', $request->input('category'));
+            $directQuery->where('category', $request->input('category'));
+            $sharedQuery->where('category', $request->input('category'));
         }
         if ($request->filled('priority')) {
-            $query->where('priority', $request->input('priority'));
+            $directQuery->where('priority', $request->input('priority'));
+            $sharedQuery->where('priority', $request->input('priority'));
         }
         if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
+            $directQuery->where('status', $request->input('status'));
+            $sharedQuery->where('status', $request->input('status'));
         }
 
-        // 3. Executa a query com a ordenação (Prioridade > ID)
-        $reports = $query->with('citizen')
-            ->orderByRaw("FIELD(priority, 'Alta', 'Média', 'Baixa') ASC")
+        // 4. Executa as queries com a ordenação (Prioridade > ID)
+        $directReports = $directQuery->with(['citizen', 'shares.fromSecretary', 'shares.toSecretary'])
+            ->orderByRaw("CASE priority WHEN 'Alta' THEN 1 WHEN 'Média' THEN 2 WHEN 'Baixa' THEN 3 ELSE 4 END")
             ->orderBy('id', 'ASC')
             ->get();
 
-        // 4. Recalcula as estatísticas explicitamente usando o ID da secretária
+        $sharedReports = $sharedQuery->with(['citizen', 'secretary', 'shares.fromSecretary', 'shares.toSecretary'])
+            ->orderByRaw("CASE priority WHEN 'Alta' THEN 1 WHEN 'Média' THEN 2 WHEN 'Baixa' THEN 3 ELSE 4 END")
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        // 5. Recalcula as estatísticas explicitamente usando o ID da secretária
         $statistics = [
             'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
+            'shared_reports' => \App\Models\Report::whereHas('shares', function ($query) use ($secretary) {
+                $query->where('to_secretary_id', $secretary->id);
+            })->where('secretary_id', '!=', $secretary->id)->count(),
             'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
                 ->where('status', 'Pendente')
                 ->count(),
@@ -104,7 +120,8 @@ class SecretaryController extends Controller
         $categories = \App\Models\Category::orderBy('name', 'asc')->get();
 
         return view('secretary.dashboard', [
-            'reports' => $reports,
+            'directReports' => $directReports,
+            'sharedReports' => $sharedReports,
             'statistics' => $statistics,
             'category' => $secretary->name,
             'categories' => $categories, 

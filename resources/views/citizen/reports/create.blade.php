@@ -1,11 +1,11 @@
-﻿<!-- Tela Criar Denúncia -->
+<!-- Tela Criar Den�ncia -->
  
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/citizen-report-create.css') }}">
 @endpush
 @extends('layouts.citizen')
 
-@section('title', $visitorMode ? 'Registrar Denúncia como Visitante' : 'Registrar Denúncia')
+@section('title', $visitorMode ? 'Registrar Den�ncia como Visitante' : 'Registrar Den�ncia')
 
 @section('content')
 
@@ -23,13 +23,13 @@
     @endif
 
     <div class="report-create-topbar">
-        <a href="{{ auth()->check() ? route('citizen.home') : route('welcome') }}" class="btn-back">← Voltar</a>
-        <h1>{{ $visitorMode ? 'Registrar Denúncia como Visitante' : 'Nova Denúncia' }}</h1>
+        <a href="{{ auth()->check() ? route('citizen.home') : route('welcome') }}" class="btn-back">? Voltar</a>
+        <h1>{{ $visitorMode ? 'Registrar Den�ncia como Visitante' : 'Nova Den�ncia' }}</h1>
     </div>
 
     @if($visitorMode)
         <div class="visitor-note" style="margin-bottom: 24px; padding: 16px; border-radius: 12px; background: #f8fafc; color: #334155; border: 1px solid #cbd5e1;">
-            Você está enviando uma denúncia como visitante. Sua denúncia será registrada, mas você não poderá receber notificações automáticas nem acompanhar o status pelo sistema.
+            Voc� est� enviando uma den�ncia como visitante. Sua den�ncia ser� registrada, mas voc� n�o poder� receber notifica��es autom�ticas nem acompanhar o status pelo sistema.
         </div>
     @endif
 
@@ -38,24 +38,10 @@
 
         <div class="report-grid">
             <div class="form-column">
-                <h2><span class="step">1</span> Informações básicas</h2>
+                <h2><span class="step">1</span> Informa��es b�sicas</h2>
 
                 <div class="form-field">
-                    <label for="title">TÍTULO DA DENÚNCIA</label>
-                    <input id="title" name="title" type="text" value="{{ old('title') }}">
-                    <x-error-message field="title" />
-                </div>
-
-                <div class="form-field">
-                    <label for="description">DESCRIÇÃO</label>
-                    <textarea id="description" name="description" rows="4">{{ old('description') }}</textarea>
-                    <x-error-message field="description" />
-                </div>
-
-                <div class="form-field">
-                    <label for="category">CATEGORIA</label>
-                    <select name="category" id="category" class="form-control" required>
-                        <option value="">Selecione uma categoria</option>
+                    <label for="title">T�TULO DA DEN�NCIA</label>
                         @foreach($categories as $category)
                             <option value="{{ $category->name }}" {{ old('category') === $category->name ? 'selected' : '' }}>{{ $category->name }}</option>
                         @endforeach
@@ -64,19 +50,19 @@
                 </div>
 
                 <div class="form-field">
-                    <label for="secretary">SETOR RESPONSÁVEL</label>
+                    <label for="secretary">SETOR RESPONS�VEL</label>
                     <select id="secretary" name="secretary_id">
                         <option value="">Carregando...</option>
                     </select>
                     <small style="display: block; margin-top: 8px; color: #666;">
-                        <i style="color: #2f6b3f;">💡</i> Preenchido automaticamente com base na categoria
+                        <i style="color: #2f6b3f;">??</i> Preenchido automaticamente com base na categoria
                     </small>
                     <x-error-message field="secretary_id" />
                 </div>
 
                     <div class="form-field">
                         <label for="captcha_answer">
-                            Confirmação anti-bot: {{ $captchaQuestion }}
+                            Confirma��o anti-bot: {{ $captchaQuestion }}
                         </label>
 
                         <input
@@ -90,11 +76,11 @@
             </div>
 
             <div class="form-column">
-                <h2><span class="step">2</span> Localização</h2>
+                <h2><span class="step">2</span> Localiza��o</h2>
 
                 <div class="form-field">
-                    <label for="address_reference">ENDEREÇO/REFERÊNCIA <span style="color: #d32f2f;">*</span></label>
-                    <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}" placeholder="Ex: Rua Principal, próximo ao mercado">
+                    <label for="address_reference">ENDERE�O/REFER�NCIA <span style="color: #d32f2f;">*</span></label>
+                    <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}" placeholder="Ex: Rua Principal, pr�ximo ao mercado">
                     <x-error-message field="address_reference" />
                 </div>
 
@@ -106,11 +92,11 @@
             </div>
 
             <div class="form-column">
-                <h2><span class="step">3</span> Fotos e evidências</h2>
+                <h2><span class="step">3</span> Fotos e evid�ncias</h2>
                 <div class="form-field">
                     <label for="image">UPLOAD DE IMAGEM (PNG, JPG ou JPEG)</label>
                     <input id="image" name="image" type="file" accept="image/png,image/jpeg" aria-describedby="image-help">
-                    <small id="image-help" style="display: block; margin-top: 8px; color: #666;">Formatos aceitos: PNG, JPG, JPEG. Tamanho máximo: 2MB</small>
+                    <small id="image-help" style="display: block; margin-top: 8px; color: #666;">Formatos aceitos: PNG, JPG, JPEG. Tamanho m�ximo: 2MB</small>
                     <x-error-message field="image" />
                 </div>
             </div>
@@ -129,42 +115,42 @@
                     {{ old('anonymous') ? 'checked' : '' }}>
 
                 <label for="anonymous">
-                    Manter denúncia anônima
+                    Manter den�ncia an�nima
                 </label>
 
             </div>
 
             <p>
-                Seus dados pessoais não serão exibidos para
-                a secretaria responsável pela denúncia.
+                Seus dados pessoais n�o ser�o exibidos para
+                a secretaria respons�vel pela den�ncia.
             </p>
 
         </div>
         @endunless
 
-        <button type="submit" class="btn-submit">Enviar Denúncia</button>
+        <button type="submit" class="btn-submit">Enviar Den�ncia</button>
     </form>
 </section>
 
 @push('scripts')
 <script>
-    console.log('✨ Script de categoria carregado!');
-    console.log('📍 Procurando elemento com ID: category');
+    console.log('? Script de categoria carregado!');
+    console.log('?? Procurando elemento com ID: category');
     
     const categorySelect = document.getElementById('category');
     const secretarySelect = document.getElementById('secretary');
     
-    console.log('✅ category encontrado:', categorySelect ? 'SIM' : 'NÃO');
-    console.log('✅ secretary encontrado:', secretarySelect ? 'SIM' : 'NÃO');
+    console.log('? category encontrado:', categorySelect ? 'SIM' : 'N�O');
+    console.log('? secretary encontrado:', secretarySelect ? 'SIM' : 'N�O');
     
     if (!categorySelect || !secretarySelect) {
-        console.error('❌ Elementos não encontrados! Abortando script.');
+        console.error('? Elementos n�o encontrados! Abortando script.');
     } else {
-        // Carrega os setores responsáveis automaticamente ao mudar a categoria
+        // Carrega os setores respons�veis automaticamente ao mudar a categoria
         categorySelect.addEventListener('change', async function() {
             const categoryId = this.value;
             
-            console.log('🔍 Categoria mudou para:', categoryId);
+            console.log('?? Categoria mudou para:', categoryId);
             
             if (!categoryId) {
                 secretarySelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
@@ -175,9 +161,9 @@
                 secretarySelect.innerHTML = '<option value="">Carregando...</option>';
                 
                 const url = `/api/categories/${categoryId}/secretaries`;
-                console.log('📡 Fazendo fetch para:', url);
+                console.log('?? Fazendo fetch para:', url);
                 
-                // Faz requisição para buscar os setores responsáveis da categoria
+                // Faz requisi��o para buscar os setores respons�veis da categoria
                 const response = await fetch(url, {
                     headers: {
                         'Accept': 'application/json',
@@ -185,51 +171,52 @@
                     }
                 });
 
-                console.log('📊 Status da resposta:', response.status);
-                console.log('📦 Response OK?', response.ok);
+                console.log('?? Status da resposta:', response.status);
+                console.log('?? Response OK?', response.ok);
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('❌ Erro na resposta:', errorText);
+                    console.error('? Erro na resposta:', errorText);
                     throw new Error(`Erro ao carregar setores (Status: ${response.status})`);
                 }
 
                 const secretaries = await response.json();
-                console.log('✅ Secretárias recebidas:', secretaries);
+                console.log('? Secret�rias recebidas:', secretaries);
                 
                 if (secretaries.length === 0) {
-                    console.warn('⚠️ Nenhuma secretária encontrada para esta categoria');
-                    secretarySelect.innerHTML = '<option value="">Nenhum setor responsável configurado</option>';
+                    console.warn('?? Nenhuma secret�ria encontrada para esta categoria');
+                    secretarySelect.innerHTML = '<option value="">Nenhum setor respons�vel configurado</option>';
                     return;
                 }
 
                 // Preenche o select com os setores
                 secretarySelect.innerHTML = '<option value="">Selecione (opcional)</option>';
                 secretaries.forEach(secretary => {
-                    console.log(`➕ Adicionando secretária: ${secretary.name} (ID: ${secretary.id})`);
+                    console.log(`? Adicionando secret�ria: ${secretary.name} (ID: ${secretary.id})`);
                     const option = document.createElement('option');
                     option.value = secretary.id;
                     option.textContent = secretary.name;
                     secretarySelect.appendChild(option);
                 });
 
-                // Se há apenas 1 secretária, seleciona automaticamente
+                // Se h� apenas 1 secret�ria, seleciona automaticamente
                 if (secretaries.length === 1) {
                     secretarySelect.value = secretaries[0].id;
-                    console.log('🎯 Secretária auto-selecionada:', secretaries[0].name);
+                    console.log('?? Secret�ria auto-selecionada:', secretaries[0].name);
                 } else {
-                    console.log('⚙️ Múltiplas secretárias disponíveis, usuário deve escolher');
+                    console.log('?? M�ltiplas secret�rias dispon�veis, usu�rio deve escolher');
                 }
 
-                console.log('🎉 Select preenchido com sucesso');
+                console.log('?? Select preenchido com sucesso');
 
             } catch (error) {
-                console.error('🚨 Erro ao carregar setores:', error);
+                console.error('?? Erro ao carregar setores:', error);
                 secretarySelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
             }
         });
         
-        console.log('✅ Event listener adicionado com sucesso');
+        console.log('? Event listener adicionado com sucesso');
     }
 </script>
 @endpush
+

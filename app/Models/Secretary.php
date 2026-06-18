@@ -88,4 +88,24 @@ class Secretary extends Authenticatable
         return $this->hasMany(ReportTransfer::class, 'from_secretary_id');
     }
 
+    /**
+     * Compartilhamentos recebidos por esta secretária.
+     *
+     * @return HasMany
+     */
+    public function receivedShares(): HasMany
+    {
+        return $this->hasMany(ReportShare::class, 'to_secretary_id');
+    }
+
+    /**
+     * Denúncias compartilhadas com esta secretária.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function sharedReports()
+    {
+        return $this->hasManyThrough(Report::class, ReportShare::class, 'to_secretary_id', 'id', 'id', 'report_id');
+    }
+
 }

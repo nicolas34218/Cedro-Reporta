@@ -91,6 +91,16 @@ class Report extends Model
     }
 
     /**
+     * Compartilhamentos desta denúncia entre secretarias.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function shares()
+    {
+        return $this->hasMany(ReportShare::class)->latest();
+    }
+
+    /**
      * Scope para filtrar denúncias por categoria.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query

@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\SecretaryController;
+use App\Http\Controllers\ReportShareController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PriorityController;
 use Illuminate\Support\Facades\Route;
@@ -198,6 +199,14 @@ Route::middleware('auth:secretary')->controller(\App\Http\Controllers\AdminContr
     // Atualizar status da denúncia (SECRETÁRIO)
     Route::put('/secretary/reports/{report}/status', 'updateReportStatus')
         ->name('secretary.report.status');
+});
+
+/**
+ * Backend de compartilhamento de denúncias entre secretarias
+ */
+Route::middleware('auth:secretary')->controller(ReportShareController::class)->group(function () {
+    Route::post('/secretary/reports/{report}/share', 'store')
+        ->name('secretary.share.store');
 });
 
 /**
