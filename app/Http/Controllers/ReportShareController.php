@@ -74,8 +74,12 @@ class ReportShareController extends Controller
             Log::error('Erro ao notificar secretaria compartilhada: ' . $throwable->getMessage());
         }
 
-        return redirect()->route('secretary.reports.show', $report)
-            ->with('success', "Denúncia #{$report->id} compartilhada com {$toSecretary->name} com sucesso.");
+         return redirect()
+            ->route('secretary.share.index')
+            ->with(
+            'success',
+            "Denúncia #{$report->id} compartilhada com {$toSecretary->name} com sucesso."
+        );
     }
 
     public function index()

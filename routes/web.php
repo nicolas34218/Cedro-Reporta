@@ -208,24 +208,18 @@ Route::middleware('auth:secretary')
     ->controller(ReportShareController::class)
     ->group(function () {
 
-        // Exibe a tela de compartilhamento
-        Route::get('/secretary/reports/{report}/share', 'create')
-            ->name('secretary.share.create');
-
-        // Realiza o compartilhamento
-        Route::post('/secretary/reports/{report}/share', 'store')
-            ->name('secretary.share.store');
-});
-
-Route::middleware('auth:secretary')
-    ->controller(ReportShareController::class)
-    ->group(function () {
-
+    // Lista de denúncias disponíveis para compartilhamento
     Route::get('/secretary/share-reports', 'index')
         ->name('secretary.share.index');
 
+    // Realiza o compartilhamento
     Route::post('/secretary/reports/{report}/share', 'store')
         ->name('secretary.share.store');
+
+    // Tela de compartilhamento de uma denúncia
+    Route::get('/secretary/reports/{report}/share', 'create')
+        ->name('secretary.share.create');
+
 });
 
 /**
