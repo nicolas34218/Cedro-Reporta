@@ -1,11 +1,12 @@
-<!-- Tela Criar Den�ncia -->
+<!-- Tela Criar Denúncia -->
  
+@extends('layouts.citizen')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/citizen-report-create.css') }}">
 @endpush
-@extends('layouts.citizen')
 
-@section('title', $visitorMode ? 'Registrar Den�ncia como Visitante' : 'Registrar Den�ncia')
+@section('title', $visitorMode ? 'Registrar Denúncia como Visitante' : 'Registrar Denúncia')
 
 @section('content')
 
@@ -22,47 +23,83 @@
         </div>
     @endif
 
-    <div class="report-create-topbar">
-        <a href="{{ auth()->check() ? route('citizen.home') : route('welcome') }}" class="btn-back">? Voltar</a>
-        <h1>{{ $visitorMode ? 'Registrar Den�ncia como Visitante' : 'Nova Den�ncia' }}</h1>
-    </div>
+        <div class="report-create-header">
+
+            <a href="{{ auth()->check()
+                ? route('citizen.home')
+                : route('welcome') }}"
+                class="btn-back">
+
+                <i class="bi bi-arrow-left"></i>
+                Voltar
+
+            </a>
+
+            <div>
+                <h1>
+                    {{ $visitorMode
+                        ? 'Registrar Denúncia como Visitante'
+                        : 'Nova Denúncia' }}
+                </h1>
+
+                <p>
+                    Preencha os dados abaixo para registrar sua denúncia.
+                </p>
+            </div>
+
+        </div>
 
     @if($visitorMode)
         <div class="visitor-note" style="margin-bottom: 24px; padding: 16px; border-radius: 12px; background: #f8fafc; color: #334155; border: 1px solid #cbd5e1;">
-            Voc� est� enviando uma den�ncia como visitante. Sua den�ncia ser� registrada, mas voc� n�o poder� receber notifica��es autom�ticas nem acompanhar o status pelo sistema.
+            Você está enviando uma denúncia como visitante. Sua denúncia será registrada, mas você não poderá receber notificações automáticas nem acompanhar o status pelo sistema.
         </div>
     @endif
 
     <form action="{{ $formAction }}" method="post" class="report-form" enctype="multipart/form-data">
         @csrf
 
-        <div class="report-grid">
-            <div class="form-column">
-                <h2><span class="step">1</span> Informa��es b�sicas</h2>
+                        <div class="report-grid">
+                            <div class="form-column">
+                                <h2><span class="step">1</span> Informações básicas</h2>
 
-                <div class="form-field">
-                    <label for="title">T�TULO DA DEN�NCIA</label>
+                                <div class="form-field">
+                    <label for="category">
+                        CATEGORIA DA DENÚNCIA
+                    </label>
+
+                    <select id="category" name="category">
+                        <option value="">
+                            Selecione uma categoria
+                        </option>
+
                         @foreach($categories as $category)
-                            <option value="{{ $category->name }}" {{ old('category') === $category->name ? 'selected' : '' }}>{{ $category->name }}</option>
+                            <option
+                                value="{{ $category->name }}"
+                                {{ old('category') === $category->name ? 'selected' : '' }}>
+
+                                {{ $category->name }}
+
+                            </option>
                         @endforeach
                     </select>
+
                     <x-error-message field="category" />
                 </div>
 
                 <div class="form-field">
-                    <label for="secretary">SETOR RESPONS�VEL</label>
+                    <label for="secretary">SETOR RESPONSÁVEL</label>
                     <select id="secretary" name="secretary_id">
                         <option value="">Carregando...</option>
                     </select>
                     <small style="display: block; margin-top: 8px; color: #666;">
-                        <i style="color: #2f6b3f;">??</i> Preenchido automaticamente com base na categoria
+                        <i style="color: #2f6b3f;"></i> Preenchido automaticamente com base na categoria
                     </small>
                     <x-error-message field="secretary_id" />
                 </div>
 
                     <div class="form-field">
                         <label for="captcha_answer">
-                            Confirma��o anti-bot: {{ $captchaQuestion }}
+                            Confirmação anti-bot: {{ $captchaQuestion }}
                         </label>
 
                         <input
@@ -76,11 +113,11 @@
             </div>
 
             <div class="form-column">
-                <h2><span class="step">2</span> Localiza��o</h2>
+                <h2><span class="step">2</span> Localização</h2>
 
                 <div class="form-field">
-                    <label for="address_reference">ENDERE�O/REFER�NCIA <span style="color: #d32f2f;">*</span></label>
-                    <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}" placeholder="Ex: Rua Principal, pr�ximo ao mercado">
+                    <label for="address_reference">ENDEREÇO/REFERÊNCIA <span style="color: #d32f2f;">*</span></label>
+                    <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}" placeholder="Ex: Rua Principal, próximo ao mercado">
                     <x-error-message field="address_reference" />
                 </div>
 
@@ -92,11 +129,11 @@
             </div>
 
             <div class="form-column">
-                <h2><span class="step">3</span> Fotos e evid�ncias</h2>
+                <h2><span class="step">3</span> Fotos e evidências</h2>
                 <div class="form-field">
                     <label for="image">UPLOAD DE IMAGEM (PNG, JPG ou JPEG)</label>
                     <input id="image" name="image" type="file" accept="image/png,image/jpeg" aria-describedby="image-help">
-                    <small id="image-help" style="display: block; margin-top: 8px; color: #666;">Formatos aceitos: PNG, JPG, JPEG. Tamanho m�ximo: 2MB</small>
+                    <small id="image-help" style="display: block; margin-top: 8px; color: #666;">Formatos aceitos: PNG, JPG, JPEG. Tamanho máximo: 2MB</small>
                     <x-error-message field="image" />
                 </div>
             </div>
@@ -115,38 +152,38 @@
                     {{ old('anonymous') ? 'checked' : '' }}>
 
                 <label for="anonymous">
-                    Manter den�ncia an�nima
+                    Manter denúncia anônima
                 </label>
 
             </div>
 
             <p>
-                Seus dados pessoais n�o ser�o exibidos para
-                a secretaria respons�vel pela den�ncia.
+                Seus dados pessoais não serão exibidos para
+                a secretaria responsável pela denúncia.
             </p>
 
         </div>
         @endunless
 
-        <button type="submit" class="btn-submit">Enviar Den�ncia</button>
+        <button type="submit" class="btn-submit">Enviar Denúncia</button>
     </form>
 </section>
 
 @push('scripts')
 <script>
-    console.log('? Script de categoria carregado!');
-    console.log('?? Procurando elemento com ID: category');
+    console.log(' Script de categoria carregado!');
+    console.log(' Procurando elemento com ID: category');
     
     const categorySelect = document.getElementById('category');
     const secretarySelect = document.getElementById('secretary');
     
-    console.log('? category encontrado:', categorySelect ? 'SIM' : 'N�O');
-    console.log('? secretary encontrado:', secretarySelect ? 'SIM' : 'N�O');
+    console.log('? category encontrado:', categorySelect ? 'SIM' : 'NÃO');
+    console.log('? secretary encontrado:', secretarySelect ? 'SIM' : 'NÃO');
     
     if (!categorySelect || !secretarySelect) {
-        console.error('? Elementos n�o encontrados! Abortando script.');
+        console.error(' Elementos não encontrados! Abortando script.');
     } else {
-        // Carrega os setores respons�veis automaticamente ao mudar a categoria
+        // Carrega os setores responsáveis automaticamente ao mudar a categoria
         categorySelect.addEventListener('change', async function() {
             const categoryId = this.value;
             
@@ -163,7 +200,7 @@
                 const url = `/api/categories/${categoryId}/secretaries`;
                 console.log('?? Fazendo fetch para:', url);
                 
-                // Faz requisi��o para buscar os setores respons�veis da categoria
+                // Faz requisição para buscar os setores responsáveis da categoria
                 const response = await fetch(url, {
                     headers: {
                         'Accept': 'application/json',
@@ -181,36 +218,36 @@
                 }
 
                 const secretaries = await response.json();
-                console.log('? Secret�rias recebidas:', secretaries);
+                console.log('? Secretárias recebidas:', secretaries);
                 
                 if (secretaries.length === 0) {
-                    console.warn('?? Nenhuma secret�ria encontrada para esta categoria');
-                    secretarySelect.innerHTML = '<option value="">Nenhum setor respons�vel configurado</option>';
+                    console.warn('?? Nenhuma secretária encontrada para esta categoria');
+                    secretarySelect.innerHTML = '<option value="">Nenhum setor responsável configurado</option>';
                     return;
                 }
 
                 // Preenche o select com os setores
                 secretarySelect.innerHTML = '<option value="">Selecione (opcional)</option>';
                 secretaries.forEach(secretary => {
-                    console.log(`? Adicionando secret�ria: ${secretary.name} (ID: ${secretary.id})`);
+                    console.log(`? Adicionando secretária: ${secretary.name} (ID: ${secretary.id})`);
                     const option = document.createElement('option');
                     option.value = secretary.id;
                     option.textContent = secretary.name;
                     secretarySelect.appendChild(option);
                 });
 
-                // Se h� apenas 1 secret�ria, seleciona automaticamente
+                // Se há apenas 1 secretária, seleciona automaticamente
                 if (secretaries.length === 1) {
                     secretarySelect.value = secretaries[0].id;
-                    console.log('?? Secret�ria auto-selecionada:', secretaries[0].name);
+                    console.log(' Secretária auto-selecionada:', secretaries[0].name);
                 } else {
-                    console.log('?? M�ltiplas secret�rias dispon�veis, usu�rio deve escolher');
+                    console.log('Multiplas secretrias disponveis, usurio deve escolher');
                 }
 
-                console.log('?? Select preenchido com sucesso');
+                console.log(' Select preenchido com sucesso');
 
             } catch (error) {
-                console.error('?? Erro ao carregar setores:', error);
+                console.error('Erro ao carregar setores:', error);
                 secretarySelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
             }
         });
