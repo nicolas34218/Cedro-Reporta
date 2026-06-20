@@ -33,7 +33,7 @@
                     </span>
 
                     <span class="status-badge">
-                        {{ $report->status }}
+                        {{ strtoupper($report->status) }}
                     </span>
 
                 </div>
@@ -54,12 +54,14 @@
                     </p>
                 </div>
 
-                <a href="{{ route('secretary.share.create', $report) }}"
-                   class="btn-share">
-                    <i class="fas fa-share-alt"></i>
-                    Compartilhar
-                </a>
-
+                <div style="display:flex; justify-content:flex-end;">
+                    <a href="{{ route('secretary.share.create', $report) }}"
+                    class="btn-share">
+                        <i class="fas fa-share-alt"></i>
+                        Compartilhar
+                    </a>
+                </div>
+                
             </div>
 
         @empty
