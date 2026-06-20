@@ -12,7 +12,9 @@
 </head>
 <body>
     <div class="secretary-layout">
-        <x-secretary.sidebar :active="$active ?? 'dashboard'" />
+        <x-secretary.sidebar
+            :active="$active ?? 'dashboard'"
+            :pendingCount="$pendingCount ?? 0" />
 
         <div class="secretary-main-wrapper">
             <header class="secretary-header">

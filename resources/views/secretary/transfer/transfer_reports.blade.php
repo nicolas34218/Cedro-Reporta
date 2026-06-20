@@ -66,33 +66,57 @@
             Nenhuma denúncia disponível para transferência.
         </div>
     @else
-        <div class="reports-table-wrapper">
-            <table class="reports-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Status</th>
-                        <th>Data</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($transferableReports as $report)
-                        <tr>
-                            <td>#{{ $report->id }}</td>
-                            <td>{{ Str::limit($report->title, 45) }}</td>
-                            <td>{{ $report->status }}</td>
-                            <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                <a href="{{ route('secretary.transfer.create', $report) }}" class="btn-transfer" style="text-decoration:none; display:inline-block;">
-                                    Transferir
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="transfer-cards-grid">
+
+            @foreach ($transferableReports as $report)
+
+                <div class="transfer-report-card">
+
+                    <div class="card-header">
+                        <span class="report-id">
+                            #{{ $report->id }}
+                        </span>
+
+                        <span class="status-badge">
+                            {{ $report->status }}
+                        </span>
+                    </div>
+
+                    <h3>
+                        {{ Str::limit($report->title, 70) }}
+                    </h3>
+
+                    <div class="card-info">
+
+                        <p>
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ $report->created_at->format('d/m/Y H:i') }}
+                        </p>
+
+                        <p>
+                            <i class="fas fa-map-marker-alt"></i>
+
+                            {{ $report->location ?? 'Local não informado' }}
+                        </p>
+
+                    </div>
+
+                    <div class="card-actions">
+
+                        <a href="{{ route('secretary.transfer.create', $report) }}"
+                        class="btn-transfer">
+
+                            <i class="fas fa-exchange-alt"></i>
+                            Transferir
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            @endforeach
+
         </div>
     @endif
 

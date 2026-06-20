@@ -75,4 +75,10 @@ class ReportShareController extends Controller
         return redirect()->route('secretary.reports.show', $report)
             ->with('success', "Denúncia #{$report->id} compartilhada com {$toSecretary->name} com sucesso.");
     }
+
+    public function index()
+    {
+        return view('secretary.share.index');
+    }
+    
 }

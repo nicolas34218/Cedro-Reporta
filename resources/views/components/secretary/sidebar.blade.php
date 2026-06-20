@@ -1,4 +1,7 @@
-@props(['active' => 'dashboard'])
+@props([
+    'active' => 'dashboard',
+    'pendingCount' => 0
+])
 
 @php
     $isSecretary = Auth::guard('secretary')->check();
@@ -22,9 +25,25 @@
                     <span>Dashboard</span>
                 </a>
                 
-                <a href="{{ route('secretary.classify-reports') }}" class="nav-item {{ $active === 'classify' ? 'active' : '' }}">
+                <a href="{{ route('secretary.classify-reports') }}"
+                    class="nav-item {{ $active === 'classify' ? 'active' : '' }}">
+
                     <i class="fas fa-flag"></i>
+
                     <span>Classificar Denúncias</span>
+
+                    @if($pendingCount > 0)
+                        <span class="menu-badge">
+                            {{ $pendingCount }}
+                        </span>
+                    @endif
+
+                </a>
+
+                <a href="{{ route('secretary.share.index') }}"
+                    class="nav-item {{ $active === 'share' ? 'active' : '' }}">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Compartilhar Denúncia</span>
                 </a>
 
                 <a href="{{ route('secretary.transfer.index') }}"

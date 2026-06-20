@@ -63,6 +63,8 @@ class SecretaryController extends Controller
      */
     public function dashboard(Request $request) 
     {
+
+    
         /** @var Secretary $secretary */
         $secretary = Auth::user();
 
@@ -119,12 +121,21 @@ class SecretaryController extends Controller
         // 5. Busca as categorias do banco de dados para os botões de filtro
         $categories = \App\Models\Category::orderBy('name', 'asc')->get();
 
+        $pendingCount = Report::where('secretary_id', $secretary->id)
+            ->whereNull('priority')
+            ->count();
+
+        $reports = Report::where('secretary_id', $secretary->id)
+            ->with('citizen')
+            ->orderBy('id', 'desc')
+            ->get();
+
         return view('secretary.dashboard', [
-            'directReports' => $directReports,
-            'sharedReports' => $sharedReports,
+            'reports' => $reports,
             'statistics' => $statistics,
             'category' => $secretary->name,
             'categories' => $categories, 
+            'pendingCount' => $pendingCount,
         ]);
     }
 
@@ -156,9 +167,12 @@ class SecretaryController extends Controller
                 ->where('status', 'Resolvida')->count(),
         ];
 
+        $pendingCount = $reports->count();
+
         return view('secretary.classify_reports', [
             'reports' => $reports,
             'statistics' => $statistics,
+            'pendingCount' => $pendingCount,
         ]);
     }
 }

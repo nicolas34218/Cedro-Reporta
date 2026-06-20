@@ -204,7 +204,26 @@ Route::middleware('auth:secretary')->controller(\App\Http\Controllers\AdminContr
 /**
  * Backend de compartilhamento de denúncias entre secretarias
  */
-Route::middleware('auth:secretary')->controller(ReportShareController::class)->group(function () {
+Route::middleware('auth:secretary')
+    ->controller(ReportShareController::class)
+    ->group(function () {
+
+        // Exibe a tela de compartilhamento
+        Route::get('/secretary/reports/{report}/share', 'create')
+            ->name('secretary.share.create');
+
+        // Realiza o compartilhamento
+        Route::post('/secretary/reports/{report}/share', 'store')
+            ->name('secretary.share.store');
+});
+
+Route::middleware('auth:secretary')
+    ->controller(ReportShareController::class)
+    ->group(function () {
+
+    Route::get('/secretary/share-reports', 'index')
+        ->name('secretary.share.index');
+
     Route::post('/secretary/reports/{report}/share', 'store')
         ->name('secretary.share.store');
 });

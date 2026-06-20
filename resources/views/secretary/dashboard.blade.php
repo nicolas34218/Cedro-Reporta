@@ -4,6 +4,10 @@
 @section('page-title', 'Dashboard da Secretária')
 @section('page-subtitle', 'Visualização das denúncias do seu setor')
 
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 @push('styles')
 <link rel="stylesheet" href="/css/secretary/filters.css"> 
 <link rel="stylesheet" href="/css/secretary/dashboard.css">
@@ -165,6 +169,14 @@
                                     <a href="{{ route('secretary.transfer.create', $report) }}" class="priority-select" style="text-decoration: none; display: inline-block;">
                                         Transferir
                                     </a>
+                                    
+                                    <br><br>
+
+                                    <a href="{{ route('secretary.share.create', $report) }}" class="priority-select"
+                                        style="text-decoration:none; display:inline-block; margin-top:5px;">
+                                        Compartilhar
+                                    </a>
+
                                 </td>
                             </tr>
                         @endforeach
