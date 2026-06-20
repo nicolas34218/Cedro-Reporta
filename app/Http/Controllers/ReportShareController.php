@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+
 use App\Models\Report;
 use App\Models\ReportShare;
 use App\Models\Secretary;
@@ -78,7 +80,17 @@ class ReportShareController extends Controller
 
     public function index()
     {
-        return view('secretary.share.index');
+        /** @var \App\Models\Secretary $secretary */
+        $secretary = auth()->user();
+
+        $reports = Report::where('secretary_id', $secretary->id)
+            ->latest()
+            ->get();
+
+        return view('secretary.share.index', [
+            'secretary' => $secretary,
+            'reports' => $reports,
+        ]);
     }
-    
+
 }
