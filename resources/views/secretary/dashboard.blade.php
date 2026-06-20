@@ -36,6 +36,13 @@
             <p class="stat-number">{{ $statistics['total_reports'] ?? 0 }}</p>
         </div>
 
+        <div class="stat-card">
+            <h3>COMPARTILHADAS</h3>
+            <p class="stat-number">
+                {{ $statistics['shared_reports'] ?? 0 }}
+            </p>
+        </div>
+
         <div class="stat-card unclassified">
             <h3>SEM CLASSIFICAÇÃO</h3>
             @php
@@ -117,7 +124,7 @@
             <h3>Denúncias Atribuídas ao Setor: <strong>{{ $category }}</strong></h3>
         </div>
 
-        @if ($reports->isEmpty())
+        @if ($directReports->isEmpty())
             <div class="no-reports-message">
                 <i class="fas fa-inbox"></i>
                 <p>Nenhuma denúncia cadastrada ou encontrada para estes filtros.</p>
@@ -137,7 +144,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($reports as $report)
+                        @foreach ($directReports as $report)
                             <tr>
                                 <td class="id-cell">#{{ $report->id }}</td>
                                 <td class="title-cell">{{ Str::limit($report->title, 45) }}</td>
@@ -185,6 +192,85 @@
             </div>
         @endif
     </section>
+    <section class="reports-section" style="margin-top: 40px;">
+
+    <div class="section-header">
+        <h3>
+            Denúncias Compartilhadas com sua Secretaria
+        </h3>
+    </div>
+
+    @if ($sharedReports->isEmpty())
+
+        <div class="no-reports-message">
+            <i class="fas fa-share-alt"></i>
+            <p>Nenhuma denúncia compartilhada.</p>
+        </div>
+
+    @else
+
+        <div class="reports-table-wrapper">
+            <table class="reports-table">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Compartilhada por</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach ($sharedReports as $report)
+
+                        <tr>
+
+                            <td>#{{ $report->id }}</td>
+
+                            <td>
+                                {{ Str::limit($report->title, 45) }}
+                            </td>
+
+                            <td>
+                                {{ $report->shares->first()->fromSecretary->name ?? '-' }}
+                            </td>
+
+                            <td>
+                                @if($report->priority)
+                                    <span class="priority-badge priority-{{ strtolower($report->priority) }}">
+                                        {{ $report->priority }}
+                                    </span>
+                                @else
+                                    Não classificada
+                                @endif
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}">
+                                    {{ $report->status }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ $report->created_at->format('d/m/Y H:i') }}
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                </tbody>
+
+            </table>
+        </div>
+
+    @endif
+
+</section>
 @endsection
 
 @push('scripts')

@@ -63,7 +63,6 @@ class SecretaryController extends Controller
      */
     public function dashboard(Request $request) 
     {
-
     
         /** @var Secretary $secretary */
         $secretary = Auth::user();
@@ -125,16 +124,12 @@ class SecretaryController extends Controller
             ->whereNull('priority')
             ->count();
 
-        $reports = Report::where('secretary_id', $secretary->id)
-            ->with('citizen')
-            ->orderBy('id', 'desc')
-            ->get();
-
         return view('secretary.dashboard', [
-            'reports' => $reports,
+            'directReports' => $directReports,
+            'sharedReports' => $sharedReports,
             'statistics' => $statistics,
             'category' => $secretary->name,
-            'categories' => $categories, 
+            'categories' => $categories,
             'pendingCount' => $pendingCount,
         ]);
     }
