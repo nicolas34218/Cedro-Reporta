@@ -212,11 +212,6 @@ body {
   }
 }
 
-/* Docked variant: when user opens sidebar on desktop, it becomes part of the layout and pushes content */
-@media (min-width: 861px) {
-  
-}
-
 .sidebar-menu{
   padding:18px 0;
 }
@@ -399,6 +394,54 @@ body {
 .hero-btn:hover {
   background: rgba(255, 255, 255, .24);
   border-color: rgba(255, 255, 255, .36);
+}
+
+.feature-list{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.feature-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    padding: 20px;
+
+    background: #fff;
+
+    border: 1px solid #9ab48f;
+    border-radius: 10px;
+
+    color: #1b1b1b;
+    text-decoration: none;
+    font-weight: 600;
+
+    transition: all .3s ease;
+}
+
+.feature-item:hover{
+    background: #f8faf7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+.feature-item span:first-child{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature-item i{
+    font-size: 18px;
+    color: #1b1b1b;
+}
+
+.feature-item span:last-child{
+    font-size: 28px;
+    color: #1b1b1b;
 }
 
 /* =========== SUMMARY GRID - CARDS RESPONSIVOS =========== */

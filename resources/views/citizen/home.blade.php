@@ -48,21 +48,33 @@
         <h3 class="features-title">FUNCIONALIDADES</h3>
 
         <div class="feature-list">
-            <a
-                href="{{ ($visitorMode ?? false)
+
+            <a href="{{ ($visitorMode ?? false)
                 ? route('visitor.reports.create')
                 : route('citizen.reports.create') }}"
-                class="hero-btn">
+            class="feature-item">
 
-                Nova Denúncia
+                <span>
+                    <i class="bi bi-file-earmark-plus"></i>
+                    Registrar Denúncia
+                </span>
 
-            </a>
-
-            <a href="{{ route('citizen.reports.index') }}" class="feature-item">
-                <span>📄 Visualizar Report</span>
                 <span>›</span>
             </a>
+
+            <a href="{{ route('citizen.reports.index') }}"
+            class="feature-item">
+
+                <span>
+                    <i class="bi bi-clipboard-check"></i>
+                    Visualizar Denúncia
+                </span>
+
+                <span>›</span>
+            </a>
+
         </div>
+
     </main>
     </section>
 </div>
