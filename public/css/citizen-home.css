@@ -111,7 +111,7 @@ body {
   position: fixed;
   top: 12px;
   left: 12px;
-  z-index: 100;
+  z-index: 9999;
   transition: all 0.3s ease;
 }
 
@@ -164,7 +164,7 @@ body {
   width:250px;
   height:calc(100vh - 70px);
   overflow-y:auto;
-  z-index: 60;
+  z-index: 100;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
@@ -626,7 +626,7 @@ body {
     position: fixed;
     left: 12px;
     top: 12px;
-    z-index: 120;
+    z-index: 200;
   }
 
   .brand .logo { 
