@@ -2,6 +2,10 @@
  
 @extends('layouts.citizen')
 
+@php
+    $hideHeader = true;
+@endphp
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/citizen-report-create.css') }}">
 @endpush
@@ -58,58 +62,89 @@
     <form action="{{ $formAction }}" method="post" class="report-form" enctype="multipart/form-data">
         @csrf
 
-                        <div class="report-grid">
-                            <div class="form-column">
-                                <h2><span class="step">1</span> Informações básicas</h2>
+                    <div class="report-grid">
+                        <div class="form-column">
+                            <h2><span class="step">1</span> Informações básicas</h2>
 
-                                <div class="form-field">
-                    <label for="category">
-                        CATEGORIA DA DENÚNCIA
-                    </label>
+                        <div class="form-field">
+                            <label for="title">
+                                TÍTULO DA DENÚNCIA <span style="color: #d32f2f;">*</span>
+                            </label>
 
-                    <select id="category" name="category">
-                        <option value="">
-                            Selecione uma categoria
-                        </option>
+                            <input
+                                id="title"
+                                name="title"
+                                type="text"
+                                value="{{ old('title') }}"
+                                placeholder="Ex: Buraco na Rua Principal">
 
-                        @foreach($categories as $category)
-                            <option
-                                value="{{ $category->name }}"
-                                {{ old('category') === $category->name ? 'selected' : '' }}>
+                            <x-error-message field="title" />
+                        </div>
 
-                                {{ $category->name }}
 
-                            </option>
-                        @endforeach
-                    </select>
+                        <div class="form-field">
+                            <label for="description">
+                                DESCRIÇÃO DA DENÚNCIA <span style="color:red">*</span>
+                            </label>
 
-                    <x-error-message field="category" />
-                </div>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="6"
+                                placeholder="Descreva detalhadamente o problema encontrado...">{{ old('description') }}</textarea>
 
-                <div class="form-field">
-                    <label for="secretary">SETOR RESPONSÁVEL</label>
-                    <select id="secretary" name="secretary_id">
-                        <option value="">Carregando...</option>
-                    </select>
-                    <small style="display: block; margin-top: 8px; color: #666;">
-                        <i style="color: #2f6b3f;"></i> Preenchido automaticamente com base na categoria
-                    </small>
-                    <x-error-message field="secretary_id" />
-                </div>
+                            <x-error-message field="description" />
+                        </div>
 
-                    <div class="form-field">
-                        <label for="captcha_answer">
-                            Confirmação anti-bot: {{ $captchaQuestion }}
-                        </label>
+                        <div class="form-field">
+                            <label for="category">
+                                CATEGORIA DA DENÚNCIA
+                            </label>
 
-                        <input
-                            id="captcha_answer"
-                            name="captcha_answer"
-                            type="text"
-                            value="{{ old('captcha_answer') }}">
+                            <select id="category" name="category">
+                                <option value="">
+                                    Selecione uma categoria
+                                </option>
 
-                        <x-error-message field="captcha_answer" />
-                    </div>
+                                @foreach($categories as $category)
+                                    <option
+                                        value="{{ $category->name }}"
+                                        {{ old('category') === $category->name ? 'selected' : '' }}>
+
+                                        {{ $category->name }}
+
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <x-error-message field="category" />
+                        </div>
+
+
+                        <div class="form-field">
+                            <label for="secretary">SETOR RESPONSÁVEL</label>
+                            <select id="secretary" name="secretary_id">
+                                <option value="">Carregando...</option>
+                            </select>
+                            <small style="display: block; margin-top: 8px; color: #666;">
+                                <i style="color: #2f6b3f;"></i> Preenchido automaticamente com base na categoria
+                            </small>
+                            <x-error-message field="secretary_id" />
+                        </div>
+
+                        <div class="form-field">
+                            <label for="captcha_answer">
+                                Confirmação anti-bot: {{ $captchaQuestion }}
+                            </label>
+
+                            <input
+                                id="captcha_answer"
+                                name="captcha_answer"
+                                type="text"
+                                value="{{ old('captcha_answer') }}">
+
+                            <x-error-message field="captcha_answer" />
+                        </div>
             </div>
 
             <div class="form-column">

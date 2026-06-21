@@ -11,7 +11,9 @@
     
 </head>
 <body>
-    <!-- <header class="citizen-header">
+
+    @if(!isset($hideHeader) || !$hideHeader)
+    <header class="citizen-header">
         <div class="container-header">
             <div class="brand">
                 <span class="logo">⚠</span>
@@ -25,7 +27,8 @@
                 @endif
             </div>
         </div>
-    </header> -->
+    </header> 
+    @endif
 
     <main class="content">
         @yield('content')
