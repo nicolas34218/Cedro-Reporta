@@ -3,10 +3,7 @@
 
 @section('title', 'Tela principal')
 
-
 @section('content')
-
-@extends('layouts.citizen')
 
 <div class="home-page-wrapper">
     <!-- Hamburger Button -->
@@ -80,9 +77,8 @@
         const dashboard = document.querySelector('.home-dashboard');
 
         function openSidebar() {
-            // add both states; CSS will choose docked vs overlay based on media queries
             dashboard.classList.add('sidebar-open');
-            dashboard.classList.add('sidebar-docked');
+            overlay.style.display = 'block';
             if (hamburger) {
                 hamburger.classList.add('open');
                 hamburger.setAttribute('aria-expanded', 'true');
@@ -91,7 +87,7 @@
 
         function closeSidebar() {
             dashboard.classList.remove('sidebar-open');
-            dashboard.classList.remove('sidebar-docked');
+            overlay.style.display = 'none';
             if (hamburger) {
                 hamburger.classList.remove('open');
                 hamburger.setAttribute('aria-expanded', 'false');
@@ -100,11 +96,13 @@
 
         if (hamburger) {
             hamburger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Toggle both; CSS controls visual mode via media queries
-                dashboard.classList.toggle('sidebar-open');
-                dashboard.classList.toggle('sidebar-docked');
-                hamburger.classList.toggle('open');
+                hamburger.addEventListener('click', function () {
+                    if (dashboard.classList.contains('sidebar-open')) {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
             });
         }
 
@@ -125,7 +123,7 @@
             });
         }
 
-        // Reset sidebar on resize
+        
         window.addEventListener('resize', function() {
             if (window.innerWidth >= 901) {
                 dashboard.classList.remove('sidebar-open');
