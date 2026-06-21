@@ -217,6 +217,7 @@ class ReportController extends Controller
     {
         try {
             $response = Http::timeout(5)
+                ->withoutVerifying() 
                 ->acceptJson()
                 ->withHeaders([
                     'User-Agent' => 'CedroReporta/1.0',

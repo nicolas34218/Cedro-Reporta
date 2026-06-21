@@ -8,6 +8,11 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/citizen-report-create.css') }}">
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 @endpush
 
 @section('title', $visitorMode ? 'Registrar Denúncia como Visitante' : 'Registrar Denúncia')
@@ -151,6 +156,28 @@
                 <h2><span class="step">2</span> Localização</h2>
 
                 <div class="form-field">
+                    <label>
+                        Clique no mapa para selecionar o local exato
+                    </label>
+
+                    <div id="map"></div>
+                </div>
+
+                <div class="form-field">
+                    <label>Endereço selecionado</label>
+
+                    <input
+                        type="text"
+                        id="location_address"
+                        name="location_address"
+                        readonly
+                        placeholder="Clique no mapa para selecionar">
+                </div>
+
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+
+                <div class="form-field">
                     <label for="address_reference">ENDEREÇO/REFERÊNCIA <span style="color: #d32f2f;">*</span></label>
                     <input id="address_reference" name="address_reference" type="text" value="{{ old('address_reference') }}" placeholder="Ex: Rua Principal, próximo ao mercado">
                     <x-error-message field="address_reference" />
@@ -205,90 +232,127 @@
 </section>
 
 @push('scripts')
+
 <script>
-    console.log(' Script de categoria carregado!');
-    console.log(' Procurando elemento com ID: category');
-    
+    console.log('Script de categoria carregado!');
+
     const categorySelect = document.getElementById('category');
     const secretarySelect = document.getElementById('secretary');
-    
-    console.log('? category encontrado:', categorySelect ? 'SIM' : 'NÃO');
-    console.log('? secretary encontrado:', secretarySelect ? 'SIM' : 'NÃO');
-    
+
     if (!categorySelect || !secretarySelect) {
-        console.error(' Elementos não encontrados! Abortando script.');
+        console.error('Elementos não encontrados!');
     } else {
-        // Carrega os setores responsáveis automaticamente ao mudar a categoria
+
         categorySelect.addEventListener('change', async function() {
+
             const categoryId = this.value;
-            
-            console.log('?? Categoria mudou para:', categoryId);
-            
+
             if (!categoryId) {
-                secretarySelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
+                secretarySelect.innerHTML =
+                    '<option value="">Selecione uma categoria primeiro</option>';
                 return;
             }
 
             try {
-                secretarySelect.innerHTML = '<option value="">Carregando...</option>';
-                
-                const url = `/api/categories/${categoryId}/secretaries`;
-                console.log('?? Fazendo fetch para:', url);
-                
-                // Faz requisição para buscar os setores responsáveis da categoria
-                const response = await fetch(url, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
+
+                secretarySelect.innerHTML =
+                    '<option value="">Carregando...</option>';
+
+                const response = await fetch(
+                    `/api/categories/${categoryId}/secretaries`,
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
                     }
-                });
-
-                console.log('?? Status da resposta:', response.status);
-                console.log('?? Response OK?', response.ok);
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('? Erro na resposta:', errorText);
-                    throw new Error(`Erro ao carregar setores (Status: ${response.status})`);
-                }
+                );
 
                 const secretaries = await response.json();
-                console.log('? Secretárias recebidas:', secretaries);
-                
-                if (secretaries.length === 0) {
-                    console.warn('?? Nenhuma secretária encontrada para esta categoria');
-                    secretarySelect.innerHTML = '<option value="">Nenhum setor responsável configurado</option>';
-                    return;
-                }
 
-                // Preenche o select com os setores
-                secretarySelect.innerHTML = '<option value="">Selecione (opcional)</option>';
+                secretarySelect.innerHTML =
+                    '<option value="">Selecione (opcional)</option>';
+
                 secretaries.forEach(secretary => {
-                    console.log(`? Adicionando secretária: ${secretary.name} (ID: ${secretary.id})`);
-                    const option = document.createElement('option');
+
+                    const option =
+                        document.createElement('option');
+
                     option.value = secretary.id;
                     option.textContent = secretary.name;
+
                     secretarySelect.appendChild(option);
                 });
 
-                // Se há apenas 1 secretária, seleciona automaticamente
-                if (secretaries.length === 1) {
-                    secretarySelect.value = secretaries[0].id;
-                    console.log(' Secretária auto-selecionada:', secretaries[0].name);
-                } else {
-                    console.log('Multiplas secretrias disponveis, usurio deve escolher');
-                }
-
-                console.log(' Select preenchido com sucesso');
-
             } catch (error) {
-                console.error('Erro ao carregar setores:', error);
-                secretarySelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
+                console.error(error);
             }
+
         });
-        
-        console.log('? Event listener adicionado com sucesso');
     }
 </script>
+
+<!-- Script externo do Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Script do mapa -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    console.log('Leaflet carregado?', typeof L);
+
+    const map = L.map('map').setView([-6.6068, -39.0628], 14);
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; OpenStreetMap'
+        }
+    ).addTo(map);
+
+    let marker;
+
+    map.on('click', function(e) {
+
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        marker = L.marker([lat, lng]).addTo(map);
+
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+
+        // Busca o endereço correspondente às coordenadas
+        fetch(`{{ route('reports.location.resolve') }}?latitude=${lat}&longitude=${lng}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            console.log('Endereço retornado:', data);
+
+            document.getElementById('location_address').value =
+                data.address || 'Endereço não encontrado';
+        })
+        .catch(error => {
+
+            console.error('Erro ao buscar endereço:', error);
+
+            document.getElementById('location_address').value =
+                'Erro ao obter endereço';
+        });
+
+    });
+
+});
+</script>
+
 @endpush
 
