@@ -441,6 +441,12 @@ label {
     border: 1px solid #f5c6cb;
 }
 
+.alert-success {
+    background-color: #d1f5e0;
+    color: #14532d;
+    border: 1px solid #86efac;
+}
+
 .alert i {
     font-size: 16px;
     flex-shrink: 0;

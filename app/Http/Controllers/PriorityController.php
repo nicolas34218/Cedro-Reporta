@@ -50,11 +50,21 @@ class PriorityController extends Controller
         ]);
 
         try {
+            $oldPriority = $report->priority;
+
             // Atualizar prioridade
             $report->update([
                 'priority' => $validated['priority'],
                 'priority_assigned_at' => now(),
             ]);
+
+            \App\Models\ReportHistory::log(
+                $report,
+                'Prioridade definida',
+                $oldPriority
+                    ? "Prioridade alterada de \"{$oldPriority}\" para \"{$validated['priority']}\"."
+                    : "Prioridade definida como \"{$validated['priority']}\"."
+            );
 
             \Illuminate\Support\Facades\Log::info('Prioridade da denúncia atualizada', [
                 'report_id' => $report->id,

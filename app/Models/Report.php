@@ -101,6 +101,28 @@ class Report extends Model
     }
 
     /**
+     * Histórico completo de atualizações desta denúncia (criação, status,
+     * prioridade, transferências e compartilhamentos), do mais recente
+     * para o mais antigo.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function histories()
+    {
+        return $this->hasMany(ReportHistory::class)->latest();
+    }
+
+    /**
+     * Verifica se a secretaria é responsável por esta denúncia: ou por ser
+     * a atual detentora, ou por ela ter sido compartilhada com a secretaria.
+     */
+    public function isResponsibleSecretary(Secretary $secretary): bool
+    {
+        return $this->secretary_id === $secretary->id
+            || $this->shares()->where('to_secretary_id', $secretary->id)->exists();
+    }
+
+    /**
      * Scope para filtrar denúncias por categoria.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query

@@ -105,6 +105,12 @@ class ReportTransferController extends Controller
 
         $toSecretary = Secretary::find($validated['to_secretary_id']);
 
+        \App\Models\ReportHistory::log(
+            $report,
+            'Transferência solicitada',
+            "Encaminhamento solicitado para a secretaria \"{$toSecretary->name}\". Justificativa: {$validated['justification']}"
+        );
+
         try {
             $toSecretary->notify(new ReportTransferRequested($transfer));
             $toSecretary->creator?->notify(new ReportTransferRequested($transfer));
@@ -136,6 +142,12 @@ class ReportTransferController extends Controller
 
         $transfer->report()->update(['secretary_id' => $transfer->to_secretary_id]);
 
+        \App\Models\ReportHistory::log(
+            $transfer->report,
+            'Transferência aceita',
+            "A secretaria \"{$secretary->name}\" aceitou o encaminhamento e assumiu a responsabilidade pela denúncia."
+        );
+
         return redirect()->route('secretary.transfer.index')
             ->with('success', "Denúncia #{$transfer->report_id} aceita e transferida para sua secretaria.");
     }
@@ -166,6 +178,12 @@ class ReportTransferController extends Controller
             'rejection_reason' => $validated['rejection_reason'],
             'decided_at' => now(),
         ]);
+
+        \App\Models\ReportHistory::log(
+            $transfer->report,
+            'Transferência rejeitada',
+            "A secretaria \"{$secretary->name}\" rejeitou o encaminhamento. Motivo: {$validated['rejection_reason']}"
+        );
 
         return redirect()->route('secretary.transfer.index')
             ->with('success', 'Encaminhamento rejeitado. A denúncia permanece com a secretaria de origem.');

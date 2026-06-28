@@ -64,6 +64,16 @@ Route::controller(AuthController::class)->group(function () {
         ->name('login.store')
         ->middleware('guest');
 
+    // Formulário de redefinição de senha
+    Route::get('/esqueci-senha', 'showResetPasswordForm')
+        ->name('password.forgot')
+        ->middleware('guest');
+
+    // Processa a redefinição de senha
+    Route::post('/esqueci-senha', 'resetPassword')
+        ->name('password.update')
+        ->middleware('guest');
+
     // Logout - Funciona para cualquier tipo de usuário (admin, secretary, citizen)
     Route::post('/logout', 'logout')
         ->name('logout');
@@ -202,6 +212,15 @@ Route::middleware('auth:secretary')->controller(\App\Http\Controllers\AdminContr
 });
 
 /**
+ * Detalhes e histórico completo de uma denúncia para a secretaria responsável
+ * Requer autenticação apenas de Secretário
+ */
+Route::middleware('auth:secretary')->controller(ReportController::class)->group(function () {
+    Route::get('/secretary/reports/{report}', 'showForSecretary')
+        ->name('secretary.reports.show');
+});
+
+/**
  * Backend de compartilhamento de denúncias entre secretarias
  */
 Route::middleware('auth:secretary')
@@ -219,6 +238,10 @@ Route::middleware('auth:secretary')
     // Tela de compartilhamento de uma denúncia
     Route::get('/secretary/reports/{report}/share', 'create')
         ->name('secretary.share.create');
+
+    // Registra uma atualização manual sobre o andamento da denúncia
+    Route::post('/secretary/reports/{report}/updates', 'postUpdate')
+        ->name('secretary.reports.updates.store');
 
 });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\Citizen;
 use App\Models\Admin;
 use App\Models\Secretary;
@@ -116,6 +117,46 @@ class AuthController extends Controller
         throw ValidationException::withMessages([
             'email' => 'Credenciais inválidas, tente novamente',
         ]);
+    }
+
+    /**
+     * Exibe o formulário de redefinição de senha.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showResetPasswordForm()
+    {
+        return view('auth.reset-password');
+    }
+
+    /**
+     * Redefine a senha do usuário (admin, secretário ou cidadão), mediante
+     * confirmação do e-mail e da senha atual. A nova senha segue as mesmas
+     * regras de validação aplicadas na criação da conta.
+     *
+     * @param ResetPasswordRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        $validated = $request->validated();
+
+        $user = Admin::where('email', $validated['email'])->first()
+            ?? Secretary::where('email', $validated['email'])->first()
+            ?? Citizen::where('email', $validated['email'])->first();
+
+        if (!$user || !Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => 'E-mail ou senha atual incorretos.',
+            ]);
+        }
+
+        $user->password = $validated['password'];
+        $user->save();
+
+        return redirect()
+            ->route('login')
+            ->with('success', 'Senha alterada com sucesso! Faça login com sua nova senha.');
     }
 
     /**

@@ -136,8 +136,15 @@ class AdminController extends Controller
         }
 
         try {
+            $oldStatus = $report->status;
             $report->status = $validated['status'];
             $report->save();
+
+            \App\Models\ReportHistory::log(
+                $report,
+                'Status atualizado',
+                "Status alterado de \"{$oldStatus}\" para \"{$report->status}\"."
+            );
 
             \Illuminate\Support\Facades\Log::info('Status da denúncia atualizado', [
                 'report_id' => $report->id,

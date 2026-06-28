@@ -173,10 +173,16 @@
                                 </td>
                                 <td class="date-cell">{{ $report->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
+                                    <a href="{{ route('secretary.reports.show', $report) }}" class="priority-select" style="text-decoration: none; display: inline-block;">
+                                        Ver Histórico
+                                    </a>
+
+                                    <br><br>
+
                                     <a href="{{ route('secretary.transfer.create', $report) }}" class="priority-select" style="text-decoration: none; display: inline-block;">
                                         Transferir
                                     </a>
-                                    
+
                                     <br><br>
 
                                     <a href="{{ route('secretary.share.create', $report) }}" class="priority-select"
@@ -220,6 +226,7 @@
                         <th>Prioridade</th>
                         <th>Status</th>
                         <th>Data</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
 
@@ -257,6 +264,18 @@
 
                             <td>
                                 {{ $report->created_at->format('d/m/Y H:i') }}
+                            </td>
+
+                            <td>
+                                <a href="{{ route('secretary.reports.show', $report) }}" class="priority-select" style="text-decoration: none; display: inline-block;">
+                                    Ver Histórico
+                                </a>
+
+                                <br><br>
+
+                                <a href="{{ route('secretary.share.create', $report) }}" class="priority-select" style="text-decoration: none; display: inline-block;">
+                                    Postar Atualização
+                                </a>
                             </td>
 
                         </tr>

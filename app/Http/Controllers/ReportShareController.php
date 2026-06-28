@@ -16,18 +16,25 @@ class ReportShareController extends Controller
 {
     public function create(Report $report)
     {
+        /** @var Secretary $secretary */
         $secretary = auth()->user();
-        abort_unless($report->secretary_id === $secretary->id, 403);
+        abort_unless($report->isResponsibleSecretary($secretary), 403);
 
-        $destinationSecretaries = Secretary::where('is_active', true)
-            ->where('id', '!=', $secretary->id)
-            ->orderBy('name')
-            ->get();
+        $isOwner = $report->secretary_id === $secretary->id;
+
+        $destinationSecretaries = $isOwner
+            ? Secretary::where('is_active', true)
+                ->where('id', '!=', $secretary->id)
+                ->orderBy('name')
+                ->get()
+            : collect();
 
         return view('secretary.share.create', [
             'report' => $report,
+            'isOwner' => $isOwner,
             'destinationSecretaries' => $destinationSecretaries,
             'history' => $report->shares()->with(['fromSecretary', 'toSecretary'])->latest()->get(),
+            'historyEntries' => $report->histories,
         ]);
     }
 
@@ -68,6 +75,13 @@ class ReportShareController extends Controller
 
         $toSecretary = Secretary::findOrFail($validated['to_secretary_id']);
 
+        \App\Models\ReportHistory::log(
+            $report,
+            'Compartilhada com outra secretaria',
+            "Denúncia compartilhada com a secretaria \"{$toSecretary->name}\"."
+                . (!empty($validated['message']) ? " Observação: {$validated['message']}" : '')
+        );
+
         try {
             $toSecretary->notify(new ReportSharedWithSecretary($share));
         } catch (\Throwable $throwable) {
@@ -75,11 +89,39 @@ class ReportShareController extends Controller
         }
 
          return redirect()
-            ->route('secretary.share.index')
+            ->route('secretary.reports.show', $report)
             ->with(
             'success',
             "Denúncia #{$report->id} compartilhada com {$toSecretary->name} com sucesso."
         );
+    }
+
+    /**
+     * Registra uma atualização manual sobre o andamento da denúncia,
+     * disponível tanto para a secretaria responsável atual quanto para
+     * qualquer secretaria com quem a denúncia tenha sido compartilhada.
+     */
+    public function postUpdate(Request $request, Report $report)
+    {
+        /** @var Secretary $secretary */
+        $secretary = auth()->user();
+        abort_unless($report->isResponsibleSecretary($secretary), 403);
+
+        $validated = $request->validate([
+            'content' => ['required', 'string', 'min:5', 'max:1000'],
+        ], [
+            'content.required' => 'Descreva a atualização sobre a denúncia.',
+            'content.min' => 'A atualização deve ter no mínimo 5 caracteres.',
+            'content.max' => 'A atualização deve ter no máximo 1000 caracteres.',
+        ]);
+
+        \App\Models\ReportHistory::log(
+            $report,
+            'Atualização sobre a denúncia',
+            $validated['content']
+        );
+
+        return back()->with('success', 'Atualização registrada com sucesso.');
     }
 
     public function index()

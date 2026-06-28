@@ -123,7 +123,16 @@ class ReportController extends Controller
                 'is_anonymous' => !$visitorMode && $request->boolean('anonymous'),
             ]);
 
-            // 5. Notificações da secretaria
+            // 5. Registro no histórico da denúncia
+            \App\Models\ReportHistory::log(
+                $report,
+                'Denúncia registrada',
+                $secretary
+                    ? "Denúncia criada e encaminhada para a secretaria \"{$secretary->name}\"."
+                    : 'Denúncia criada e aguardando triagem.'
+            );
+
+            // 6. Notificações da secretaria
             if ($secretary) {
                 try {
                     $secretary->notify(new \App\Notifications\NewReportAssigned($report));
@@ -275,7 +284,28 @@ public function index()
     public function trackStatus(Report $report)
     {
         $this->authorize('track', $report);
+        $report->load('histories');
+
         return view('citizen.reports.track-status', ['report' => $report]);
+    }
+
+    /**
+     * Exibe os detalhes e o histórico completo de uma denúncia para a
+     * secretaria responsável (atual) ou para uma secretaria com quem
+     * a denúncia tenha sido compartilhada.
+     */
+    public function showForSecretary(Report $report)
+    {
+        /** @var \App\Models\Secretary $secretary */
+        $secretary = auth('secretary')->user();
+
+        abort_unless($report->isResponsibleSecretary($secretary), 403);
+
+        $report->load(['citizen', 'secretary', 'histories']);
+
+        return view('secretary.reports.show', [
+            'report' => $report,
+        ]);
     }
 
 public function search(Request $request)

@@ -50,6 +50,13 @@
                 <h2>Bem-vindo(a) de volta</h2>
                 <p>Faça login para acessar sua conta</p>
 
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="alert alert-danger" role="alert">
                         <i class="bi bi-exclamation-circle"></i>
@@ -74,7 +81,7 @@
                         </button>
                     </div>
 
-                    <a href="#" class="forgot">Esqueci minha senha</a>
+                    <a href="{{ route('password.forgot') }}" class="forgot">Esqueci minha senha</a>
 
                     <button class="primary" type="submit">Entrar</button>
                 </form>

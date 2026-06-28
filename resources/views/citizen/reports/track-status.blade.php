@@ -70,37 +70,28 @@
         <div class="timeline-section">
             <h2>Histórico de Atualizações</h2>
 
+            @php
+                $historyEntries = $report->histories->sortBy('id');
+            @endphp
+
             <div class="timeline">
-                <div class="timeline-item" style="border-color: {{ App\Enums\ReportStatus::getStatusConfig('Pendente')['color'] }};">
-                    <div class="timeline-marker" style="background-color: {{ App\Enums\ReportStatus::getStatusConfig('Pendente')['color'] }};">{{ App\Enums\ReportStatus::getStatusConfig('Pendente')['icon'] }}</div>
-                    <div class="timeline-content">
-                        <h4>Denúncia Registrada</h4>
-                        <p>{{ $report->created_at->format('d/m/Y') }} às {{ $report->created_at->format('H:i') }}</p>
-                    </div>
-                </div>
-
-                @if($report->status !== 'Pendente')
-                    <div class="timeline-item" style="border-color: {{ App\Enums\ReportStatus::getStatusConfig('Em Análise')['color'] }};">
-                        <div class="timeline-marker" style="background-color: {{ App\Enums\ReportStatus::getStatusConfig('Em Análise')['color'] }};">{{ App\Enums\ReportStatus::getStatusConfig('Em Análise')['icon'] }}</div>
+                @forelse ($historyEntries as $entry)
+                    <div class="timeline-item">
+                        <div class="timeline-marker" style="background-color: #2f6b3f;">●</div>
                         <div class="timeline-content">
-                            <h4>Em Análise</h4>
-                            <p>{{ $report->updated_at->format('d/m/Y') }} às {{ $report->updated_at->format('H:i') }}</p>
+                            <h4>{{ $entry->action }}</h4>
+                            <p>
+                                {{ $entry->created_at->format('d/m/Y') }} às {{ $entry->created_at->format('H:i') }}
+                                &middot; {{ $entry->actor_name }} ({{ $entry->actor_role }})
+                            </p>
+                            @if($entry->description)
+                                <p>{{ $entry->description }}</p>
+                            @endif
                         </div>
                     </div>
-                @endif
-
-                @if(in_array($report->status, ['Resolvida', 'Fechada']))
-                    @php
-                        $finalConfig = App\Enums\ReportStatus::getStatusConfig($report->status);
-                    @endphp
-                    <div class="timeline-item" style="border-color: {{ $finalConfig['color'] }};">
-                        <div class="timeline-marker" style="background-color: {{ $finalConfig['color'] }};">{{ $finalConfig['icon'] }}</div>
-                        <div class="timeline-content">
-                            <h4>{{ $report->status }}</h4>
-                            <p>{{ $report->updated_at->format('d/m/Y') }} às {{ $report->updated_at->format('H:i') }}</p>
-                        </div>
-                    </div>
-                @endif
+                @empty
+                    <p>Nenhuma atualização registrada até o momento.</p>
+                @endforelse
             </div>
         </div>
 
