@@ -56,6 +56,23 @@
         <div class="category-list-column">
             <h2 class="list-title">CATEGORIAS EXISTENTES ({{ $categories->count() }})</h2>
 
+            <div class="categories-toolbar">
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    id="category-search"
+                    placeholder="Pesquisar categoria...">
+            </div>
+
+            <p id="no-results" style="display:none; text-align:center; margin-top:20px;">
+                Nenhuma categoria encontrada.
+            </p>
+
+        </div>
+
             <div class="category-list">
                 @forelse ($categories as $category)
                     <article class="category-item">
@@ -84,6 +101,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const secError = document.getElementById('secretaryError');
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s]+$/;
+
+    const searchInput = document.getElementById('category-search');
+    const categories = document.querySelectorAll('.category-item');
+    const noResults = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function () {
+
+        const filter = this.value.toLowerCase();
+        let visibleCount = 0;
+
+        categories.forEach(item => {
+
+            const text = item.innerText.toLowerCase();
+
+            if (text.includes(filter)) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        noResults.style.display =
+            visibleCount === 0 ? 'block' : 'none';
+    });
 
     function validateName() {
         const val = nameInput.value.trim();
