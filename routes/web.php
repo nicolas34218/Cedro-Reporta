@@ -243,6 +243,17 @@ Route::middleware('auth:secretary')
     Route::post('/secretary/reports/{report}/updates', 'postUpdate')
         ->name('secretary.reports.updates.store');
 
+    // Aceita o compartilhamento de uma denúncia
+    Route::patch('/secretary/share/{share}/accept',
+    [ReportShareController::class, 'accept']
+    )->name('secretary.share.accept');
+
+    // Rejeita o compartilhamento de uma denúncia
+    Route::patch(
+        '/secretary/share/{share}/reject',
+        [ReportShareController::class, 'reject']
+    )->name('secretary.share.reject');
+
 });
 
 /**

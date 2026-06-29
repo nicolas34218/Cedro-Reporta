@@ -30,10 +30,13 @@
             </h2>
 
             <span class="incoming-count">
-                1 pendente
+                {{ $incomingShares->count() }}
+                {{ $incomingShares->count() == 1 ? 'pendente' : 'pendentes' }}
             </span>
 
         </div>
+
+    @forelse($incomingShares as $share)
 
         <div class="incoming-card">
 
@@ -46,38 +49,52 @@
             </div>
 
             <h3>
-                Buraco na Rua José de Alencar
+                {{ $share->report->title }}
             </h3>
 
             <div class="incoming-info">
 
                 <p>
                     <strong>Secretaria:</strong>
-                    Secretaria de Obras
+                    {{ $share->fromSecretary->name }}
                 </p>
 
                 <p>
                     <strong>Data:</strong>
-                    21/06/2026 às 14:35
+                    {{ $share->shared_at->format('d/m/Y \à\s H:i') }}
                 </p>
 
             </div>
 
             <div class="incoming-message">
 
-                Necessário apoio desta secretaria para conclusão da ocorrência.
+                {{ $share->message ?: 'Sem observações.' }}
 
             </div>
 
             <div class="incoming-actions">
 
-                <button class="btn-accept">
+                <form
+                    action="{{ route('secretary.share.accept', $share) }}"
+                    method="POST"
+                    style="display:inline;">
 
-                    ✔ Aceitar
+                    @csrf
+                    @method('PATCH')
 
-                </button>
+                    <button
+                        type="submit"
+                        class="btn-accept">
 
-                <button class="btn-reject">
+                        ✔ Aceitar
+
+                    </button>
+
+                </form>
+
+                <button
+                    type="button"
+                    class="btn-reject toggle-reject">
 
                     ✖ Recusar
 
@@ -85,36 +102,45 @@
 
             </div>
 
-            <div class="reject-form" id="reject-form">
+            <form
+                action="{{ route('secretary.share.reject', $share) }}"
+                method="POST"
+                class="reject-form"
+                style="display:none;">
 
-                <label for="reject-reason">
-                    Justificativa da recusa
-                </label>
+                @csrf
+                @method('PATCH')
 
                 <textarea
-                    id="reject-reason"
+                    name="response"
                     rows="4"
-                    placeholder="Explique o motivo pelo qual sua secretaria não pode assumir esta denúncia..."></textarea>
+                    placeholder="Informe a justificativa da recusa..."
+                    required>
+                </textarea>
 
-                <div class="reject-actions">
+                <button
+                    type="submit"
+                    class="btn-confirm-reject">
 
-                    <button class="btn-cancel-reject">
-                        Cancelar
-                    </button>
+                    Confirmar Recusa
 
-                    <button class="btn-confirm-reject">
-                        Confirmar Recusa
-                    </button>
+                </button>
 
-                </div>
-
-            </div>
-
-            <div class="share-result" id="share-result"></div>
+            </form>
 
         </div>
 
-    </div>
+    @empty
+
+        <div class="no-reports-message">
+
+            Nenhuma denúncia compartilhada com sua secretaria.
+
+        </div>
+
+    @endforelse
+
+</div>
     
 
     <div class="reports-grid">
@@ -175,81 +201,18 @@
 
 <script>
 
-document.addEventListener('DOMContentLoaded', () => {
+document.querySelectorAll('.toggle-reject').forEach(button => {
 
-    const rejectButton = document.querySelector('.btn-reject');
-    const acceptButton = document.querySelector('.btn-accept');
+    button.addEventListener('click', function () {
 
-    const cancelButton = document.querySelector('.btn-cancel-reject');
-    const confirmReject = document.querySelector('.btn-confirm-reject');
+        const form =
+            this.closest('.incoming-card')
+                .querySelector('.reject-form');
 
-    const rejectForm = document.getElementById('reject-form');
-    const resultBox = document.getElementById('share-result');
-    const reasonField = document.getElementById('reject-reason');
-
-    // Abrir formulário
-    rejectButton.addEventListener('click', () => {
-
-        rejectForm.classList.add('active');
-
-    });
-
-    // Cancelar
-    cancelButton.addEventListener('click', () => {
-
-        rejectForm.classList.remove('active');
-
-    });
-
-    // Aceitar compartilhamento
-    acceptButton.addEventListener('click', () => {
-
-        document.querySelector('.incoming-actions').style.display = 'none';
-
-        rejectForm.style.display = 'none';
-
-        resultBox.className = 'share-result success';
-
-        resultBox.innerHTML = `
-            <h4>✔ Compartilhamento aceito</h4>
-
-            <p>
-                Sua secretaria agora faz parte da resolução desta denúncia.
-            </p>
-
-            <p>
-                Você poderá registrar atualizações normalmente.
-            </p>
-        `;
-
-    });
-
-    // Confirmar recusa
-    confirmReject.addEventListener('click', () => {
-
-        const reason = reasonField.value.trim();
-
-        if(reason === ''){
-
-            alert('Informe uma justificativa.');
-
-            return;
-
-        }
-
-        document.querySelector('.incoming-actions').style.display = 'none';
-
-        rejectForm.style.display = 'none';
-
-        resultBox.className = 'share-result error';
-
-        resultBox.innerHTML = `
-            <h4>✖ Compartilhamento recusado</h4>
-
-            <p><strong>Justificativa:</strong></p>
-
-            <p>${reason}</p>
-        `;
+        form.style.display =
+            form.style.display === 'block'
+                ? 'none'
+                : 'block';
 
     });
 

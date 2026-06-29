@@ -16,10 +16,15 @@ class ReportShare extends Model
         'to_secretary_id',
         'message',
         'shared_at',
+        'status',
+        'response',
+        'responded_at',
+        'shared_at',
     ];
 
     protected $casts = [
         'shared_at' => 'datetime',
+        'responded_at' => 'datetime',
     ];
 
     public function report(): BelongsTo

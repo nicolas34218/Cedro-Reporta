@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
-
 use App\Models\Report;
 use App\Models\ReportShare;
 use App\Models\Secretary;
@@ -70,6 +68,7 @@ class ReportShareController extends Controller
             'from_secretary_id' => $secretary->id,
             'to_secretary_id' => $validated['to_secretary_id'],
             'message' => $validated['message'] ?? null,
+            'status' => 'pending',
             'shared_at' => now(),
         ]);
 
@@ -124,6 +123,70 @@ class ReportShareController extends Controller
         return back()->with('success', 'Atualização registrada com sucesso.');
     }
 
+    public function accept(ReportShare $share)
+    {
+        /** @var Secretary $secretary */
+        $secretary = auth()->user();
+
+        abort_unless(
+            $share->to_secretary_id === $secretary->id,
+            403
+        );
+
+        $share->update([
+            'status' => 'accepted',
+            'responded_at' => now(),
+        ]);
+
+        \App\Models\ReportHistory::log(
+            $share->report,
+            'Compartilhamento aceito',
+            "A secretaria \"{$secretary->name}\" aceitou o compartilhamento da denúncia."
+        );
+
+        return back()->with(
+            'success',
+            'Compartilhamento aceito com sucesso.'
+        );
+    }
+
+    public function reject(Request $request, ReportShare $share)
+    {
+        /** @var Secretary $secretary */
+        $secretary = auth()->user();
+
+        abort_unless(
+            $share->to_secretary_id === $secretary->id,
+            403
+        );
+
+        $validated = $request->validate([
+            'response' => [
+                'required',
+                'string',
+                'min:10',
+                'max:1000'
+            ]
+        ]);
+
+        $share->update([
+            'status' => 'rejected',
+            'response' => $validated['response'],
+            'responded_at' => now(),
+        ]);
+
+        \App\Models\ReportHistory::log(
+            $share->report,
+            'Compartilhamento recusado',
+            "A secretaria \"{$secretary->name}\" recusou o compartilhamento. Justificativa: {$validated['response']}"
+        );
+
+        return back()->with(
+            'success',
+            'Compartilhamento recusado.'
+        );
+    }
+
     public function index()
     {
         /** @var \App\Models\Secretary $secretary */
@@ -133,9 +196,19 @@ class ReportShareController extends Controller
             ->latest()
             ->get();
 
+        $incomingShares = ReportShare::with([
+        'report',
+        'fromSecretary'
+            ])
+            ->where('to_secretary_id', $secretary->id)
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
         return view('secretary.share.index', [
-            'secretary' => $secretary,
-            'reports' => $reports,
+            'secretary'      => $secretary,
+            'reports'        => $reports,
+            'incomingShares' => $incomingShares,
         ]);
     }
 
