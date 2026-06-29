@@ -58,20 +58,21 @@
 
             <div class="categories-toolbar">
 
-            <div class="search-box">
-                <i class="bi bi-search"></i>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
 
-                <input
-                    type="text"
-                    id="category-search"
-                    placeholder="Pesquisar categoria...">
+                    <input
+                        type="text"
+                        id="category-search"
+                        placeholder="Pesquisar categoria...">
+                </div>
+
             </div>
 
-            <p id="no-results" style="display:none; text-align:center; margin-top:20px;">
+            <p id="no-results">
+                <i class="bi bi-search"></i>
                 Nenhuma categoria encontrada.
             </p>
-
-        </div>
 
             <div class="category-list">
                 @forelse ($categories as $category)
@@ -85,6 +86,7 @@
                     </article>
                 @endforelse
             </div>
+            
         </div>
     </section>
 
