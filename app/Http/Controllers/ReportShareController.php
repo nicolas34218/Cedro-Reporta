@@ -4,212 +4,167 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\ReportShare;
-use App\Models\Secretary;
+use App\Models\ReportHistory;
+use App\Models\Admin; 
+use App\Http\Requests\StoreReportShareRequest;
+use App\Http\Requests\RespondReportShareRequest;
 use App\Notifications\ReportSharedWithSecretary;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Http\JsonResponse;
 
 class ReportShareController extends Controller
 {
-    public function create(Report $report)
+    /**
+     * Compartilha uma denúncia com outra secretaria.
+     */
+    public function store(StoreReportShareRequest $request, $id): JsonResponse
     {
-        /** @var Secretary $secretary */
-        $secretary = auth()->user();
-        abort_unless($report->isResponsibleSecretary($secretary), 403);
-
-        $isOwner = $report->secretary_id === $secretary->id;
-
-        $destinationSecretaries = $isOwner
-            ? Secretary::where('is_active', true)
-                ->where('id', '!=', $secretary->id)
-                ->orderBy('name')
-                ->get()
-            : collect();
-
-        return view('secretary.share.create', [
-            'report' => $report,
-            'isOwner' => $isOwner,
-            'destinationSecretaries' => $destinationSecretaries,
-            'history' => $report->shares()->with(['fromSecretary', 'toSecretary'])->latest()->get(),
-            'historyEntries' => $report->histories,
-        ]);
-    }
-
-    public function store(Request $request, Report $report)
-    {
-        $secretary = auth()->user();
-        abort_unless($report->secretary_id === $secretary->id, 403);
-
-        $validated = $request->validate([
-            'to_secretary_id' => [
-                'required',
-                Rule::exists('secretaries', 'id')->where('is_active', true),
-                Rule::notIn([$secretary->id]),
-            ],
-            'message' => ['nullable', 'string', 'max:1000'],
-        ], [
-            'to_secretary_id.required' => 'Selecione a secretaria de destino.',
-            'to_secretary_id.exists' => 'Secretaria de destino inválida.',
-            'to_secretary_id.not_in' => 'Não é possível compartilhar com a própria secretaria.',
-            'message.max' => 'A observação deve ter no máximo 1000 caracteres.',
-        ]);
-
-        $alreadyShared = $report->shares()
-            ->where('to_secretary_id', $validated['to_secretary_id'])
-            ->exists();
-
-        if ($alreadyShared) {
-            return back()->with('error', 'Esta denúncia já foi compartilhada com esta secretaria.');
-        }
-
-        $share = ReportShare::create([
-            'report_id' => $report->id,
-            'from_secretary_id' => $secretary->id,
-            'to_secretary_id' => $validated['to_secretary_id'],
-            'message' => $validated['message'] ?? null,
-            'status' => 'pending',
-            'shared_at' => now(),
-        ]);
-
-        $toSecretary = Secretary::findOrFail($validated['to_secretary_id']);
-
-        \App\Models\ReportHistory::log(
-            $report,
-            'Compartilhada com outra secretaria',
-            "Denúncia compartilhada com a secretaria \"{$toSecretary->name}\"."
-                . (!empty($validated['message']) ? " Observação: {$validated['message']}" : '')
-        );
+        $report = Report::findOrFail($id);
+        $user = Auth::user(); // Usuário logado
+        
+        $data = $request->validated();
 
         try {
-            $toSecretary->notify(new ReportSharedWithSecretary($share));
-        } catch (\Throwable $throwable) {
-            Log::error('Erro ao notificar secretaria compartilhada: ' . $throwable->getMessage());
-        }
+            DB::transaction(function () use ($report, $user, $data) {
+                // 1. Salvar o compartilhamento
+                $share = ReportShare::create([
+                    'report_id' => $report->id,
+                    'source_secretary_id' => $report->secretary_id, // Secretaria atual da denúncia
+                    'destination_secretary_id' => $data['destination_secretary_id'],
+                    'user_id' => $user->id,
+                    'status' => 'PENDENTE',
+                    'justification' => $data['justification'],
+                ]);
 
-         return redirect()
-            ->route('secretary.reports.show', $report)
-            ->with(
-            'success',
-            "Denúncia #{$report->id} compartilhada com {$toSecretary->name} com sucesso."
-        );
+                // 2. Registrar o histórico
+                $this->recordHistory(
+                    $report->id,
+                    $user->id,
+                    'COMPARTILHAMENTO_CRIADO',
+                    $data['justification'],
+                    $report->secretary_id,
+                    $data['destination_secretary_id']
+                );
+
+                // 3. Notificar todos os administradores da secretaria destino
+                $destinationAdmins = Admin::where('secretary_id', $data['destination_secretary_id'])->get();
+                if ($destinationAdmins->isNotEmpty()) {
+                    Notification::send($destinationAdmins, new ReportSharedWithSecretary($share));
+                }
+            });
+
+            return response()->json([
+                'message' => 'Denúncia compartilhada com sucesso. Aguardando aceite da secretaria destino.'
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao compartilhar denúncia.', 'details' => $e->getMessage()], 500);
+        }
     }
 
     /**
-     * Registra uma atualização manual sobre o andamento da denúncia,
-     * disponível tanto para a secretaria responsável atual quanto para
-     * qualquer secretaria com quem a denúncia tenha sido compartilhada.
+     * Aceita um compartilhamento pendente.
      */
-    public function postUpdate(Request $request, Report $report)
+    public function accept(RespondReportShareRequest $request, $id): JsonResponse
     {
-        /** @var Secretary $secretary */
-        $secretary = auth()->user();
-        abort_unless($report->isResponsibleSecretary($secretary), 403);
+        $share = ReportShare::findOrFail($id);
 
-        $validated = $request->validate([
-            'content' => ['required', 'string', 'min:5', 'max:1000'],
-        ], [
-            'content.required' => 'Descreva a atualização sobre a denúncia.',
-            'content.min' => 'A atualização deve ter no mínimo 5 caracteres.',
-            'content.max' => 'A atualização deve ter no máximo 1000 caracteres.',
-        ]);
+        // Verifica a Policy: Somente administradores da secretaria destino podem aceitar
+        $this->authorize('respond', $share);
 
-        \App\Models\ReportHistory::log(
-            $report,
-            'Atualização sobre a denúncia',
-            $validated['content']
-        );
+        if ($share->status !== 'PENDENTE') {
+            return response()->json(['error' => 'Este compartilhamento não está pendente.'], 422);
+        }
 
-        return back()->with('success', 'Atualização registrada com sucesso.');
+        try {
+            DB::transaction(function () use ($share) {
+                // 1. Alterar status para ACEITO
+                $share->update([
+                    'status' => 'ACEITO'
+                ]);
+
+                // 2. Registrar no histórico
+                $this->recordHistory(
+                    $share->report_id,
+                    Auth::id(),
+                    'COMPARTILHAMENTO_ACEITO',
+                    'A secretaria de destino aceitou o compartilhamento.',
+                    $share->source_secretary_id,
+                    $share->destination_secretary_id
+                );
+                
+                // Nota: A secretaria destino já é tratada como responsável devido 
+                // à relação `sharedSecretaries()` configurada na Model Report.
+            });
+
+            return response()->json([
+                'message' => 'Compartilhamento aceito com sucesso. Sua secretaria agora também é responsável pela denúncia.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao aceitar compartilhamento.', 'details' => $e->getMessage()], 500);
+        }
     }
 
-    public function accept(ReportShare $share)
+    /**
+     * Rejeita um compartilhamento pendente.
+     */
+    public function reject(RespondReportShareRequest $request, $id): JsonResponse
     {
-        /** @var Secretary $secretary */
-        $secretary = auth()->user();
+        $share = ReportShare::findOrFail($id);
 
-        abort_unless(
-            $share->to_secretary_id === $secretary->id,
-            403
-        );
+        // Verifica a Policy: Somente administradores da secretaria destino podem rejeitar
+        $this->authorize('respond', $share);
 
-        $share->update([
-            'status' => 'accepted',
-            'responded_at' => now(),
-        ]);
+        if ($share->status !== 'PENDENTE') {
+            return response()->json(['error' => 'Este compartilhamento não está pendente.'], 422);
+        }
 
-        \App\Models\ReportHistory::log(
-            $share->report,
-            'Compartilhamento aceito',
-            "A secretaria \"{$secretary->name}\" aceitou o compartilhamento da denúncia."
-        );
+        $data = $request->validated();
 
-        return back()->with(
-            'success',
-            'Compartilhamento aceito com sucesso.'
-        );
+        try {
+            DB::transaction(function () use ($share, $data) {
+                // 1. Alterar status para REJEITADO e salvar justificativa
+                $share->update([
+                    'status' => 'REJEITADO',
+                    'response_justification' => $data['justification']
+                ]);
+
+                // 2. Registrar no histórico
+                $this->recordHistory(
+                    $share->report_id,
+                    Auth::id(),
+                    'COMPARTILHAMENTO_REJEITADO',
+                    $data['justification'],
+                    $share->source_secretary_id,
+                    $share->destination_secretary_id
+                );
+            });
+
+            return response()->json([
+                'message' => 'Compartilhamento rejeitado com sucesso.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao rejeitar compartilhamento.', 'details' => $e->getMessage()], 500);
+        }
     }
 
-    public function reject(Request $request, ReportShare $share)
+    /**
+     * Método auxiliar privado para padronizar o registro de histórico.
+     * Adapte os nomes das colunas de acordo com a sua tabela 'report_histories'.
+     */
+    private function recordHistory($reportId, $userId, $action, $justification, $sourceId = null, $destinationId = null): void
     {
-        /** @var Secretary $secretary */
-        $secretary = auth()->user();
-
-        abort_unless(
-            $share->to_secretary_id === $secretary->id,
-            403
-        );
-
-        $validated = $request->validate([
-            'response' => [
-                'required',
-                'string',
-                'min:10',
-                'max:1000'
-            ]
-        ]);
-
-        $share->update([
-            'status' => 'rejected',
-            'response' => $validated['response'],
-            'responded_at' => now(),
-        ]);
-
-        \App\Models\ReportHistory::log(
-            $share->report,
-            'Compartilhamento recusado',
-            "A secretaria \"{$secretary->name}\" recusou o compartilhamento. Justificativa: {$validated['response']}"
-        );
-
-        return back()->with(
-            'success',
-            'Compartilhamento recusado.'
-        );
-    }
-
-    public function index()
-    {
-        /** @var \App\Models\Secretary $secretary */
-        $secretary = auth()->user();
-
-        $reports = Report::where('secretary_id', $secretary->id)
-            ->latest()
-            ->get();
-
-        $incomingShares = ReportShare::with([
-        'report',
-        'fromSecretary'
-            ])
-            ->where('to_secretary_id', $secretary->id)
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
-
-        return view('secretary.share.index', [
-            'secretary'      => $secretary,
-            'reports'        => $reports,
-            'incomingShares' => $incomingShares,
+        ReportHistory::create([
+            'report_id' => $reportId,
+            'user_id' => $userId,
+            'action' => $action,
+            'justification' => $justification,
+            'source_secretary_id' => $sourceId,
+            'destination_secretary_id' => $destinationId,
         ]);
     }
-
 }

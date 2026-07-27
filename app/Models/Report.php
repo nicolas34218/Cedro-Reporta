@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Modelo de denúncia/relatório.
@@ -64,7 +67,7 @@ class Report extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function citizen()
+    public function citizen(): BelongsTo
     {
         return $this->belongsTo(Citizen::class, 'user_id');
     }
@@ -75,7 +78,7 @@ class Report extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function secretary()
+    public function secretary(): BelongsTo
     {
         return $this->belongsTo(Secretary::class, 'secretary_id');
     }
@@ -85,7 +88,7 @@ class Report extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function transfers()
+    public function transfers(): HasMany
     {
         return $this->hasMany(ReportTransfer::class)->latest();
     }
@@ -95,7 +98,7 @@ class Report extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function shares()
+    public function shares(): HasMany
     {
         return $this->hasMany(ReportShare::class)->latest();
     }
@@ -107,9 +110,30 @@ class Report extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function histories()
+    public function histories(): HasMany
     {
         return $this->hasMany(ReportHistory::class)->latest();
+    }
+
+    /**
+     * Relacionamento: Secretarias que TAMBÉM são responsáveis pela denúncia
+     * através de um compartilhamento que foi ACEITO.
+     * 
+     * Aqui utilizamos a tabela 'report_shares' como uma tabela Pivot (N:N).
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function sharedSecretaries(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Secretary::class,
+            'report_shares',
+            'report_id',
+            'destination_secretary_id' // Certifique-se de que a coluna se chama assim na migration de report_shares
+        )
+        ->withPivot(['status', 'source_secretary_id', 'user_id', 'justification', 'response_justification'])
+        ->wherePivot('status', 'ACEITO') // Filtra apenas compartilhamentos que foram aceitos
+        ->withTimestamps();
     }
 
     /**
@@ -119,7 +143,10 @@ class Report extends Model
     public function isResponsibleSecretary(Secretary $secretary): bool
     {
         return $this->secretary_id === $secretary->id
-            || $this->shares()->where('to_secretary_id', $secretary->id)->exists();
+            || $this->shares()
+                    ->where('destination_secretary_id', $secretary->id) // Alterado de 'to_secretary_id' para seguir o padrão do planejamento
+                    ->where('status', 'ACEITO') // A secretaria de destino só é responsável SE o compartilhamento foi aceito.
+                    ->exists();
     }
 
     /**

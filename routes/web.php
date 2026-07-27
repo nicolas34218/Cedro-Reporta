@@ -90,7 +90,6 @@ Route::controller(ReportController::class)->group(function () {
         ->name('visitor.reports.store');
 });
 
-
 /**
  * Entrar como visitante
  */
@@ -140,12 +139,6 @@ Route::prefix('admin')->name('admin.')->controller(AdminController::class)->grou
     Route::get('/dashboard', 'dashboard')
         ->name('dashboard')
         ->middleware(['admin.auth', 'admin.only']);
-
-    // // Detalhes da denúncia
-    // Route::get('/reports/{report}', 'showReport')
-    //     ->name('report.show')
-    //     ->middleware(['admin.auth', 'admin.only']);
-
 });
 
 /**
@@ -244,15 +237,12 @@ Route::middleware('auth:secretary')
         ->name('secretary.reports.updates.store');
 
     // Aceita o compartilhamento de uma denúncia
-    Route::patch('/secretary/share/{share}/accept',
-    [ReportShareController::class, 'accept']
-    )->name('secretary.share.accept');
+    Route::patch('/secretary/share/{share}/accept', 'accept')
+        ->name('secretary.share.accept');
 
     // Rejeita o compartilhamento de uma denúncia
-    Route::patch(
-        '/secretary/share/{share}/reject',
-        [ReportShareController::class, 'reject']
-    )->name('secretary.share.reject');
+    Route::patch('/secretary/share/{share}/reject', 'reject')
+        ->name('secretary.share.reject');
 
 });
 
@@ -339,4 +329,4 @@ Route::prefix('api')->group(function () {
     // Resolve coordenadas em um endereço legível para o mapa da denúncia
     Route::get('/reports/location/resolve', [ReportController::class, 'resolveLocation'])
         ->name('reports.location.resolve');
-});   
+});
