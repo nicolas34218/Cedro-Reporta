@@ -1,6 +1,6 @@
 @extends('layouts.secretary', ['active' => 'share'])
 
-@section('title', 'Compartilhar Denúncia')
+@section('title', $report->shares->isNotEmpty() ? 'Gerenciar Atualizações e Compartilhamento' : 'Compartilhar Denúncia')
 
 @push('styles')
 <link rel="stylesheet"
@@ -12,11 +12,26 @@
 <div class="share-create-page">
 
     <div class="page-header">
-        <h1>Compartilhamento de Denúncia</h1>
+        <h1>
+            @if($report->shares->isNotEmpty())
+                Gerenciar Denúncia (#{{ $report->id }})
+            @else
+                Compartilhamento de Denúncia
+            @endif
+        </h1>
 
         <p>
-            Compartilhe esta denúncia com outra secretaria quando a resolução
-            da ocorrência exigir atuação conjunta entre setores.
+            @if($report->shares->isEmpty())
+                <div class="bloco-explicativo-compartilhamento">
+                    <h2>Compartilhamento de Denúncia</h2>
+                    <p>Compartilhe esta denúncia com outra secretaria quando a resolução da ocorrência exigir atuação conjunta entre setores.</p>
+                </div>
+            @else
+                <div class="bloco-explicativo-compartilhamento">
+                    <h2>Painel de Atualizações</h2>
+                    <p>Esta denúncia já possui movimentações. Utilize este painel para postar novas atualizações de andamento ou gerenciar o compartilhamento.</p>
+                </div>
+            @endif
         </p>
     </div>
 
@@ -34,7 +49,7 @@
 
     <div class="report-preview-card">
 
-        <h4>Ocorrência selecionada para compartilhamento</h4>
+        <h4>Ocorrência selecionada</h4>
 
         <div class="report-card">
 
@@ -156,52 +171,59 @@
 
     @endif
 
-    <div class="share-history">
+    {{-- SÓ APARECE SE A DENÚNCIA JÁ FOI COMPARTILHADA --}}
+    @if($report->shares->isNotEmpty())
+        <div class="share-history">
 
-        <h3>
-            <i class="fas fa-comment-dots"></i>
-            Atualizações sobre a Denúncia
-        </h3>
+            <h3>
+                <i class="fas fa-comment-dots"></i>
+                Atualizações sobre a Denúncia
+            </h3>
 
-        <form action="{{ route('secretary.reports.updates.store', $report) }}" method="POST" class="share-form" style="margin-bottom:25px;">
-            @csrf
+            <form action="{{ route('secretary.reports.updates.store', $report) }}" method="POST" class="share-form" style="margin-bottom:25px;">
+                @csrf
 
-            <div class="form-group">
-                <label>O que está sendo feito em relação a esta denúncia?</label>
-                <textarea
-                    name="content"
-                    rows="3"
-                    placeholder="Descreva a atualização sobre o andamento desta denúncia...">{{ old('content') }}</textarea>
-                @error('content')
-                    <small style="color:#b91c1c;">{{ $message }}</small>
-                @enderror
-            </div>
+                <div class="form-group">
+                    <label>O que está sendo feito em relação a esta denúncia?</label>
+                    <textarea
+                        name="content"
+                        rows="3"
+                        placeholder="Descreva a atualização sobre o andamento desta denúncia...">{{ old('content') }}</textarea>
+                    @error('content')
+                        <small style="color:#b91c1c;">{{ $message }}</small>
+                    @enderror
+                </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-share">
-                    <i class="fas fa-paper-plane"></i>
-                    Postar Atualização
-                </button>
-            </div>
-        </form>
+                <div class="form-actions">
+                    <button type="submit" class="btn-share">
+                        <i class="fas fa-paper-plane"></i>
+                        Postar Atualização
+                    </button>
+                </div>
+            </form>
 
-        @forelse($historyEntries as $entry)
-            <div class="history-item">
-                <strong>{{ $entry->action }}</strong>
-                <p>
-                    {{ $entry->actor_name }} ({{ $entry->actor_role }})
-                    &middot;
-                    {{ $entry->created_at->format('d/m/Y \à\s H:i') }}
-                </p>
-                @if($entry->description)
-                    <p>{{ $entry->description }}</p>
-                @endif
-            </div>
-        @empty
-            <p>Nenhuma atualização registrada até o momento.</p>
-        @endforelse
+            @forelse($historyEntries as $entry)
+                <div class="history-item">
+                    <strong>{{ $entry->action }}</strong>
+                    <p>
+                        {{-- Exibe o nome da secretaria/autor e mais contexto --}}
+                        <i class="fas fa-user-shield"></i> {{ $entry->actor_name }} 
+                        @if(!empty($entry->actor_role))
+                            <span>({{ $entry->actor_role }})</span>
+                        @endif
+                        &middot;
+                        <i class="far fa-clock"></i> {{ $entry->created_at->format('d/m/Y \à\s H:i') }}
+                    </p>
+                    @if($entry->description)
+                        <p style="margin-top: 8px; color: #334155;">{{ $entry->description }}</p>
+                    @endif
+                </div>
+            @empty
+                <p>Nenhuma atualização registrada até o momento.</p>
+            @endforelse
 
-    </div>
+        </div>
+    @endif
 
 </div>
 

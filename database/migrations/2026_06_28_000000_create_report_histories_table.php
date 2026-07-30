@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('report_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('report_id')->constrained('reports')->cascadeOnDelete();
-            $table->string('action');
-            $table->text('description')->nullable();
+            $table->foreignId('report_id')->constrained()->cascadeOnDelete();
+            $table->string('action')->default('Atualização');
             $table->string('actor_name');
             $table->string('actor_role');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

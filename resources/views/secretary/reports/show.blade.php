@@ -97,27 +97,80 @@
         </div>
     </div>
 
+    {{-- SEÇÃO 1: FEEDBACKS E ATUALIZAÇÕES DA DENÚNCIA --}}
     <div class="report-show-section">
-        <h2>Histórico de Atualizações</h2>
+        <h2>Feedbacks e Atualizações</h2>
 
         @if ($report->histories->isEmpty())
             <div class="no-history-message">
-                Nenhuma atualização registrada até o momento.
+                Nenhum feedback ou atualização registrado até o momento.
             </div>
         @else
             <div class="history-timeline">
-                @foreach ($report->histories as $entry)
+                @foreach ($report->histories->sortByDesc('created_at') as $feedback)
                     <div class="history-entry">
                         <span class="history-entry-marker"></span>
-                        <div class="history-entry-action">{{ $entry->action }}</div>
+                        <div class="history-entry-action">{{ $feedback->action ?? 'Atualização' }}</div>
                         <div class="history-entry-meta">
-                            {{ $entry->actor_name }} ({{ $entry->actor_role }})
+                            {{ $feedback->actor_name }} ({{ $feedback->actor_role }})
                             &middot;
-                            {{ $entry->created_at->format('d/m/Y \à\s H:i') }}
+                            {{ $feedback->created_at->format('d/m/Y \à\s H:i') }}
                         </div>
-                        @if($entry->description)
-                            <div class="history-entry-description">{{ $entry->description }}</div>
+                        <div class="history-entry-description">
+                            {{ $feedback->description }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    {{-- SEÇÃO 2: HISTÓRICO ADMINISTRATIVO DE MOVIMENTAÇÕES --}}
+    <div class="report-show-section">
+        <h2>Histórico de Movimentações</h2>
+
+        @php
+            $movements = $report->shares->concat($report->transfers)->sortByDesc('created_at');
+        @endphp
+
+        @if ($movements->isEmpty())
+            <div class="no-history-message">
+                Nenhuma movimentação administrativa registrada.
+            </div>
+        @else
+            <div class="history-timeline">
+                @foreach ($movements as $entry)
+                    <div class="history-entry">
+                        <span class="history-entry-marker"></span>
+                        
+                        {{-- LAYOUT DE COMPARTILHAMENTO --}}
+                        @if (class_basename($entry) === 'ReportShare')
+                            <div class="history-entry-action">Compartilhamento</div>
+                            <div class="history-entry-meta">
+                                De: {{ $entry->fromSecretary->name ?? 'Sistema' }} para {{ $entry->toSecretary->name ?? 'Outra Secretaria' }}
+                                &middot; {{ $entry->created_at->format('d/m/Y \à\s H:i') }}
+                            </div>
+                            <div class="history-entry-description">
+                                Status: <strong>{{ ucfirst(__($entry->status)) }}</strong>
+                                @if($entry->message)
+                                    <br>Observação enviada: {{ $entry->message }}
+                                @endif
+                                @if($entry->response)
+                                    <br>Resposta recebida: {{ $entry->response }}
+                                @endif
+                            </div>
+
+                        {{-- LAYOUT DE TRANSFERÊNCIA --}}
+                        @elseif (class_basename($entry) === 'ReportTransfer')
+                            <div class="history-entry-action">Transferência</div>
+                            <div class="history-entry-meta">
+                                Alteração de Responsabilidade &middot; {{ $entry->created_at->format('d/m/Y \à\s H:i') }}
+                            </div>
+                            <div class="history-entry-description">
+                                A denúncia foi transferida definitivamente.
+                            </div>
                         @endif
+                        
                     </div>
                 @endforeach
             </div>

@@ -70,9 +70,10 @@ class SecretaryController extends Controller
         // 1. Inicia a query base apenas com as denúncias diretas desta secretária
         $directQuery = Report::where('secretary_id', $secretary->id);
 
-        // 2. Query das denúncias compartilhadas com esta secretária
+        // 2. Query das denúncias compartilhadas com esta secretária (Apenas Aceitas)
         $sharedQuery = Report::whereHas('shares', function ($query) use ($secretary) {
-            $query->where('to_secretary_id', $secretary->id);
+            $query->where('to_secretary_id', $secretary->id)
+                  ->where('status', 'accepted'); // <-- Filtro adicionado aqui
         })->where('secretary_id', '!=', $secretary->id);
 
         // 3. Aplica os filtros, SE a secretária os tiver selecionado
@@ -104,7 +105,8 @@ class SecretaryController extends Controller
         $statistics = [
             'total_reports' => \App\Models\Report::where('secretary_id', $secretary->id)->count(),
             'shared_reports' => \App\Models\Report::whereHas('shares', function ($query) use ($secretary) {
-                $query->where('to_secretary_id', $secretary->id);
+                $query->where('to_secretary_id', $secretary->id)
+                      ->where('status', 'accepted'); // <-- Filtro adicionado aqui também
             })->where('secretary_id', '!=', $secretary->id)->count(),
             'pending_reports' => \App\Models\Report::where('secretary_id', $secretary->id)
                 ->where('status', 'Pendente')

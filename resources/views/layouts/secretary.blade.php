@@ -12,9 +12,17 @@
 </head>
 <body>
     <div class="secretary-layout">
+        @php
+            // Verifica se estamos em rotas de compartilhamento ou transferência
+            $isShareOrTransfer = request()->routeIs('secretary.share*') || request()->routeIs('secretary.transfers*');
+            
+            // Se estivermos nessas telas, forçamos o contador de pendências a ser 0
+            $effectivePendingCount = $isShareOrTransfer ? 0 : ($pendingCount ?? 0);
+        @endphp
+
         <x-secretary.sidebar
             :active="$active ?? 'dashboard'"
-            :pendingCount="$pendingCount ?? 0" />
+            :pendingCount="$effectivePendingCount" />
 
         <div class="secretary-main-wrapper">
             <header class="secretary-header">

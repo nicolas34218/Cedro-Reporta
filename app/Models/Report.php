@@ -74,7 +74,6 @@ class Report extends Model
 
     /**
      * Relacionamento com a secretária responsável pela denúncia.
-     * A denúncia é automaticamente atribuída a uma secretária baseado na categoria.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -100,13 +99,11 @@ class Report extends Model
      */
     public function shares(): HasMany
     {
-        return $this->hasMany(ReportShare::class)->latest();
+        return $this->hasMany(ReportShare::class);
     }
 
     /**
-     * Histórico completo de atualizações desta denúncia (criação, status,
-     * prioridade, transferências e compartilhamentos), do mais recente
-     * para o mais antigo.
+     * Feedbacks e atualizações manuais da denúncia.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -118,8 +115,6 @@ class Report extends Model
     /**
      * Relacionamento: Secretarias que TAMBÉM são responsáveis pela denúncia
      * através de um compartilhamento que foi ACEITO.
-     * 
-     * Aqui utilizamos a tabela 'report_shares' como uma tabela Pivot (N:N).
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -151,10 +146,6 @@ class Report extends Model
 
     /**
      * Scope para filtrar denúncias por categoria.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array $categories
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByCategory($query, $categories)
     {
@@ -162,7 +153,6 @@ class Report extends Model
             return $query;
         }
 
-        // Permite tanto string única quanto array de categorias
         $categories = is_array($categories) ? $categories : [$categories];
 
         return $query->whereIn('category', $categories);
@@ -170,10 +160,6 @@ class Report extends Model
 
     /**
      * Scope para filtrar denúncias por localização.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $location
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByLocation($query, $location)
     {
@@ -186,10 +172,6 @@ class Report extends Model
 
     /**
      * Scope para filtrar denúncias por status.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array $statuses
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByStatus($query, $statuses)
     {
@@ -197,7 +179,6 @@ class Report extends Model
             return $query;
         }
 
-        // Permite tanto string única quanto array de status
         $statuses = is_array($statuses) ? $statuses : [$statuses];
 
         return $query->whereIn('status', $statuses);
@@ -205,10 +186,6 @@ class Report extends Model
 
     /**
      * Scope para aplicar múltiplos filtros simultaneamente.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFilter($query, array $filters)
     {

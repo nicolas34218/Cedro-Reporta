@@ -301,7 +301,7 @@ public function index()
 
         abort_unless($report->isResponsibleSecretary($secretary), 403);
 
-        $report->load(['citizen', 'secretary', 'histories']);
+        $report->load(['citizen', 'secretary', 'shares', 'transfers', 'histories']);
 
         return view('secretary.reports.show', [
             'report' => $report,
