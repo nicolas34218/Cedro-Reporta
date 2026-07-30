@@ -129,10 +129,10 @@ class Report extends Model
             Secretary::class,
             'report_shares',
             'report_id',
-            'destination_secretary_id' // Certifique-se de que a coluna se chama assim na migration de report_shares
+            'to_secretary_id'
         )
-        ->withPivot(['status', 'source_secretary_id', 'user_id', 'justification', 'response_justification'])
-        ->wherePivot('status', 'ACEITO') // Filtra apenas compartilhamentos que foram aceitos
+        ->withPivot(['status', 'from_secretary_id', 'message', 'response', 'shared_at', 'responded_at'])
+        ->wherePivot('status', 'accepted')
         ->withTimestamps();
     }
 
@@ -144,8 +144,8 @@ class Report extends Model
     {
         return $this->secretary_id === $secretary->id
             || $this->shares()
-                    ->where('destination_secretary_id', $secretary->id) // Alterado de 'to_secretary_id' para seguir o padrão do planejamento
-                    ->where('status', 'ACEITO') // A secretaria de destino só é responsável SE o compartilhamento foi aceito.
+                    ->where('to_secretary_id', $secretary->id)
+                    ->whereIn('status', ['accepted', 'pending'])
                     ->exists();
     }
 
