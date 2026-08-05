@@ -64,13 +64,35 @@ Route::controller(AuthController::class)->group(function () {
         ->name('login.store')
         ->middleware('guest');
 
-    // Formulário de redefinição de senha
-    Route::get('/esqueci-senha', 'showResetPasswordForm')
+    // Tela de recuperação de senha
+    Route::get('/esqueci-senha', 'showPasswordRecoveryForm')
         ->name('password.forgot')
         ->middleware('guest');
 
-    // Processa a redefinição de senha
-    Route::post('/esqueci-senha', 'resetPassword')
+    // Verifica se o e-mail existe no sistema e inicia a recuperação
+    Route::post('/esqueci-senha', 'verifyPasswordRecoveryEmail')
+        ->name('password.recovery.verify')
+        ->middleware('guest');
+
+    // Fluxo visual de recuperação de senha
+    Route::get('/recuperar-senha', 'showPasswordRecoveryForm')
+        ->name('password.recovery')
+        ->middleware('guest');
+
+    Route::get('/recuperar-senha/redefinir', 'showPasswordRecoveryResetForm')
+        ->name('password.recovery.reset')
+        ->middleware('guest');
+
+    Route::post('/recuperar-senha/redefinir', 'updateRecoveredPassword')
+        ->name('password.recovery.update')
+        ->middleware('guest');
+
+    Route::get('/recuperar-senha/sucesso', 'showPasswordRecoverySuccess')
+        ->name('password.recovery.success')
+        ->middleware('guest');
+
+    // Processa a redefinição de senha em um endpoint separado
+    Route::post('/redefinir-senha', 'resetPassword')
         ->name('password.update')
         ->middleware('guest');
 

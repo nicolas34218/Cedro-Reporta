@@ -27,11 +27,71 @@ describe('Password Reset', function () {
         ]);
     });
 
-    it('shows the reset password form', function () {
+    it('shows the recovery password form', function () {
         $response = $this->get(route('password.forgot'));
 
         $response->assertOk();
-        $response->assertSee('Redefinir Senha');
+        $response->assertSee('Esqueci minha senha');
+        $response->assertSee('E-mail cadastrado');
+    });
+
+    it('rejects recovery when the e-mail is not registered', function () {
+        $response = $this->post(route('password.recovery.verify'), [
+            'email' => 'inexistente@example.com',
+        ]);
+
+        $response->assertSessionHasErrors('email');
+    });
+
+    it('starts recovery when the e-mail exists', function () {
+        $response = $this->post(route('password.recovery.verify'), [
+            'email' => 'cidadao@example.com',
+        ]);
+
+        $response->assertRedirect(route('password.recovery.reset'));
+        $response->assertSessionHas('password_recovery.email', 'cidadao@example.com');
+    });
+
+    it('shows the reset password step after email verification', function () {
+        $this->withSession([
+            'password_recovery.email' => 'cidadao@example.com',
+            'password_recovery.guard' => 'citizen',
+        ]);
+
+        $response = $this->get(route('password.recovery.reset'));
+
+        $response->assertOk();
+        $response->assertSee('Redefinição de senha');
+        $response->assertSee('cidadao@example.com');
+    });
+
+    it('shows the success page for the recovery flow', function () {
+        $this->withSession([
+            'password_recovery.completed' => true,
+        ]);
+
+        $response = $this->get(route('password.recovery.success'));
+
+        $response->assertOk();
+        $response->assertSee('Senha redefinida com sucesso');
+        $response->assertSee('Voltar para o Login');
+    });
+
+    it('redefines the password after recovery verification', function () {
+        $this->withSession([
+            'password_recovery.email' => 'cidadao@example.com',
+            'password_recovery.guard' => 'citizen',
+        ]);
+
+        $response = $this->post(route('password.recovery.update'), [
+            'password' => 'senha-nova-123',
+            'password_confirmation' => 'senha-nova-123',
+        ]);
+
+        $response->assertRedirect(route('password.recovery.success'));
+        $response->assertSessionHas('password_recovery.completed', true);
+
+        expect(Hash::check('senha-nova-123', $this->citizen->refresh()->password))->toBeTrue();
     });
 
     it('shows the forgot password link on the login page', function () {
