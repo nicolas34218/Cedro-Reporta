@@ -19,19 +19,19 @@
 
                 <div class="hero-kicker">
                     <i class="bi bi-shield-lock"></i>
-                    Recuperação guiada
+                    Recuperação Direta
                 </div>
 
-                <h1 class="hero-title">Recupere seu acesso em <span>3 passos</span></h1>
+                <h1 class="hero-title">Redefina seu acesso <span>agora</span></h1>
 
                 <p class="hero-description">
-                    Use este fluxo simulado para validar e-mail, redefinir a senha e voltar à tela de login com uma confirmação visual clara.
+                    Informe o seu e-mail cadastrado e escolha a sua nova senha para voltar a acessar o sistema imediatamente.
                 </p>
 
                 <ul class="hero-checklist">
-                    <li><i class="bi bi-1-circle-fill"></i> Confirme o e-mail cadastrado para verificar se existe uma conta associada.</li>
-                    <li><i class="bi bi-2-circle-fill"></i> Redefina a senha em uma tela separada, com confirmação de digitação.</li>
-                    <li><i class="bi bi-3-circle-fill"></i> Receba uma mensagem de sucesso e volte ao login quando terminar.</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Informe o e-mail da sua conta.</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Digite a nova senha desejada.</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Confirme e acesse o sistema.</li>
                 </ul>
             </div>
         </aside>
@@ -41,30 +41,15 @@
                 <div class="recovery-card-header">
                     <div>
                         <div class="meta">Acesso</div>
-                        <h2 class="card-title">Esqueci minha senha</h2>
-                    </div>
-                    <div class="badge">Etapa 1 de 3</div>
-                </div>
-
-                <div class="stepper" aria-label="Etapas da recuperação de senha">
-                    <div class="step is-active">
-                        <strong>1</strong>
-                        <span>Recuperar</span>
-                    </div>
-                    <div class="step">
-                        <strong>2</strong>
-                        <span>Redefinir</span>
-                    </div>
-                    <div class="step">
-                        <strong>3</strong>
-                        <span>Sucesso</span>
+                        <h2 class="card-title">Alterar minha senha</h2>
                     </div>
                 </div>
 
                 <p class="card-text">
-                    Informe o e-mail cadastrado para iniciarmos a recuperação de acesso.
+                    Preencha os dados abaixo para redefinir a sua senha de acesso.
                 </p>
 
+                <!-- Mensagem de Sucesso -->
                 @if (session('success'))
                     <div class="alert alert-success is-visible" role="alert">
                         <i class="bi bi-check-circle"></i>
@@ -72,25 +57,53 @@
                     </div>
                 @endif
 
-                @error('email')
-                    <div class="alert alert-error is-visible" role="alert">
+                <!-- Mensagem de Erro Genérico (ex: E-mail não encontrado) -->
+                @if (session('error'))
+                    <div class="alert alert-error is-visible" role="alert" style="background-color: #fef2f2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; gap: 8px; border: 1px solid #f87171;">
                         <i class="bi bi-exclamation-circle"></i>
-                        <span>{{ $message }}</span>
+                        <span>{{ session('error') }}</span>
                     </div>
-                @enderror
+                @endif
 
-                <form class="form-stack" action="{{ url('/esqueci-senha') }}" method="post">
+                <form class="form-stack" action="{{ route('password.recovery.submit') }}" method="post">
                     @csrf
+                    
+                    <!-- Campo E-mail -->
                     <div class="form-field">
                         <label for="recovery-email">E-mail cadastrado</label>
                         <div class="input-shell">
                             <i class="bi bi-envelope"></i>
                             <input id="recovery-email" name="email" type="email" value="{{ old('email') }}" placeholder="usuario@exemplo.com" autocomplete="email" required>
                         </div>
-                        <div class="inline-help">O sistema verificará se o e-mail pertence a uma conta cadastrada.</div>
+                        @error('email')
+                            <div class="inline-help" style="color: #dc2626; margin-top: 4px;">{{ $message }}</div>
+                        @else
+                            <div class="inline-help">O sistema verificará a qual conta este e-mail pertence.</div>
+                        @enderror
                     </div>
 
-                    <button type="submit" class="primary-btn">Recuperar Senha</button>
+                    <!-- Campo Nova Senha -->
+                    <div class="form-field">
+                        <label for="recovery-password">Nova Senha</label>
+                        <div class="input-shell">
+                            <i class="bi bi-lock"></i>
+                            <input id="recovery-password" name="password" type="password" placeholder="Mínimo de 6 caracteres" required>
+                        </div>
+                        @error('password')
+                            <div class="inline-help" style="color: #dc2626; margin-top: 4px;">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Campo Confirmar Nova Senha -->
+                    <div class="form-field">
+                        <label for="recovery-password-confirm">Confirmar Nova Senha</label>
+                        <div class="input-shell">
+                            <i class="bi bi-lock-fill"></i>
+                            <input id="recovery-password-confirm" name="password_confirmation" type="password" placeholder="Repita a nova senha" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="primary-btn">Alterar Senha</button>
                 </form>
 
                 <a href="{{ route('login') }}" class="text-link">
@@ -100,6 +113,5 @@
             </article>
         </section>
     </main>
-
 </body>
 </html>

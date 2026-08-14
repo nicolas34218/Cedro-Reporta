@@ -30,4 +30,41 @@ class ReportHistory extends Model
     {
         return $this->belongsTo(Report::class);
     }
+
+    /**
+     * Cria um registro de histórico para a denúncia.
+     *
+     * @param Report $report
+     * @param string $action
+     * @param string|null $description
+     * @return ReportHistory
+     */
+    public static function log(Report $report, string $action, ?string $description = null): self
+    {
+        // Define os valores padrão para caso seja um visitante/anônimo
+        $actorName = 'Visitante / Anônimo';
+        $actorRole = 'Visitante';
+
+        // Verifica se há alguém logado para pegar o nome e a função
+        if (auth()->check()) {
+            $user = auth()->user();
+            $actorName = $user->name ?? 'Cidadão';
+            $actorRole = 'Cidadão';
+        } elseif (auth('secretary')->check()) {
+            $actorName = auth('secretary')->user()->name;
+            $actorRole = 'Secretaria';
+        } elseif (auth('admin')->check()) {
+            $actorName = auth('admin')->user()->name;
+            $actorRole = 'Administrador';
+        }
+
+        // Salva o histórico no banco de dados
+        return self::create([
+            'report_id' => $report->id,
+            'action' => $action,
+            'actor_name' => $actorName,
+            'actor_role' => $actorRole,
+            'description' => $description,
+        ]);
+    }
 }

@@ -21,8 +21,6 @@ class AuthController extends Controller
 {
     /**
      * Exibe o formulário de registro (apenas para cidadãos).
-     *
-     * @return \Illuminate\View\View
      */
     public function showRegisterForm()
     {
@@ -31,14 +29,10 @@ class AuthController extends Controller
 
     /**
      * Registra um novo cidadão no sistema.
-     *
-     * @param RegisterRequest $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function register(RegisterRequest $request)
     {
         try {
-            // Cria novo cidadão com valores validados
             $citizen = Citizen::create([
                 'name' => $request->validated('name'),
                 'email' => $request->validated('email'),
@@ -46,7 +40,6 @@ class AuthController extends Controller
                 'is_active' => true,
             ]);
 
-            // Realiza login automático após o registro
             Auth::guard('citizen')->login($citizen);
             
             return redirect()
@@ -61,8 +54,6 @@ class AuthController extends Controller
 
     /**
      * Exibe o formulário de login.
-     *
-     * @return \Illuminate\View\View
      */
     public function showLoginForm()
     {
@@ -70,9 +61,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Exibe o formulário de recuperação de senha.
-     *
-     * @return \Illuminate\View\View
+     * Exibe o formulário de recuperação de senha (agora numa única etapa).
      */
     public function showPasswordRecoveryForm()
     {
@@ -80,138 +69,46 @@ class AuthController extends Controller
     }
 
     /**
-     * Verifica se o e-mail informado pertence a uma conta cadastrada.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Altera a senha diretamente usando apenas o e-mail informado no formulário.
+     * (Substitui as antigas etapas complexas de validação por sessão).
      */
-    public function verifyPasswordRecoveryEmail(Request $request)
+    public function processDirectPasswordRecovery(Request $request)
     {
+        // 1. Validação dos dados que vêm do formulário
         $validated = $request->validate([
-            'email' => ['required', 'string', 'email'],
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'Insira um e-mail válido.',
+            'password.required' => 'A nova senha é obrigatória.',
+            'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
+            'password.confirmed' => 'As senhas não coincidem.',
         ]);
 
+        // 2. Busca a qual tipo de utilizador este e-mail pertence
         $recoveryTarget = $this->findRecoverableUserByEmail($validated['email']);
 
+        // 3. Se não encontrar, retorna erro
         if (!$recoveryTarget) {
-            throw ValidationException::withMessages([
-                'email' => 'Nenhuma conta foi encontrada com esse e-mail.',
-            ]);
+            return back()
+                ->withInput()
+                ->with('error', 'Nenhuma conta foi encontrada com esse e-mail.');
         }
 
-        $request->session()->put([
-            'password_recovery.email' => $validated['email'],
-            'password_recovery.guard' => $recoveryTarget['guard'],
-        ]);
+        // 4. Salva a nova senha
+        $user = $recoveryTarget['user'];
+        $user->password = $validated['password'];
+        $user->save();
 
+        // 5. Redireciona para o login com sucesso
         return redirect()
-            ->to('/recuperar-senha/redefinir')
-            ->with('success', 'Conta localizada. Defina uma nova senha para continuar.');
-    }
-
-    /**
-     * Exibe a tela de redefinição após a verificação do e-mail.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
-     */
-    public function showPasswordRecoveryResetForm(Request $request)
-    {
-        $recoveryEmail = $request->session()->get('password_recovery.email');
-
-        if (!$recoveryEmail) {
-            return redirect()
-                ->to('/esqueci-senha')
-                ->withErrors([
-                    'email' => 'Informe seu e-mail para iniciar a recuperação de senha.',
-                ]);
-        }
-
-        return view('auth.password-reset', [
-            'recoveryEmail' => $recoveryEmail,
-        ]);
-    }
-
-    /**
-     * Atualiza a senha da conta localizada na etapa de recuperação.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function updateRecoveredPassword(Request $request)
-    {
-        $validated = $request->validate([
-            'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required',
-        ]);
-
-        $recoveryEmail = $request->session()->get('password_recovery.email');
-
-        if (!$recoveryEmail) {
-            return redirect()
-                ->to('/esqueci-senha')
-                ->withErrors([
-                    'email' => 'A sessão de recuperação expirou. Informe seu e-mail novamente.',
-                ]);
-        }
-
-        $recoveryTarget = $this->findRecoverableUserByEmail($recoveryEmail);
-
-        if (!$recoveryTarget) {
-            $request->session()->forget([
-                'password_recovery.email',
-                'password_recovery.guard',
-                'password_recovery.completed',
-            ]);
-
-            return redirect()
-                ->to('/esqueci-senha')
-                ->withErrors([
-                    'email' => 'Nenhuma conta foi encontrada com esse e-mail.',
-                ]);
-        }
-
-        $recoveryTarget['user']->password = $validated['password'];
-        $recoveryTarget['user']->save();
-
-        $request->session()->put('password_recovery.completed', true);
-        $request->session()->forget([
-            'password_recovery.email',
-            'password_recovery.guard',
-        ]);
-
-        return redirect()
-            ->to('/recuperar-senha/sucesso')
-            ->with('success', 'Senha redefinida com sucesso. Agora você já pode voltar ao login.');
-    }
-
-    /**
-     * Exibe a tela final de sucesso da recuperação.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
-     */
-    public function showPasswordRecoverySuccess(Request $request)
-    {
-        $completed = $request->session()->pull('password_recovery.completed', false);
-
-        if (!$completed) {
-            return redirect()
-                ->to('/esqueci-senha')
-                ->withErrors([
-                    'email' => 'Conclua a redefinição de senha para acessar esta tela.',
-                ]);
-        }
-
-        return view('auth.password-success');
+            ->route('login')
+            ->with('success', 'Senha redefinida com sucesso. Agora você já pode fazer login com a sua nova senha.');
     }
 
     /**
      * Autentica o usuário no sistema.
-     * Tenta autenticar como cidadão, admin ou secretário.
-     *
-     * @param LoginRequest $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function login(LoginRequest $request)
     {
@@ -225,9 +122,7 @@ class AuthController extends Controller
         if ($admin && Hash::check($password, $admin->password)) {
             Auth::guard('admin')->login($admin, $remember);
             $request->session()->regenerate();
-            return redirect()
-                ->route('admin.dashboard')
-                ->with('success', 'Login realizado com sucesso!');
+            return redirect()->route('admin.dashboard')->with('success', 'Login realizado com sucesso!');
         }
 
         // Tenta autenticar como secretário
@@ -235,9 +130,7 @@ class AuthController extends Controller
         if ($secretary && Hash::check($password, $secretary->password)) {
             Auth::guard('secretary')->login($secretary, $remember);
             $request->session()->regenerate();
-            return redirect()
-                ->route('secretary.dashboard')
-                ->with('success', 'Login realizado com sucesso!');
+            return redirect()->route('secretary.dashboard')->with('success', 'Login realizado com sucesso!');
         }
 
         // Tenta autenticar como cidadão
@@ -245,21 +138,16 @@ class AuthController extends Controller
         if ($citizen && Hash::check($password, $citizen->password)) {
             Auth::guard('citizen')->login($citizen, $remember);
             $request->session()->regenerate();
-            return redirect()
-                ->route('citizen.home')
-                ->with('success', 'Login realizado com sucesso!');
+            return redirect()->route('citizen.home')->with('success', 'Login realizado com sucesso!');
         }
 
-        // Nenhuma autenticação bem-sucedida
         throw ValidationException::withMessages([
             'email' => 'Credenciais inválidas, tente novamente',
         ]);
     }
 
     /**
-     * Exibe o formulário de redefinição de senha.
-     *
-     * @return \Illuminate\View\View
+     * Exibe o formulário de redefinição de senha (quando logado).
      */
     public function showResetPasswordForm()
     {
@@ -267,12 +155,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Redefine a senha do usuário (admin, secretário ou cidadão), mediante
-     * confirmação do e-mail e da senha atual. A nova senha segue as mesmas
-     * regras de validação aplicadas na criação da conta.
-     *
-     * @param ResetPasswordRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Redefine a senha do usuário (quando logado).
      */
     public function resetPassword(ResetPasswordRequest $request)
     {
@@ -304,31 +187,16 @@ class AuthController extends Controller
      */
     private function findRecoverableUserByEmail(string $email): ?array
     {
-        $admin = Admin::where('email', $email)->first();
-
-        if ($admin) {
-            return [
-                'user' => $admin,
-                'guard' => 'admin',
-            ];
+        if ($admin = Admin::where('email', $email)->first()) {
+            return ['user' => $admin, 'guard' => 'admin'];
         }
 
-        $secretary = Secretary::where('email', $email)->first();
-
-        if ($secretary) {
-            return [
-                'user' => $secretary,
-                'guard' => 'secretary',
-            ];
+        if ($secretary = Secretary::where('email', $email)->first()) {
+            return ['user' => $secretary, 'guard' => 'secretary'];
         }
 
-        $citizen = Citizen::where('email', $email)->first();
-
-        if ($citizen) {
-            return [
-                'user' => $citizen,
-                'guard' => 'citizen',
-            ];
+        if ($citizen = Citizen::where('email', $email)->first()) {
+            return ['user' => $citizen, 'guard' => 'citizen'];
         }
 
         return null;
@@ -336,19 +204,11 @@ class AuthController extends Controller
 
     /**
      * Realiza logout do usuário.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(Request $request)
     {
-        // Realiza logout
         Auth::logout();
-
-        // Invalida a sessão
         $request->session()->invalidate();
-
-        // Regenera o token CSRF para segurança
         $request->session()->regenerateToken();
 
         return redirect()
@@ -356,4 +216,3 @@ class AuthController extends Controller
             ->with('success', 'Você foi desconectado com sucesso!');
     }
 }
-

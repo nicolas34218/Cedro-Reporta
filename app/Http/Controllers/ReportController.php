@@ -104,8 +104,9 @@ class ReportController extends Controller
                 return back()->withInput()->with('error', 'Categoria inválida.');
             }
 
-            $secretary = $category->secretary;
-            $secretaryId = $secretary?->id;
+            // FORMA SEGURA: Pega o ID diretamente da tabela de categorias e busca a Secretaria
+            $secretaryId = $category->secretary_id;
+            $secretary = $secretaryId ? \App\Models\Secretary::find($secretaryId) : null;
 
             // 4. Criação da Denúncia
             $report = Report::create([
@@ -153,7 +154,7 @@ class ReportController extends Controller
                 ->with('success', 'Denúncia registrada com sucesso! ID: #' . $report->id);
 
         } catch (\Exception $e) {
-            Log::error('Erro fatal ao criar denúncia: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Erro fatal ao criar denúncia: ' . $e->getMessage());
             return back()->withInput()->with('error', 'Ocorreu um erro ao registrar a denúncia.');
         }
     }

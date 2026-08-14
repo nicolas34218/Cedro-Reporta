@@ -91,6 +91,9 @@ Route::controller(AuthController::class)->group(function () {
         ->name('password.recovery.success')
         ->middleware('guest');
 
+    Route::post('/recuperar-senha', [\App\Http\Controllers\AuthController::class, 'processDirectPasswordRecovery'])
+        ->name('password.recovery.submit');    
+
     // Processa a redefinição de senha em um endpoint separado
     Route::post('/redefinir-senha', 'resetPassword')
         ->name('password.update')
