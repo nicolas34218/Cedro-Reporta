@@ -55,7 +55,7 @@
                             </span>
                             <span class="report-date">{{ $report->created_at->format('d/m/Y') }}</span>
                         </div>
-                            <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}">
+                            <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}" id="status-badge-{{ $report->id }}">
                                 {{ $report->status }}
                             </span>
                         </div>
@@ -67,6 +67,14 @@
                                 <option value="Alta" {{ $report->priority === 'Alta' ? 'selected' : '' }}>Alta</option>
                                 <option value="Média" {{ $report->priority === 'Média' ? 'selected' : '' }}>Média</option>
                                 <option value="Baixa" {{ $report->priority === 'Baixa' ? 'selected' : '' }}>Baixa</option>
+                            </select>
+
+                            <select class="priority-select" id="status-select-{{ $report->id }}" style="margin-top: 8px;" onchange="updateStatus({{ $report->id }}, this.value)">
+                                @foreach (\App\Enums\ReportStatus::getAll() as $statusOption)
+                                    <option value="{{ $statusOption }}" {{ $report->status === $statusOption ? 'selected' : '' }}>
+                                        {{ $statusOption }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -125,6 +133,65 @@
         .catch(error => {
             console.error('❌ Erro na requisição:', error);
             alert(`❌ Erro ao atualizar prioridade:\n${error.message}`);
+        });
+    }
+
+    function updateStatus(reportId, newStatus) {
+        if (!newStatus) {
+            return;
+        }
+
+        const select = document.getElementById(`status-select-${reportId}`);
+        const badge = document.getElementById(`status-badge-${reportId}`);
+        const currentStatus = badge ? badge.textContent.trim() : null;
+
+        if (currentStatus === newStatus) {
+            return;
+        }
+
+        const confirmed = confirm(
+            `Tem certeza que deseja alterar o status da denúncia #${reportId} de "${currentStatus}" para "${newStatus}"?`
+        );
+
+        if (!confirmed) {
+            if (select && currentStatus) {
+                select.value = currentStatus;
+            }
+            return;
+        }
+
+        fetch(`/secretary/reports/${reportId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Erro ao atualizar status. Tente novamente.');
+            }
+            return data;
+        })
+        .then(data => {
+            if (badge) {
+                badge.textContent = data.status;
+                badge.className = 'status-badge status-' + data.status.toLowerCase().replace(/ /g, '-');
+            }
+            if (select) {
+                select.value = data.status;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição:', error);
+            alert(`❌ Não foi possível atualizar o status:\n${error.message}`);
+            if (select && currentStatus) {
+                select.value = currentStatus;
+            }
         });
     }
 </script>

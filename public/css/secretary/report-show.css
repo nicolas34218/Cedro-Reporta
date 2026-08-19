@@ -141,3 +141,72 @@
     text-align: center;
     color: #5d6b58;
 }
+
+.status-pendente {
+    background-color: #fff3cd;
+    color: #92620a;
+}
+
+.status-update-control {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.status-update-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.status-select {
+    padding: 8px 10px;
+    border: 1px solid #b9c6b3;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #333;
+    background-color: #fff;
+}
+
+.btn-update-status {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #2f6b3f;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-update-status:hover:not(:disabled) {
+    background-color: #245030;
+}
+
+.btn-update-status:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.status-update-message {
+    margin: 0;
+    font-size: 12px;
+    display: none;
+}
+
+.status-update-message-success {
+    display: block;
+    color: #15803d;
+}
+
+.status-update-message-error {
+    display: block;
+    color: #b91c1c;
+}
+
+.status-update-message-info {
+    display: block;
+    color: #5d6b58;
+}

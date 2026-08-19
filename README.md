@@ -4,6 +4,18 @@ Sistema de denúncias desenvolvido com Laravel 11.
 
 ---
 
+## 👥 Equipe
+
+| Nome | Papel |
+|------|-------|
+| Caíque de Souza Oliveira | Desenvolvedor Back-End |
+| José Carlos Pinheiro Ramalho | Desenvolvedor Back-End |
+| João Vitor Maia | Desenvolvedor Front-End |
+| Nicolas Pereira Dias | Analista de QA, Tester e Bug Fixer |
+| Teógenes Antônio Cordeiro Bisneto | Analista de Requisitos e UI Designer |
+
+---
+
 ## 📋 Pré-requisitos
 
 - PHP 8.3+
@@ -13,17 +25,20 @@ Sistema de denúncias desenvolvido com Laravel 11.
 
 ---
 
-## 🚀 Setup Automático
+## 🚀 Setup
 
 ### 1. Clonar e Configurar
+
 ```bash
 git clone https://github.com/seu-usuario/cedro-reporta.git
 cd cedro-reporta
+```
 
 ### 2. Configurar Storage (Upload de Imagens)
 
 **Essencial para a funcionalidade de upload de denúncias!**
 
+```bash
 # Setup do storage (cria pastas e valida permissões)
 php artisan storage:setup
 
@@ -39,26 +54,57 @@ php artisan upload:diagnose
 3. Acesse `http://localhost/phpmyadmin/`
 4. Crie um banco chamado `cedro_reporta`
 5. Edite o arquivo `.env`:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=cedro_reporta
-DB_USERNAME=root
-DB_PASSWORD=
-```
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=cedro_reporta
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 6. Execute novamente:
- `
-php artisan migrate:fresh --seed
-php artisan serve
+   ```bash
+   php artisan migrate:fresh --seed
+   php artisan serve
+   ```
 
 #### Para SQLite (Padrão):
 Não é necessária configuração adicional - o banco é criado automaticamente.
 
-### Produção
+### 4. Produção
+
 ```bash
 npm run build
 php artisan serve
+```
+
+---
+
+## 🎯 Atribuição Automática de Denúncias
+
+O sistema **atribui automaticamente denúncias aos setores responsáveis** baseado na categoria selecionada pelo cidadão.
+
+### Critérios Atendidos
+
+- ✅ Atribuição automática de denúncias aos setores responsáveis por categoria
+- ✅ Suporte a **múltiplas secretárias por categoria**
+- ✅ **Notificações internas** para secretárias quando denúncia é atribuída
+- ✅ Campo "Setor Responsável" no formulário (carregamento automático)
+- ✅ Interface conforme mockup fornecido
+
+### Instalação da Funcionalidade
+
+```bash
+# 1. Migrar o banco de dados
+php artisan migrate
+php artisan migrate:fresh --seed
+
+# 2. Associar secretárias às categorias
+php artisan db:seed --class=CategorySecretarySeeder
+
+# 3. Limpar cache
+php artisan config:cache
+php artisan migrate:fresh --seed --no-interaction
 ```
 
 ---
@@ -84,8 +130,6 @@ php artisan test tests/Feature/ReportFilterTest.php
 | Secretário | secretaria.(-NOME DA SECRETARIA-)@cedroreporta.com | secretary123 |
 | Cidadão | teste@gmail.com | teste123 |
 
-
-
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -94,34 +138,3 @@ php artisan test tests/Feature/ReportFilterTest.php
 - **Banco de Dados**: SQLite (desenvolvimento) / MySQL (produção)
 - **Frontend**: Vite, Tailwind CSS
 - **Testes**: Pest PHP
-
-# Sistema de Atribuição Automática de Denúncias
-
-## 🎯 Funcionalidade Implementada
-
-O sistema agora **atribui automaticamente denúncias aos setores responsáveis** baseado na categoria selecionada pelo cidadão.
-
-### Critérios Atendidos
-
-✅ Atribuição automática de denúncias aos setores responsáveis por categoria  
-✅ Suporte a **múltiplas secretárias por categoria**  
-✅ **Notificações internas** para secretárias quando denúncia é atribuída  
-✅ Campo "Setor Responsável" no formulário (carregamento automático)  
-✅ Interface conforme mockup fornecido  
-
-## 🔧 Instalação
-
-### 1. Migrar o banco de dados
-```bash
-php artisan migrate
-php artisan migrate:fresh --seed
-
-### 2. Associar secretárias às categorias
-```bash
-php artisan db:seed --class=CategorySecretarySeeder
-
-### 3. Limpar cache
-```bash
-php artisan config:cache
-
-php artisan migrate:fresh --seed --no-interaction

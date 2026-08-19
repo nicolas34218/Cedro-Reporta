@@ -120,6 +120,11 @@ class AdminController extends Controller
      */
     public function updateReportStatus(Report $report, Request $request)
     {
+        /** @var \App\Models\Secretary $secretary */
+        $secretary = auth('secretary')->user();
+
+        abort_unless($report->isResponsibleSecretary($secretary), 403);
+
         $validated = $request->validate([
             'status' => ['required', Rule::in(ReportStatus::getAll())],
         ]);
@@ -131,7 +136,7 @@ class AdminController extends Controller
                     'message' => 'O status da denúncia já está definido como ' . $report->status . '.'
                 ], 200);
             }
-            return redirect()->route('admin.report.show', $report)
+            return redirect()->route('secretary.reports.show', $report)
                 ->with('info', 'O status da denúncia já está definido como ' . $report->status . '.');
         }
 
@@ -155,11 +160,12 @@ class AdminController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Status da denúncia atualizado com sucesso!',
-                    'status' => $report->status
+                    'status' => $report->status,
+                    'status_config' => ReportStatus::getStatusConfig($report->status),
                 ], 200);
             }
 
-            return redirect()->route('admin.report.show', $report)
+            return redirect()->route('secretary.reports.show', $report)
                 ->with('success', 'Status da denúncia atualizado com sucesso!');
 
         } catch (\Exception $e) {

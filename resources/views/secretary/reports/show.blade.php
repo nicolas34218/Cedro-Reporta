@@ -32,11 +32,26 @@
         <div class="report-info-grid">
             <div class="info-item">
                 <label>Status</label>
-                <p>
-                    <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}">
+                <div class="status-update-control">
+                    <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $report->status)) }}" id="status-badge">
                         {{ $report->status }}
                     </span>
-                </p>
+
+                    <div class="status-update-form">
+                        <select id="status-select" class="status-select" aria-label="Selecionar novo status da denúncia">
+                            @foreach (\App\Enums\ReportStatus::getAll() as $statusOption)
+                                <option value="{{ $statusOption }}" {{ $report->status === $statusOption ? 'selected' : '' }}>
+                                    {{ $statusOption }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <button type="button" id="status-update-btn" class="btn-update-status">
+                            Atualizar Status
+                        </button>
+                    </div>
+
+                    <p id="status-update-message" class="status-update-message"></p>
+                </div>
             </div>
 
             <div class="info-item">
@@ -179,3 +194,85 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const statusUrl = @json(route('secretary.report.status', $report));
+        const select = document.getElementById('status-select');
+        const badge = document.getElementById('status-badge');
+        const button = document.getElementById('status-update-btn');
+        const message = document.getElementById('status-update-message');
+
+        function getCsrfToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.content;
+        }
+
+        function slugifyStatus(status) {
+            return status.toLowerCase().replace(/ /g, '-');
+        }
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'status-update-message status-update-message-' + type;
+        }
+
+        button.addEventListener('click', function () {
+            const currentStatus = badge.textContent.trim();
+            const newStatus = select.value;
+
+            if (newStatus === currentStatus) {
+                showMessage('A denúncia já está com o status "' + newStatus + '".', 'info');
+                return;
+            }
+
+            const confirmed = window.confirm(
+                'Tem certeza que deseja alterar o status da denúncia de "' + currentStatus + '" para "' + newStatus + '"?'
+            );
+
+            if (!confirmed) {
+                select.value = currentStatus;
+                return;
+            }
+
+            button.disabled = true;
+            select.disabled = true;
+            const originalLabel = button.textContent;
+            button.textContent = 'Atualizando...';
+
+            fetch(statusUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ status: newStatus }),
+            })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'Erro ao atualizar status. Tente novamente.');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    badge.textContent = data.status;
+                    badge.className = 'status-badge status-' + slugifyStatus(data.status);
+                    select.value = data.status;
+                    showMessage(data.message || 'Status atualizado com sucesso!', 'success');
+                })
+                .catch((error) => {
+                    select.value = currentStatus;
+                    showMessage(error.message, 'error');
+                })
+                .finally(() => {
+                    button.disabled = false;
+                    select.disabled = false;
+                    button.textContent = originalLabel;
+                });
+        });
+    })();
+</script>
+@endpush
